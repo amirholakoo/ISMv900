@@ -77,4 +77,3 @@
 
 -   Comments: Include comments in your code to indicate areas that are placeholders or need future updates. This will make it easier for you to find and replace or update code sections as the project evolves.
 
-### Next Steps:
