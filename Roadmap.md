@@ -1,6 +1,6 @@
 ### Roadmap and Outline:
 
-#### Phase 1: Environment Setup and Initial Configuration
+#### Step 1: Environment Setup and Initial Configuration
 
 1\.  Setting Up a Python Environment
 
@@ -12,7 +12,7 @@
 
 5\.  Running the Development Server
 
-#### Phase 2: Application Structure and Database Models
+#### Step 2: Application Structure and Database Models
 
 1\.  Creating the App
 
@@ -24,7 +24,7 @@
 
 4\.  Testing
 
-#### Phase 3: Admin Interface and CRUD Operations
+#### Step 3: Admin Interface and CRUD Operations
 
 1\.  Admin Site Setup:
 
@@ -38,7 +38,7 @@
 
 4\.  Testing
 
-#### Phase 4: Frontend Development with Bootstrap
+#### Step 4: Frontend Development with Bootstrap
 
 1\.  Integrating Bootstrap:
 
@@ -50,7 +50,7 @@
 
 3\.  Testing
 
-#### Phase 5: Dynamic Content and Reporting
+#### Step 5: Dynamic Content and Reporting
 
 1\.  AJAX for Dynamic Content
 
@@ -61,7 +61,7 @@
 
 3\.  Testing
 
-#### Phase 6: Testing and Deployment
+#### Step 6: Testing and Deployment
 
 1\.  Testing:
 
