@@ -57,11 +57,11 @@ This project aims to develop a comprehensive system to manage the production, sa
 
 #### 7\. Project Milestones and Timeline
 
--   Initial setup and configuration of development environment: 1 week.
--   Development of backend (models, APIs) and database schema: 4 weeks.
--   Frontend development and integration with backend: 4 weeks.
--   Testing and quality assurance: 2 weeks.
--   Deployment and initial user training: 1 week.
+-   Initial setup and configuration of development environment: 2 day.
+-   Development of backend (models, APIs) and database schema: 6 days.
+-   Frontend development and integration with backend: 5 days.
+-   Testing and quality assurance: 2 days.
+-   Deployment and initial user training: 2 days.
 
 #### 8\. Budget Estimation
 
