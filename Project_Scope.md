@@ -41,8 +41,8 @@ This project aims to develop a comprehensive system to manage the production, sa
 #### 4\. Technology Stack
 
 -   Backend: Django (Python) for server-side logic and database interactions.
--   Frontend: React or Vue.js for building a dynamic and user-friendly interface.
--   Database: MySQL or PostgreSQL for data storage and management.
+-   Frontend: Vue.js for building a dynamic and user-friendly interface.
+-   Database: PostgreSQL for data storage and management.
 
 #### 5\. Security Measures
 
@@ -58,10 +58,11 @@ This project aims to develop a comprehensive system to manage the production, sa
 #### 7\. Project Milestones and Timeline
 
 -   Initial setup and configuration of development environment: 2 day.
--   Development of backend (models, APIs) and database schema: 6 days.
--   Frontend development and integration with backend: 5 days.
--   Testing and quality assurance: 2 days.
--   Deployment and initial user training: 2 days.
+-   Design: 4 day.
+-   Development of backend (models, APIs) and database schema: 10 days.
+-   Frontend development and integration with backend: 10 days.
+-   Finalizing and Testing: 3 days.
+-   Deployment and Delivery: 1 days.
 
 #### 8\. Budget Estimation
 
