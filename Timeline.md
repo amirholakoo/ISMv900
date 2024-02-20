@@ -1,123 +1,85 @@
-### Phase 1: Project Setup and Planning (Days 1)1
+### فاز 1: راه‌اندازی پروژه و تجزیه و تحلیل نیازمندی‌ها
 
--   Activities:
-    -   Set up the development environment.
-    -   Initialize the Django project and configure the LAMP server on RPI4.
-    -   Create the GitHub repository for version control.
--   Deliverables:
-    -   Development environment ready.
-    -   Project skeleton and initial configuration committed to GitHub.
+-   مدت زمان: ۲ روز
 
-### Phase 2: Database Design and Models (Days 2-5)3
+-   فعالیت‌های کلیدی: جلسه اولیه برای بحث در مورد دامنه پروژه، اهداف و نیازمندی‌ها. راه‌اندازی مخزن پروژه در GitHub. 
 
--   Activities:
-    -   Design the database schema based on requirements.
-    -   Implement Django models for entities like shipments, trucks, customers, suppliers, etc.
-    -   Set up initial migrations and admin panels for basic data management.
--   Deliverables:
-    -   Database schema and initial Django models.
-    -   Admin interface for basic CRUD operations on core entities.
--   Testing/QA:
-    -   Validate database schema integrity and model relations.
-    -   Basic admin functionality tests.
+-   تجزیه و تحلیل دقیق نیازمندی‌ها و مستندسازی.
 
-### Phase 3: Core Backend Development (Days 6-11)5
+-   تحویلی‌ها: سند برنامه پروژه. سند مشخصات نیازمندی‌ها.
 
--   Activities:
-    -   Develop business logic for handling shipments, inventory management, etc.
-    -   Implement backend APIs or views for data processing and manipulation.
--   Deliverables:
-    -   Backend logic for core functionalities.
-    -   APIs/views for handling business processes.
--   Testing/QA:
-    -   Unit testing for individual models and business logic.
-    -   Integration testing for workflows (e.g., shipment process, inventory updates).
+-   مستندات:‌ آپلود کردن تغییرات و فایلهای جدید در برنچ گیت هاب و ضمیمه اسکرین از گیت هاب در داخل میز کار داخل سایت کارلنسر. 
 
-### Phase 4: Frontend Development and Integration (Days 12-16)4
+-   تست: بررسی اسناد برای کامل و دقیق بودن.
 
--   Activities:
-    -   Develop responsive UIs using Bootstrap for the various forms and panels.
-    -   Integrate frontend with backend using AJAX for dynamic content.
--   Deliverables:
-    -   Complete frontend interfaces for all major functionalities.
-    -   Integrated system with both frontend and backend working together.
--   Testing/QA:
-    -   UI/UX testing on various devices.
-    -   Functional testing of the integrated system.
+-   پرداخت: 10% از کل هزینه پروژه.
 
-### Phase 5: Advanced Features and Additional Integrations (Days 17-20)3
+### فاز 2: طراحی سیستم و راه‌اندازی پایگاه داده
 
--   Activities:
-    -   Implement additional features such as advanced reporting, notifications, etc.
-    -   Integrate any third-party services or APIs if required.
--   Deliverables:
-    -   Advanced system features fully operational.
-    -   Third-party integrations completed.
--   Testing/QA:
-    -   Testing of advanced features.
-    -   Testing integrations for reliability and performance.
+-   مدت زمان: ۱ روز
 
-### Phase 6: Deployment Preparation and Initial Testing (Days 21-23)2
+-   فعالیت‌های کلیدی: طراحی معماری سیستم، طراحی و راه‌اندازی پایگاه داده PostgreSQL. ایجاد اولیه وایرفریم‌ها برای فرانت‌اند.
 
--   Activities:
-    -   Prepare the deployment environment on RPI4.
-    -   Conduct initial deployment and setup continuous database backups.
--   Deliverables:
-    -   System deployed on RPI4.
-    -   Backup and recovery procedures in place.
--   Testing/QA:
-    -   Smoke testing on the production environment.
-    -   Performance benchmarking.
+-   تحویلی‌ها: سند معماری سیستم. ایجاد محیط تست و قرار دادن فایلها و مدل ها و غیره. اسکیما پایگاه داده و فایل‌های مهاجرت اولیه. وایرفریم‌های صفحات کلیدی UI.
 
-### Phase 7: Documentation, Training, and Final QA (Days 24-25)1
+-   مستندات:‌ آپلود کردن تغییرات و فایلهای جدید در برنچ گیت هاب و ضمیمه اسکرین از گیت هاب در داخل میز کار داخل سایت کارلنسر. 
 
--   Activities:
-    -   Prepare system documentation and user manuals.
-    -   Develop training materials for end-users and administrators.
--   Deliverables:
-    -   Comprehensive documentation and training materials.
--   Testing/QA:
-    -   Final round of QA testing on the complete system.
-    -   User acceptance testing with sample data.
+-   تست: اعتبارسنجی اسکیما پایگاه داده؛ بررسی وایرفریم‌ها.
 
-### Phase 8: Project Review and Closure (Days 26-31)5
+-   پرداخت: 15% از کل هزینه پروژه.
 
--   Activities:
-    -   Address any feedback from final QA and user acceptance testing.
-    -   Finalize documentation and training materials based on feedback.
-    -   Conduct project review to ensure all objectives are met.
--   Deliverables:
-    -   Final system adjustments and optimizations.
-    -   Completed project documentation and training materials.
--   Testing/QA:
-    -   Final adjustments tested and validated.
+### فاز 3: توسعه بک‌اند (Python w/ Django )
 
+-   مدت زمان: ۶ روز
 
+-   فعالیت‌های کلیدی: توسعه مدل‌ها، نماها و URL‌های Django برای قابلیت‌های اصلی. پیاده‌سازی احراز هویت و مجوز.
 
+-   تحویلی‌ها: کد/فایل بک‌اند که آماده تست هستند بصورت روزانه یا پس از اتمام هر فایل می بایست منتقل بشوند به GitHub. مستندسازی نقاط پایانی API.
 
-### OLD TIMELINE
+-   مستندات:‌ آپلود کردن تغییرات و فایلهای جدید در برنچ گیت هاب و ضمیمه اسکرین از گیت هاب در داخل میز کار داخل سایت کارلنسر. 
 
-1.  Project Setup and Initial Configuration: 1 day
+-   تست: تست واحد مدل‌ها و نماها. تست ادغام نقاط پایانی API. تست دستی از طریق مدیریت Django.
 
-    -   Setting up the development environment, Django project structure, LAMP server configuration on RPI4, and GitHub repository.
-2.  Database Design and Models Implementation: 2 days
+-   پرداخت: 30 % از کل هزینه پروژه.
 
-    -   Designing the database schema, creating Django models for entities like shipments, customers, suppliers, trucks, etc., and setting up initial migrations.
-3.  Backend Development (Business Logic): 5-7 days
+### فاز 4: توسعه فرانت‌اند (JavaScript w/ React OR Vue.js)
 
-    -   Implementing the business logic for handling shipments, inventory, sales, and purchases, including CRUD operations, weight calculations, and status updates.
-4.  Frontend Development (UI/UX with Bootstrap): 3-4 days
+-   مدت زمان: ۵ روز
 
-    -   Developing responsive UIs for each form and panel, integrating AJAX for dynamic content, and ensuring compatibility across different devices.
-5.  Integration and Testing: 2-3 days
+-   فعالیت‌های کلیدی: توسعه کامپوننت‌های React برای فرانت‌اند، تعامل با API بک‌اند.
 
-    -   Integrating the frontend with the backend, conducting unit tests, integration tests, and user acceptance testing to ensure system reliability and performance.
-6.  Deployment and Initial Setup on RPI4: 2 days
+-   تحویلی‌ها: کد/فایل بک‌اند که آماده تست هستند بصورت روزانه یا پس از اتمام هر فایل می بایست منتقل بشوند به GitHub.  سند پیاده‌سازی رابط کاربری.
 
-    -   Deploying the application on the RPI4 LAMP server, setting up continuous database backups, and ensuring the system runs smoothly in the production environment.
-7.  Documentation: 1 day
+-   مستندات:‌ آپلود کردن تغییرات و فایلهای جدید در برنچ گیت هاب و ضمیمه اسکرین از گیت هاب در داخل میز کار داخل سایت کارلنسر. 
 
-    -   Preparing comprehensive documentation for system use and maintenance, and providing training materials for end-users and administrators.
-8.  Buffer for Revisions and Unexpected Issues: 5 days
+-   تست: تست کامپوننت با استفاده از Jest یا ابزار مشابه. تست UI در دستگاه‌های دستگاه‌های مختلف و مرورگرها. تست UI.
 
-    -   Allocating time for addressing feedback, making revisions, and solving any unforeseen issues that arise during development.
+-   پرداخت: 30 % از کل هزینه پروژه.
+
+### فاز 5: ادغام و تست
+
+-   مدت زمان: ۳ روز
+
+-   فعالیت‌های کلیدی: ادغام کامپوننت‌های فرانت‌اند و بک‌اند. تست جامع شامل تست‌های عملکردی، کاربردپذیری و عملکرد.
+
+-   تحویلی‌ها: سیستم ادغام‌شده مستقر در محیط استیجینگ. گزارش تست.
+
+-   مستندات:‌ آپلود کردن تغییرات و فایلهای جدید در برنچ گیت هاب و ضمیمه اسکرین از گیت هاب در داخل میز کار داخل سایت کارلنسر. 
+
+-   تست: تست انتها به انتها. تست عملکرد برای اطمینان از قابلیت اطمینان.
+
+-   پرداخت: 5 % از کل هزینه پروژه.
+
+### فاز 6: استقرار نهایی
+
+-   مدت زمان: ۲ روز
+
+-   فعالیت‌های کلیدی: استقرار سیستم در محیط تولید. آموزش درباره استفاده و نگهداری سیستم.
+
+-   تحویلی‌ها: سیستم زنده قابل دسترسی برای استفاده. مواد و مستندات آموزشی.
+
+-   مستندات:‌ آپلود کردن تغییرات و فایلهای جدید در برنچ گیت هاب و ضمیمه اسکرین از گیت هاب در داخل میز کار داخل سایت کارلنسر. 
+
+-   تست: تست محیط زنده برای اطمینان از ثبات و عملکرد سیستم.
+
+-   پرداخت: 10 % از کل هزینه پروژه.
