@@ -5,6 +5,10 @@
 npm install
 ```
 
+```
+sudo apt install npm -y
+```
+
 ### Compiles and hot-reloads for development
 ```
 npm run serve
