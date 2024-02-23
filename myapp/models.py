@@ -1,6 +1,8 @@
 import uuid
 
 from django.db import models
+from datetime import datetime
+
 
 # Create your models here.
 from django.db import models
@@ -224,3 +226,27 @@ class Sale(models.Model):
 
     def __str__(self):
         return f"Sale (ID: {self.sale_id}, Date: {self.date}, Customer: {self.customer})"
+
+
+class AnbarSangin(models.Model):
+    id = models.AutoField(primary_key=True)
+    receive_date = models.DateTimeField()
+    reel_number = models.CharField(max_length=255)
+    supplier = models.ForeignKey(Supplier, on_delete=models.CASCADE)
+    supplier_name = models.CharField(max_length=255)
+    material_type = models.CharField(max_length=255)
+    material_name = models.CharField(max_length=255)
+    description = models.TextField(blank=True)
+    status = models.CharField(max_length=10, choices=[('In-stock', 'In-stock'), ('Moved', 'Moved'), ('Used', 'Used')])
+    location = models.CharField(max_length=255, blank=True)
+    last_date = models.DateTimeField(blank=True, null=True)
+    width = models.IntegerField(blank=True, null=True)
+    gsm = models.IntegerField(blank=True, null=True)
+    length = models.IntegerField(blank=True, null=True)
+    grade = models.CharField(max_length=255, blank=True, null=True)
+    breaks = models.CharField(max_length=255, blank=True, null=True)
+    comments = models.TextField(blank=True)
+    qr_code = models.TextField(blank=True)
+
+    def __str__(self):
+        return f"Anbar Sangin (ID: {self.id}, Reel Number: {self.reel_number})"
