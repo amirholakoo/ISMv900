@@ -426,3 +426,17 @@ class Anbar_Akhal(models.Model):
 
     def __str__(self):
         return f"Anbar Akhal (Reel Number: {self.reel_number}, Status: {self.status})"
+
+
+class Consumption(models.Model):
+    consumption_id = models.AutoField(primary_key=True)
+    date = models.DateTimeField(null=False)
+    supplier = models.ForeignKey(Supplier, on_delete=models.SET_NULL, blank=True, null=True)
+    supplier_name = models.CharField(max_length=255, blank=True)  # redundant if using supplier FK
+    material_type = models.CharField(max_length=255, blank=True)
+    material_name = models.CharField(max_length=255, blank=True)
+    description = models.TextField(blank=True)
+    status = models.CharField(max_length=50, blank=True)
+
+    def __str__(self):
+        return f"Consumption (ID: {self.consumption_id}, Date: {self.date})"
