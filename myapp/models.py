@@ -136,32 +136,13 @@ class Consumption(models.Model):
         return f"Consumption {self.id}"
 
 
-class Sales(models.Model):
-    """
-    Model representing a sales record with various attributes related to the sales details.
-    """
-    Date = models.DateTimeField(null=True)
-    CustomerID = models.ForeignKey('Customer', on_delete=models.CASCADE, null=True)
-    TruckID = models.ForeignKey('Truck', on_delete=models.CASCADE, null=True)
-    LicenseNumber = models.CharField(max_length=22555, null=True)
-    ListOfReels = models.TextField(null=True)
-    ProofProfileName = models.CharField(max_length=22555, null=True)
-    Weight1 = models.DecimalField(max_digits=1100, decimal_places=22, null=True)
-    Weight2 = models.DecimalField(max_digits=1100, decimal_places=22, null=True)
-    NetWeight = models.DecimalField(max_digits=1100, decimal_places=22, null=True)
-    PricePerKG = models.DecimalField(max_digits=1100, decimal_places=0, null=True)
-    VAT = models.DecimalField(max_digits=1100, decimal_places=0, null=True)  # Assuming VAT is a decimal field with no decimal places
-    TotalPrice = models.DecimalField(max_digits=1100, decimal_places=22, null=True)
-    ExtraCost = models.DecimalField(max_digits=1100, decimal_places=22, null=True)
-    InvoiceStatus = models.CharField(max_length=10, choices=[('Sent', 'Sent'), ('NA', 'Not Applicable')], default=None, null=True)
-    InvoiceNumber = models.CharField(max_length=22555, null=True)
-    Status = models.CharField(max_length=10, choices=[('Paid', 'Paid'), ('Terms', 'Terms'), ('Cancelled', 'Cancelled')], default=None, null=True)
-    PaymentDetails = models.CharField(max_length=22555, null=True)
-    PaymentDate = models.DateTimeField(null=True)
-    DocumentInfo = models.TextField(null=True)
-    Comments = models.TextField(null=True)
-    CancellationReason = models.TextField(null=True)
-    ShipmentID = models.ForeignKey('Shipment', on_delete=models.CASCADE, null=True)
+class Truck(models.Model):
+    truck_id = models.AutoField(primary_key=True)
+    license_number = models.CharField(max_length=255, unique=True)
+    driver_name = models.CharField(max_length=255, blank=True)
+    phone = models.CharField(max_length=20, blank=True)
+    status = models.CharField(max_length=10, choices=[('Free', 'Free'), ('Busy', 'Busy')])
+    location = models.CharField(max_length=255, blank=True)
 
     def __str__(self):
-        return f"Sale {self.id}"
+        return self.license_number
