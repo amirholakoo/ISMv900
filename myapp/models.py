@@ -79,3 +79,40 @@ class Shipment(models.Model):
     def __str__(self):
         return self.license_number
 
+from django.db import models
+
+class Purchases(models.Model):
+    """
+    Model representing a purchase with various attributes related to the purchase details.
+    """
+
+    Date = models.DateTimeField(null=True)
+    ReceiveDate = models.DateTimeField(null=True)
+    SupplierID = models.ForeignKey('Supplier', on_delete=models.CASCADE, null=True)
+    TruckID = models.ForeignKey('Truck', on_delete=models.CASCADE, null=True)
+    MaterialID = models.ForeignKey('Material', on_delete=models.CASCADE, null=True)
+    MaterialType = models.CharField(max_length=225, null=True)
+    MaterialName = models.CharField(max_length=225, null=True)
+    Unit = models.CharField(max_length=225, null=True)
+    Quantity = models.IntegerField(null=True)
+    Quality = models.CharField(max_length=225, null=True)
+    Penalty = models.CharField(max_length=225, null=True)
+    Weight1 = models.DecimalField(max_digits=10, decimal_places=2, null=True)
+    Weight2 = models.DecimalField(max_digits=10, decimal_places=2, null=True)
+    NetWeight = models.DecimalField(max_digits=10, decimal_places=2, null=True)
+    PricePerKG = models.DecimalField(max_digits=10, decimal_places=2, null=True)
+    VAT = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    TotalPrice = models.DecimalField(max_digits=10, decimal_places=2, null=True)
+    ExtraCost = models.DecimalField(max_digits=10, decimal_places=2, null=True)
+    InvoiceStatus = models.CharField(max_length=10, choices=[('Received', 'Received'), ('NA', 'Not Applicable')], default=None, null=True)
+    Status = models.CharField(max_length=10, choices=[('Paid', 'Paid'), ('Terms', 'Terms'), ('Cancelled', 'Cancelled')], default=None, null=True)
+    PaymentDetail = models.CharField(max_length=225, null=True)
+    PaymentDate = models.DateTimeField(null=True)
+    InvoiceNumber = models.CharField(max_length=225, null=True)
+    DocumentInfo = models.TextField(null=True)
+    Comments = models.TextField(null=True)
+    CancellationReason = models.TextField(null=True)
+    ShipmentID = models.ForeignKey('Shipment', on_delete=models.CASCADE, null=True)
+
+    def __str__(self):
+        return f"Purchase {self.id}"
