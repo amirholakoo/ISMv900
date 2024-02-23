@@ -376,3 +376,32 @@ class Anbar_Khamir_Kordan(models.Model):
 
     def __str__(self):
         return f"Anbar_Khamir_Kordan (ID: {self.id}, Reel Number: {self.reel_number})"
+
+
+from django.db import models
+from datetime import datetime
+
+class AnbarMuhvatehKardan(models.Model):
+    id = models.AutoField(primary_key=True)
+    receive_date = models.DateTimeField(null=True)
+    reel_number = models.CharField(max_length=255)
+    supplier_id = models.ForeignKey(Supplier, on_delete=models.CASCADE)
+    supplier_name = models.CharField(max_length=255, blank=True)
+    material_type = models.CharField(max_length=255)
+    material_name = models.CharField(max_length=255)
+    description = models.TextField(blank=True)
+    status = models.CharField(
+        max_length=10, choices=[('In-stock', 'In-stock'), ('Moved', 'Moved'), ('Used', 'Used')]
+    )
+    location = models.CharField(max_length=255, blank=True)
+    last_date = models.DateTimeField(null=True)
+    width = models.IntegerField(blank=True, null=True)
+    gsm = models.IntegerField(blank=True, null=True)
+    length = models.IntegerField(blank=True, null=True)
+    grade = models.CharField(max_length=255, blank=True, null=True)
+    breaks = models.CharField(max_length=255, blank=True, null=True)
+    comments = models.TextField(blank=True)
+    qr_code = models.TextField(blank=True)
+
+    def __str__(self):
+        return f"AnbarMuhvatehKardan (Reel Number: {self.reel_number}, Status: {self.status})"
