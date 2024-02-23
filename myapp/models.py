@@ -134,3 +134,34 @@ class Consumption(models.Model):
 
     def __str__(self):
         return f"Consumption {self.id}"
+
+
+class Sales(models.Model):
+    """
+    Model representing a sales record with various attributes related to the sales details.
+    """
+    Date = models.DateTimeField(null=True)
+    CustomerID = models.ForeignKey('Customer', on_delete=models.CASCADE, null=True)
+    TruckID = models.ForeignKey('Truck', on_delete=models.CASCADE, null=True)
+    LicenseNumber = models.CharField(max_length=22555, null=True)
+    ListOfReels = models.TextField(null=True)
+    ProofProfileName = models.CharField(max_length=22555, null=True)
+    Weight1 = models.DecimalField(max_digits=1100, decimal_places=22, null=True)
+    Weight2 = models.DecimalField(max_digits=1100, decimal_places=22, null=True)
+    NetWeight = models.DecimalField(max_digits=1100, decimal_places=22, null=True)
+    PricePerKG = models.DecimalField(max_digits=1100, decimal_places=0, null=True)
+    VAT = models.DecimalField(max_digits=1100, decimal_places=0, null=True)  # Assuming VAT is a decimal field with no decimal places
+    TotalPrice = models.DecimalField(max_digits=1100, decimal_places=22, null=True)
+    ExtraCost = models.DecimalField(max_digits=1100, decimal_places=22, null=True)
+    InvoiceStatus = models.CharField(max_length=10, choices=[('Sent', 'Sent'), ('NA', 'Not Applicable')], default=None, null=True)
+    InvoiceNumber = models.CharField(max_length=22555, null=True)
+    Status = models.CharField(max_length=10, choices=[('Paid', 'Paid'), ('Terms', 'Terms'), ('Cancelled', 'Cancelled')], default=None, null=True)
+    PaymentDetails = models.CharField(max_length=22555, null=True)
+    PaymentDate = models.DateTimeField(null=True)
+    DocumentInfo = models.TextField(null=True)
+    Comments = models.TextField(null=True)
+    CancellationReason = models.TextField(null=True)
+    ShipmentID = models.ForeignKey('Shipment', on_delete=models.CASCADE, null=True)
+
+    def __str__(self):
+        return f"Sale {self.id}"
