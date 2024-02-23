@@ -64,7 +64,7 @@ class Shipment(models.Model):
     sales_id = models.IntegerField(null=True)
     price_per_kg = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     extra_cost = models.DecimalField(max_digits=10, decimal_places=2, null=True)
-    supplier_id = models.IntegerField(null=True) # Corrected typo
+    supplier_id = models.IntegerField(null=True)
     material_id = models.IntegerField(null=True)
     material_type = models.CharField(max_length=225, null=True)
     material_name = models.CharField(max_length=225, null=True)
@@ -195,3 +195,32 @@ class Customer(models.Model):
 
     def __str__(self):
         return self.customer_name
+
+
+class Sale(models.Model):
+    sale_id = models.AutoField(primary_key=True)
+    date = models.DateTimeField()
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
+    truck = models.ForeignKey(Truck, on_delete=models.CASCADE)
+    license_number = models.CharField(max_length=255, blank=True)
+    list_of_reels = models.TextField(blank=True)
+    weight1 = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    weight2 = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    net_weight = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    shipping_cost = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    vat = models.CharField(max_length=255, blank=True)
+    total_price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    invoice_status = models.CharField(
+        max_length=10, choices=[('Sent', 'Sent'), ('NA', 'NA')]
+    )
+    payment_status = models.CharField(
+        max_length=10, choices=[('Paid', 'Paid'), ('Terms', 'Terms'),
+                                 ('Unknown', 'Unknown'), ('Cancelled', 'Cancelled')]
+    )
+    invoice_number = models.CharField(max_length=255, blank=True)
+    document_info = models.TextField(blank=True)
+    comments = models.TextField(blank=True)
+    shipment = models.ForeignKey(Shipment, on_delete=models.CASCADE, blank=True, null=True)
+
+    def __str__(self):
+        return f"Sale (ID: {self.sale_id}, Date: {self.date}, Customer: {self.customer})"
