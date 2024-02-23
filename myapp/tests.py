@@ -28,6 +28,26 @@ class TruckTest(TestCase):
         # Add more assertions for other fields and functionalities as needed
 
 
+class SupplierTest(TestCase):
+
+    def test_create_supplier(self):
+        supplier = Supplier.objects.create(
+            supplier_name="Test Supplier",
+            address="123 Main Street, Anytown, USA",
+            phone="555-555-1234",
+            status="Active",
+            comments="This is a test supplier."
+        )
+
+        self.assertEqual(supplier.supplier_name, "Test Supplier")
+        self.assertEqual(supplier.address, "123 Main Street, Anytown, USA")
+        self.assertEqual(supplier.phone, "555-555-1234")
+        self.assertEqual(supplier.status, "Active")
+        self.assertEqual(supplier.comments, "This is a test supplier.")
+
+        # Add more assertions for other fields as needed
+
+
 class ShipmentModelTest(TestCase):
 
     def setUp(self):
