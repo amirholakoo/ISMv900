@@ -5,6 +5,29 @@ from django.test import TestCase
 from datetime import datetime
 from .models import *
 
+class TruckTest(TestCase):
+
+    def test_create_and_retrieve_truck(self):
+        truck = Truck.objects.create(
+            license_number="ABC123",
+            driver_name="John Doe",
+            phone="123-456-7890",
+            status="Free",
+            location="Warehouse",
+        )
+
+        retrieved_truck = Truck.objects.get(license_number="ABC123")
+
+        self.assertEqual(truck, retrieved_truck)
+        self.assertEqual(truck.license_number, "ABC123")
+        self.assertEqual(truck.driver_name, "John Doe")
+        self.assertEqual(truck.phone, "123-456-7890")
+        self.assertEqual(truck.status, "Free")
+        self.assertEqual(truck.location, "Warehouse")
+
+        # Add more assertions for other fields and functionalities as needed
+
+
 class ShipmentModelTest(TestCase):
 
     def setUp(self):
@@ -69,3 +92,43 @@ class ShipmentModelTest(TestCase):
         with self.assertRaises(ValueError):
             Shipment.objects.create(payment_status="Invalid Payment Status")
 
+#
+# class PurchaseTest(TestCase):
+#
+#     def test_create_purchase(self):
+#         supplier = Supplier.objects.create(supplier_name="Test Supplier")
+#         truck = Truck.objects.create(license_number="ABC123")
+#         material = Material.objects.create(material_type="Cotton", material_name="Raw Cotton")
+#         shipment = Shipment.objects.create(status="Incoming")
+#
+#         purchase = Purchases.objects.create(
+#             Date=datetime.now(),
+#             ReceiveDate=datetime.now(),
+#             SupplierID=supplier,
+#             TruckID=truck,
+#             MaterialID=material,
+#             MaterialType="Cotton",
+#             MaterialName="Raw Cotton",
+#             Unit="Bale",
+#             Quantity=100,
+#             Weight1=1000,
+#             Weight2=990,
+#             NetWeight=990,
+#             PricePerKG=10,
+#             TotalPrice=9900,
+#             InvoiceStatus="Received",
+#             PaymentStatus="Paid",
+#             ShipmentID=shipment,
+#         )
+#
+#         self.assertEqual(purchase.SupplierID, supplier)
+#         self.assertEqual(purchase.TruckID, truck)
+#         self.assertEqual(purchase.MaterialID, material)
+#         self.assertEqual(purchase.Quantity, 100)
+#         self.assertEqual(purchase.NetWeight, 990)
+#         self.assertEqual(purchase.TotalPrice, 9900)
+#         self.assertEqual(purchase.InvoiceStatus, "Received")
+#         self.assertEqual(purchase.PaymentStatus, "Paid")
+#         self.assertEqual(purchase.ShipmentID, shipment)
+#
+#         # Add more assertions for other fields and relationships as needed
