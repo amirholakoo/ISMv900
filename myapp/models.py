@@ -79,7 +79,6 @@ class Shipment(models.Model):
     def __str__(self):
         return self.license_number
 
-from django.db import models
 
 class Purchases(models.Model):
     """
@@ -115,4 +114,23 @@ class Purchases(models.Model):
     ShipmentID = models.ForeignKey('Shipment', on_delete=models.CASCADE, null=True)
 
     def __str__(self):
-        return f"Purchase {self.id}"
+        return f"Purchase {self.TruckID}"
+
+
+class Consumption(models.Model):
+    """
+    Model representing a consumption record with various attributes related to the consumption details.
+    """
+    ReceiveDate = models.DateTimeField(null=True)
+    SupplierID = models.IntegerField(null=True)  # Assuming SupplierID is not a foreign key
+    SupplierName = models.CharField(max_length=225, null=True)
+    MaterialType = models.CharField(max_length=225, null=True)
+    MaterialName = models.CharField(max_length=225, null=True)
+    Unit = models.CharField(max_length=225, null=True)
+    RealNumber = models.CharField(max_length=225, null=True)
+    ProofProfileName = models.CharField(max_length=225, null=True)
+    Comments = models.TextField(null=True)
+    Status = models.CharField(max_length=50, null=True)
+
+    def __str__(self):
+        return f"Consumption {self.id}"
