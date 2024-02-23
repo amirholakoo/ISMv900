@@ -157,3 +157,23 @@ class Supplier(models.Model):
 
     def __str__(self):
         return self.supplier_name
+
+class Product(models.Model):
+    reel_number = models.CharField(max_length=255, primary_key=True)
+    width = models.IntegerField(blank=True, null=True)
+    gsm = models.IntegerField(blank=True, null=True)
+    length = models.IntegerField(blank=True, null=True)
+    grade = models.CharField(max_length=255, blank=True, null=True)
+    breaks = models.CharField(max_length=255, blank=True, null=True)
+    comments = models.TextField(blank=True)
+    qr_code = models.TextField(blank=True)
+    location = models.CharField(max_length=255, blank=True)
+    status = models.CharField(
+        max_length=10, choices=[('In-stock', 'In-stock'), ('Sold', 'Sold'),
+                                 ('Moved', 'Moved'), ('Delivered', 'Delivered')]
+    )
+    receive_date = models.DateTimeField(blank=True, null=True)
+    last_date = models.DateTimeField(blank=True, null=True)
+
+    def __str__(self):
+        return f"Product (Reel Number: {self.reel_number}, Status: {self.status})"
