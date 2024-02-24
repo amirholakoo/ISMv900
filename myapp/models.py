@@ -92,7 +92,7 @@ class Purchases(models.Model):
     ReceiveDate = models.DateTimeField(null=True)
     SupplierID = models.ForeignKey('Supplier', on_delete=models.CASCADE, null=True)
     TruckID = models.ForeignKey('Truck', on_delete=models.CASCADE, null=True)
-    MaterialID = models.ForeignKey('Material', on_delete=models.CASCADE, null=True)
+    # MaterialID = models.ForeignKey('Material', on_delete=models.CASCADE, null=True)
     MaterialType = models.CharField(max_length=225, null=True)
     MaterialName = models.CharField(max_length=225, null=True)
     Unit = models.CharField(max_length=225, null=True)
@@ -120,24 +120,24 @@ class Purchases(models.Model):
         return f"Purchase {self.TruckID}"
 
 
-class Consumption(models.Model):
-    """
-    Model representing a consumption record with various attributes related to the consumption details.
-    """
-    ReceiveDate = models.DateTimeField(null=True)
-    SupplierID = models.IntegerField(null=True)  # Assuming SupplierID is not a foreign key
-    SupplierName = models.CharField(max_length=225, null=True)
-    MaterialType = models.CharField(max_length=225, null=True)
-    MaterialName = models.CharField(max_length=225, null=True)
-    Unit = models.CharField(max_length=225, null=True)
-    RealNumber = models.CharField(max_length=225, null=True)
-    ProofProfileName = models.CharField(max_length=225, null=True)
-    Comments = models.TextField(null=True)
-    Status = models.CharField(max_length=50, null=True)
-
-    def __str__(self):
-        return f"Consumption {self.id}"
-
+# class Consumption(models.Model):
+#     """
+#     Model representing a consumption record with various attributes related to the consumption details.
+#     """
+#     ReceiveDate = models.DateTimeField(null=True)
+#     SupplierID = models.IntegerField(null=True)  # Assuming SupplierID is not a foreign key
+#     SupplierName = models.CharField(max_length=225, null=True)
+#     MaterialType = models.CharField(max_length=225, null=True)
+#     MaterialName = models.CharField(max_length=225, null=True)
+#     Unit = models.CharField(max_length=225, null=True)
+#     RealNumber = models.CharField(max_length=225, null=True)
+#     ProofProfileName = models.CharField(max_length=225, null=True)
+#     Comments = models.TextField(null=True)
+#     Status = models.CharField(max_length=50, null=True)
+#
+#     def __str__(self):
+#         return f"Consumption {self.id}"
+#
 
 class Truck(models.Model):
     truck_id = models.AutoField(primary_key=True)
@@ -194,6 +194,38 @@ class Customer(models.Model):
 
     def __str__(self):
         return self.customer_name
+
+from django.db import models
+
+class RawMaterial(models.Model):
+    """
+    Represents a raw material used in production.
+
+    Attributes:
+        material_id (int): Auto-incrementing primary key for the raw material.
+        supplier (ForeignKey): Foreign key to the Supplier model representing the raw material's source.
+        material_type (str): Type of the raw material (e.g., cotton, wool, plastic).
+        material_name (str): Name of the specific raw material (e.g., Pima cotton, Merino wool).
+        description (str, optional): Optional description of the raw material and its properties.
+        status (str): Current status of the raw material (e.g., available, low stock, discontinued).
+        comments (str, optional): Additional comments or notes about the raw material.
+    """
+
+    material_id = models.AutoField(primary_key=True)
+    supplier = models.ForeignKey(Supplier, on_delete=models.SET_NULL, null=True, related_name='raw_materials')
+    material_type = models.CharField(max_length=255)
+    material_name = models.CharField(max_length=255)
+    description = models.CharField(max_length=255, blank=True)
+    status = models.CharField(max_length=255)
+    comments = models.TextField(blank=True)
+
+    def __str__(self):
+        """
+        Returns a human-readable representation of the RawMaterial object.
+
+        Format: "{material_name} (ID: {material_id})"
+        """
+        return f"{self.material_name} (ID: {self.material_id})"
 
 
 class Sale(models.Model):
