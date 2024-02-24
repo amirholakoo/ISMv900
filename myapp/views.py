@@ -38,3 +38,38 @@ def add_customer_view(request):
         # Display empty form
         return render(request, 'add_customer.html')
 
+
+def add_supplier_view(request):
+    if request.method == 'POST':
+        # Load existing supplier names from DB
+        existing_names = [supplier.supplier_name for supplier in Supplier.objects.all().values_list('supplier_name')]
+
+        # Validate and process form data
+        supplier_name = request.POST.get('supplier_name')
+        address = request.POST.get('address')
+        phone = request.POST.get('phone')
+        comments = request.POST.get('comments')
+
+        # Check for duplicate name
+        if supplier_name in existing_names:
+            error_message = "Supplier already exists with name '{}'. Please add full name and try again.".format(supplier_name)
+            return render(request, 'add_supplier.html', {'error_message': error_message})
+
+        # Create new supplier object
+        new_supplier = Supplier(
+            supplier_name=supplier_name,
+            address=address,
+            phone=phone,
+            status="Active",
+            comments=f"Username Created NOW (CVS)"
+        )
+        new_supplier.save()
+
+        # Success message
+        success_message = f"Supplier '{supplier_name}' has been added successfully."
+        return render(request, 'add_supplier.html', {'success_message': success_message})
+
+    else:
+        # Display empty form
+        return render(request, 'add_supplier.html')
+
