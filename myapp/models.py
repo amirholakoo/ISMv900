@@ -198,8 +198,8 @@ class Purchases(models.Model):
 
     Date = models.DateTimeField(null=True)
     ReceiveDate = models.DateTimeField(null=True)
-    SupplierID = models.ForeignKey('Supplier', on_delete=models.CASCADE, null=True)
-    TruckID = models.ForeignKey('Truck', on_delete=models.CASCADE, null=True)
+    SupplierID = models.ForeignKey(Supplier, on_delete=models.CASCADE, null=True)
+    TruckID = models.ForeignKey(Truck, on_delete=models.CASCADE, null=True)
     MaterialID = models.ForeignKey(RawMaterial, on_delete=models.CASCADE, null=True)
     MaterialType = models.CharField(max_length=225, null=True)
     MaterialName = models.CharField(max_length=225, null=True)
@@ -222,7 +222,7 @@ class Purchases(models.Model):
     DocumentInfo = models.TextField(null=True)
     Comments = models.TextField(null=True)
     CancellationReason = models.TextField(null=True)
-    ShipmentID = models.ForeignKey('Shipment', on_delete=models.CASCADE, null=True)
+    ShipmentID = models.ForeignKey(Shipment, on_delete=models.CASCADE, null=True)
 
     def __str__(self):
         return f"Purchase {self.TruckID}"
