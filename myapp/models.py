@@ -469,3 +469,29 @@ class Consumption(models.Model):
 
     def __str__(self):
         return f"Consumption (ID: {self.consumption_id}, Date: {self.date})"
+
+
+class MaterialType(models.Model):
+    """
+    Represents a type of material used in production.
+
+    Attributes:
+        material_type_id (int): Auto-incrementing primary key for the material type.
+        name (str): Name of the material type (unique).
+        username_created (str, optional): Username of the user who created the material type (not enforced in this implementation).
+        created_on (datetime): Date and time the material type was created.
+        status (str, default="Active"): Current status of the material type (e.g., Active, Archived).
+    """
+
+    material_type_id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=255, unique=True)
+    username_created = models.CharField(max_length=255, blank=True)
+    created_on = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=255, default="Active")
+
+    def __str__(self):
+        """
+        Returns a human-readable representation of the MaterialType object.
+        """
+        return self.name
+

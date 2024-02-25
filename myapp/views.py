@@ -74,23 +74,27 @@ def add_supplier_view(request):
         return render(request, 'add_supplier.html')
 
 
-def add_material_type(request):
+
+def new_material_type(request):
+    existing_types = MaterialType.objects.all()
     if request.method == 'POST':
-        material_type = request.POST.get('material_type')
-
-        # Check if material type already exists
-        existing_type = RawMaterial.objects.filter(material_type=material_type).first()
-        if existing_type:
-            return JsonResponse({'error': 'Material type already exists.'}, status=400)
-
-        # Create new material type
-        new_material = RawMaterial(
-            material_type=material_type,
-            comments=f"Username Created NOW (CVS)",
-            status="Active",
-        )
-        new_material.save()
-
-        return JsonResponse({'success': 'Material type added successfully.'}, status=201)
+        name = request.POST['name']
+        if MaterialType.objects.filter(name=name).exists():
+            # Material type already exists
+            error_message = 'Material type already exists'
+            return render(request, 'add_material_error.html', {'error': error_message})
+        else:
+            # Optionally capture username for reference
+            # username = request.user.username  # If using User model
+            new_type = MaterialType.objects.create(
+                name=name
+                # username_created=username  # Uncomment if capturing username
+            )
+            return redirect('add_material_success', material_type_id=new_type.id)
     else:
-        return render(request, 'add_material_type.html')
+        return render(request, 'new_material_form.html', {'existing_types': existing_types})
+
+
+def add_material_success(request, material_type_id):
+    material_type = MaterialType.objects.get(pk=material_type_id)
+    return render(request, 'add_material_success.html', {'material_type': material_type})
