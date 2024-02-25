@@ -208,6 +208,7 @@ def add_truck(request):
     if request.method == 'POST':
         license_number = request.POST.get('license_number')
         driver_name = request.POST.get('driver_name')
+        driver_doc = request.POST.get('driver_doc')
         phone = request.POST.get('phone')
         status = request.POST.get('status')
         location = request.POST.get('location')
@@ -226,6 +227,7 @@ def add_truck(request):
         new_truck = Truck(
             license_number=license_number,
             driver_name=driver_name,
+            driver_doc=driver_doc,
             phone=phone,
             status=status if status in ['Free', 'Busy'] else 'Free',
             location=location,
