@@ -191,3 +191,54 @@ def add_material_success(request, material_id):
 
     material = RawMaterial.objects.get(pk=material_id)
     return render(request, 'add_material_success.html', {'material': material})
+
+
+def add_truck(request):
+    """
+    Handles POST requests to add a new truck.
+
+    Returns:
+        JsonResponse:
+            - success (str): Success message upon successful creation.
+            - error (str): Error message if validation fails or truck already exists.
+        HttpResponse:
+            - Renders the "add_truck.html" template if GET request.
+    """
+
+    if request.method == 'POST':
+        license_number = request.POST.get('license_number')
+        driver_name = request.POST.get('driver_name')
+        phone = request.POST.get('phone')
+        status = request.POST.get('status')
+        location = request.POST.get('location')
+        comments = request.POST.get('comments')
+
+        # Validate input
+        if not license_number:
+            return JsonResponse({'error': 'License number is required.'}, status=400)
+
+        # Check for existing truck
+        existing_truck = Truck.objects.filter(license_number=license_number).first()
+        if existing_truck:
+            return JsonResponse({'error': 'Truck with this license number already exists.'}, status=400)
+
+        # Create new truck
+        new_truck = Truck(
+            license_number=license_number,
+            driver_name=driver_name,
+            phone=phone,
+            status=status if status in ['Free', 'Busy'] else 'Free',
+            location=location,
+            comments=comments,
+        )
+        new_truck.save()
+
+        # Return success response
+        return JsonResponse({
+            'success': 'Truck added successfully.',
+            'license_number': new_truck.license_number,
+        }, status=201)
+
+    else:
+        return render(request, 'add_truck.html')
+

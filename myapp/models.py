@@ -103,16 +103,36 @@ class Shipment(models.Model):
 #         return f"Consumption {self.id}"
 #
 
+
 class Truck(models.Model):
+    """
+    Represents a truck used for transportation purposes.
+
+    Attributes:
+        truck_id (int): Auto-incrementing primary key for the truck.
+        license_number (str): Unique license number of the truck (max length 255).
+        driver_name (str, optional): Name of the driver assigned to the truck (max length 255).
+        phone (str, optional): Phone number of the driver (max length 20).
+        status (str): Current status of the truck (choices: 'Free', 'Busy').
+        location (str, optional): Current location of the truck (max length 255).
+        comments (str, optional): Additional notes or information about the truck.
+    """
+
     truck_id = models.AutoField(primary_key=True)
     license_number = models.CharField(max_length=255, unique=True)
     driver_name = models.CharField(max_length=255, blank=True)
     phone = models.CharField(max_length=20, blank=True)
-    status = models.CharField(max_length=10, choices=[('Free', 'Free'), ('Busy', 'Busy')])
+    status = models.CharField(max_length=10, choices=[('Free', 'Free'), ('Busy', 'Busy')], default='Free')
     location = models.CharField(max_length=255, blank=True)
+    comments = models.TextField(blank=True)
 
     def __str__(self):
-        return self.license_number
+        """
+        Returns a human-readable representation of the Truck object.
+
+        Format: "Truck {license_number} - {status}"
+        """
+        return f"Truck {self.license_number} - {self.status}"
 
 
 class Supplier(models.Model):
