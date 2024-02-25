@@ -242,3 +242,45 @@ def add_truck(request):
     else:
         return render(request, 'add_truck.html')
 
+
+def add_anbar(request):
+    """
+    Handles POST requests to add a new Anbar.
+
+    Returns:
+        JsonResponse:
+            - success (str): Success message upon successful creation.
+            - error (str): Error message if validation fails or Anbar already exists.
+        HttpResponse:
+            - Renders the "add_anbar.html" template if GET request.
+    """
+
+    if request.method == 'POST':
+        location_name = request.POST.get('location_name')
+
+        # Validate input
+        if not location_name:
+            return JsonResponse({'error': 'Location name is required.'}, status=400)
+
+        # Check for existing Anbar
+        existing_anbar = Anbar.objects.filter(location_name=location_name).first()
+        if existing_anbar:
+            return JsonResponse({'error': 'Anbar with this location name already exists.'}, status=400)
+
+        # Create new Anbar
+        new_anbar = Anbar(
+            location_name=location_name,
+            comments=f"Automatically Created",
+        )
+        new_anbar.save()
+
+        # Return success response
+        return JsonResponse({
+            'success': 'Anbar added successfully.',
+            'location_name': new_anbar.location_name,
+        }, status=201)
+
+    else:
+        return render(request, 'add_anbar.html')
+
+

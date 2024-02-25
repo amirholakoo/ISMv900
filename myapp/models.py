@@ -538,3 +538,32 @@ class Unit(models.Model):
 
     def __str__(self):
         return self.name
+
+
+from django.db import models
+
+class Anbar(models.Model):
+    """
+    Represents an Anbar location for storing materials.
+
+    Attributes:
+        anbar_id (int): Auto-incrementing primary key for the Anbar.
+        location_name (str): Name of the Anbar location (unique, max length 255).
+        comments (str, optional): Additional notes or information about the Anbar.
+        status (str): Current status of the Anbar (choices: 'Active', 'Inactive').
+        created_on (DateTimeField, auto_now_add=True): Date and time the Anbar was created.
+    """
+
+    anbar_id = models.AutoField(primary_key=True)
+    location_name = models.CharField(max_length=255, unique=True)
+    comments = models.TextField(blank=True)
+    status = models.CharField(max_length=20, choices=[('Active', 'Active'), ('Inactive', 'Inactive')], default='Active')
+    created_on = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        """
+        Returns a human-readable representation of the Anbar object.
+
+        Format: "{location_name} ({status})"
+        """
+        return f"{self.location_name} ({self.status})"
