@@ -370,3 +370,76 @@ def add_reel(request):
     else:
         return JsonResponse({'error': 'Invalid request method.'})
 
+
+
+from django.utils import timezone
+
+def create_shipment(request):
+    """
+    Creates a new shipment based on user input.
+
+    Handles both POST and GET requests:
+        - POST: Processes form data and creates a shipment, returning JSON response.
+        - GET: Renders the initial form with available trucks, suppliers, etc.
+
+    Validates required fields and performs appropriate actions based on shipment type.
+    """
+
+    if request.method == 'POST':
+        # Extract data from request.POST
+        license_number = request.POST.get('license_number')
+        supplier_id = request.POST.get('supplier')
+        material_type_id = request.POST.get('material_type')
+        material_id = request.POST.get('material')
+        customer_id = request.POST.get('customer')
+        shipment_type = request.POST.get('shipment_type')
+
+        # Check required fields
+        errors = []
+        if not license_number:
+            errors.append('License number is required.')
+        if shipment_type == 'Incoming' and not (supplier_id and material_type_id and material_id):
+            errors.append('Supplier, material type, and material are required for incoming shipments.')
+        if shipment_type == 'Outgoing' and not customer_id:
+            errors.append('Customer is required for outgoing shipments.')
+
+        if errors:
+            return JsonResponse({'status': 'error', 'errors': errors})
+
+        # Process data and create shipment
+        truck = Truck.objects.filter(license_number=license_number, status='Free').first()
+        if not truck:
+            return JsonResponse({'status': 'error', 'message': 'No free truck with that license number.'})
+
+        shipment = Shipment()
+        shipment.entry_time = timezone.now()
+        shipment.license_number = license_number
+        shipment.shipment_type = shipment_type
+
+        # Handle incoming/outgoing shipment logic
+        if shipment_type == 'Incoming':
+            shipment.supplier = Supplier.objects.get(pk=supplier_id)
+            shipment.material_type = MaterialType.objects.get(pk=material_type_id)
+            shipment.material = MaterialType.objects.get(pk=material_id)
+            # Update material quantity if applicable
+            # ...
+
+        elif shipment_type == 'Outgoing':
+            shipment.customer = Customer.objects.get(pk=customer_id)
+            # Update customer inventory if applicable
+            # ...
+
+        shipment.save()
+
+        truck.status = 'Busy'
+        truck.location = 'Entrance'
+        truck.save()
+
+        return JsonResponse({'status': 'success', 'message': 'Shipment created successfully!'})
+
+    # Render initial form or handle GET requests
+    trucks = Truck.objects.filter(status='Free')
+    suppliers = Supplier.objects.filter(status='Active')
+    material_types = MaterialType.objects.filter(status='Active')
+    customers = Customer.objects.filter(status='Active')
+    return render(request, 'create_shipment.html', {'trucks': trucks, 'suppliers': suppliers, 'material_types': material_types, 'customers': customers})
