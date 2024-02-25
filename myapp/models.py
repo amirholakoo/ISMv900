@@ -540,8 +540,6 @@ class Unit(models.Model):
         return self.name
 
 
-from django.db import models
-
 class Anbar(models.Model):
     """
     Represents an Anbar location for storing materials.
