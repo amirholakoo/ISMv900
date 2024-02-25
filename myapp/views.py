@@ -98,3 +98,96 @@ def new_material_type(request):
 def add_material_success(request, material_type_id):
     material_type = MaterialType.objects.get(pk=material_type_id)
     return render(request, 'add_material_success.html', {'material_type': material_type})
+
+
+
+def new_unit(request):
+    existing_units = Unit.objects.all()
+    if request.method == 'POST':
+        name = request.POST['name']
+        count_kg = request.POST.get('count_kg', None)  # Handle optional field
+        if Unit.objects.filter(name=name).exists():
+            # Unit already exists
+            error_message = 'Unit already exists'
+            return render(request, 'add_unit_error.html', {'error': error_message})
+        else:
+            # Optionally capture username for reference
+            username = request.user.username  # If using User model
+            new_unit = Unit.objects.create(
+                name=name,
+                count_kg=count_kg,
+                username_created=username
+            )
+            return redirect('add_unit_success', unit_id=new_unit.id)
+    else:
+        return render(request, 'new_unit_form.html', {'existing_units': existing_units})
+
+
+
+def add_unit_success(request, unit_id):
+    unit = Unit.objects.get(pk=unit_id)
+    return render(request, 'add_unit_success.html', {'unit': unit})
+
+
+
+def new_raw_material(request):
+    """
+    View for adding a new raw material.
+
+    Retrieves existing suppliers and material types, validates form data,
+    and creates a new RawMaterial object if valid.
+
+    Args:
+        request: The HTTP request object.
+
+    Returns:
+        HttpResponse:
+            - Rendered new_material_form.html on GET.
+            - Redirect to add_material_success on successful POST.
+            - Rendered add_material_error.html with error message on failed POST.
+    """
+
+    suppliers = Supplier.objects.all()
+    material_types = MaterialType.objects.all()
+    if request.method == 'POST':
+        supplier_id = request.POST['supplier']
+        material_type_id = request.POST['material_type']
+        name = request.POST['name']
+        comments = request.POST.get('comments', "")  # Handle optional field
+
+        # Check for existing material with same name and supplier
+        if RawMaterial.objects.filter(supplier_id=supplier_id, material_type_id=material_type_id, name=name).exists():
+            error_message = 'Material already exists'
+            return render(request, 'add_material_error.html', {'error': error_message})
+
+        # Optionally capture username for reference
+        username = request.user.username  # If using User model
+
+        # Create new RawMaterial object
+        new_material = RawMaterial.objects.create(
+            supplier_id=supplier_id,
+            material_type_id=material_type_id,
+            name=name,
+            comments=comments,
+            username_created=username
+        )
+
+        return redirect('add_material_success', material_id=new_material.id)
+    else:
+        return render(request, 'new_material_form.html', {'suppliers': suppliers, 'material_types': material_types})
+
+
+def add_material_success(request, material_id):
+    """
+    View for displaying success message after adding a new raw material.
+
+    Args:
+        request: The HTTP request object.
+        material_id: ID of the newly created RawMaterial object.
+
+    Returns:
+        HttpResponse: Rendered add_material_success.html with material details.
+    """
+
+    material = RawMaterial.objects.get(pk=material_id)
+    return render(request, 'add_material_success.html', {'material': material})

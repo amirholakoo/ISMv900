@@ -495,3 +495,26 @@ class MaterialType(models.Model):
         """
         return self.name
 
+
+class Unit(models.Model):
+    """
+    Represents a unit of measurement for quantities.
+
+    Attributes:
+        unit_id (int): Auto-incrementing primary key for the unit.
+        name (str): Name of the unit (unique).
+        count_kg (float, optional): Value representing the unit's capacity in kilograms (e.g., 25 for 25kg bag).
+        username_created (str, blank=True): Username of the user who created the unit (optional).
+        created_on (datetime): Date and time the unit was created.
+        status (str, default="Active"): Current status of the unit (e.g., Active, Archived).
+    """
+
+    unit_id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=255, unique=True)
+    count_kg = models.FloatField(blank=True, null=True)
+    username_created = models.CharField(max_length=255, blank=True)
+    created_on = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=255, default="Active")
+
+    def __str__(self):
+        return self.name
