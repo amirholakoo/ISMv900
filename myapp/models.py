@@ -112,6 +112,7 @@ class Truck(models.Model):
         truck_id (int): Auto-incrementing primary key for the truck.
         license_number (str): Unique license number of the truck (max length 255).
         driver_name (str, optional): Name of the driver assigned to the truck (max length 255).
+        driver_doc (str, optional): doc of the driver assigned to the truck (max length 255).
         phone (str, optional): Phone number of the driver (max length 20).
         status (str): Current status of the truck (choices: 'Free', 'Busy').
         location (str, optional): Current location of the truck (max length 255).
@@ -121,6 +122,7 @@ class Truck(models.Model):
     truck_id = models.AutoField(primary_key=True)
     license_number = models.CharField(max_length=255, unique=True)
     driver_name = models.CharField(max_length=255, blank=True)
+    driver_doc = models.CharField(max_length=255, blank=True)
     phone = models.CharField(max_length=20, blank=True)
     status = models.CharField(max_length=10, choices=[('Free', 'Free'), ('Busy', 'Busy')], default='Free')
     location = models.CharField(max_length=255, blank=True)
