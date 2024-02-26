@@ -159,6 +159,72 @@ def add_supplier(request):
         return JsonResponse({'status': 'error', 'message': 'Invalid request method.'})
 
 
+@csrf_exempt
+def add_customer(request):
+    """
+    Handles POST requests to add a new Customer to the database.
+
+    This view function is designed to be used with a POST request containing the necessary
+    data for creating a new Customer object. It checks for the presence of required fields,
+    ensures the customer name is unique, and then creates a new Customer object with the
+    provided data and saves it to the database.
+
+    Parameters:
+    - request (HttpRequest): The incoming HTTP request.
+
+    Returns:
+    - JsonResponse: A JSON response indicating the success or failure of the operation.
+    """
+    if request.method == 'POST':
+        # Extract data from the request
+        customer_name = request.GET.get('customer_name')
+        address = request.GET.get('address')
+        phone = request.GET.get('phone')
+        comments = request.GET.get('comments')
+
+        # Initialize an empty list to collect error messages
+        errors = []
+
+        # Check if all required fields are provided
+        if not customer_name:
+            errors.append({'status': 'error', 'message': 'Customer name is required.'})
+        if not address:
+            errors.append({'status': 'error', 'message': 'Address is required.'})
+        if not phone:
+            errors.append({'status': 'error', 'message': 'Phone is required.'})
+        if not comments:
+            errors.append({'status': 'error', 'message': 'Comments are required.'})
+
+        # Load existing customer names from DB
+        existing_names = [customer.customer_name for customer in Customer.objects.all().values_list('customer_name')]
+        # Check for duplicate name
+        if customer_name in existing_names:
+            error_message = f"Customer already exists with name '{customer_name}'. Please add full name and try again."
+            errors.append({'status': 'error', 'message': error_message})
+
+        # If there are any errors, return them in the response
+        if errors:
+            return JsonResponse({'status': 'error', 'errors': errors})
+
+        # Create a new Customer object
+        new_customer = Supplier(
+            supplier_name=customer_name,
+            address=address,
+            phone=phone,
+            comments=comments
+        )
+
+        # Save the new Customer object to the database
+        try:
+            new_customer.save()
+            return JsonResponse({'status': 'success', 'message': f'New Customer {customer_name} has been added to database successfully!'})
+        except Exception as e:
+            # Handle any exceptions that occur during the save operation
+            return JsonResponse({'status': 'error', 'message': f'Error adding Customer: {str(e)}'})
+    else:
+        return JsonResponse({'status': 'error', 'message': 'Invalid request method.'})
+
+
 
 
 
