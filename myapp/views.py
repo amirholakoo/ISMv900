@@ -132,7 +132,8 @@ def add_supplier(request):
         existing_names = [supplier.supplier_name for supplier in Supplier.objects.all().values_list('supplier_name')]
         # Check for duplicate name
         if supplier_name in existing_names:
-            error_message = "Supplier already exists with name '{}'. Please add full name and try again.".format(supplier_name)
+            error_message = "Supplier already exists with name '{}'. Please add full name and try again.".format(
+                supplier_name)
             errors.append({'status': 'error', 'message': error_message})
 
         # If there are any errors, return them in the response
