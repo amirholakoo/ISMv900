@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from .models import *
 from django.http import  JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 from datetime import datetime
 # Create your views here.
 
@@ -10,10 +11,10 @@ def add_customer_view(request):
         existing_names = [customer.customer_name for customer in Customer.objects.all().values_list('customer_name')]
 
         # Validate and process form data
-        customer_name = request.POST.get('customer_name')
-        address = request.POST.get('address')
-        phone = request.POST.get('phone')
-        comments = request.POST.get('comments')
+        customer_name = request.GET.get('customer_name')
+        address = request.GET.get('address')
+        phone = request.GET.get('phone')
+        comments = request.GET.get('comments')
 
         # Check for duplicate name
         if customer_name in existing_names:
@@ -45,10 +46,10 @@ def add_supplier_view(request):
         existing_names = [supplier.supplier_name for supplier in Supplier.objects.all().values_list('supplier_name')]
 
         # Validate and process form data
-        supplier_name = request.POST.get('supplier_name')
-        address = request.POST.get('address')
-        phone = request.POST.get('phone')
-        comments = request.POST.get('comments')
+        supplier_name = request.GET.get('supplier_name')
+        address = request.GET.get('address')
+        phone = request.GET.get('phone')
+        comments = request.GET.get('comments')
 
         # Check for duplicate name
         if supplier_name in existing_names:
@@ -78,7 +79,7 @@ def add_supplier_view(request):
 def new_material_type(request):
     existing_types = MaterialType.objects.all()
     if request.method == 'POST':
-        name = request.POST['name']
+        name = request.GET['name']
         if MaterialType.objects.filter(name=name).exists():
             # Material type already exists
             error_message = 'Material type already exists'
@@ -104,8 +105,8 @@ def add_material_success(request, material_type_id):
 def new_unit(request):
     existing_units = Unit.objects.all()
     if request.method == 'POST':
-        name = request.POST['name']
-        count_kg = request.POST.get('count_kg', None)  # Handle optional field
+        name = request.GET['name']
+        count_kg = request.GET.get('count_kg', None)  # Handle optional field
         if Unit.objects.filter(name=name).exists():
             # Unit already exists
             error_message = 'Unit already exists'
@@ -150,10 +151,10 @@ def new_raw_material(request):
     suppliers = Supplier.objects.all()
     material_types = MaterialType.objects.all()
     if request.method == 'POST':
-        supplier_id = request.POST['supplier']
-        material_type_id = request.POST['material_type']
-        name = request.POST['name']
-        comments = request.POST.get('comments', "")  # Handle optional field
+        supplier_id = request.GET['supplier']
+        material_type_id = request.GET['material_type']
+        name = request.GET['name']
+        comments = request.GET.get('comments', "")  # Handle optional field
 
         # Check for existing material with same name and supplier
         if RawMaterial.objects.filter(supplier_id=supplier_id, material_type_id=material_type_id, name=name).exists():
@@ -193,6 +194,7 @@ def add_material_success(request, material_id):
     return render(request, 'add_material_success.html', {'material': material})
 
 
+
 def add_truck(request):
     """
     Handles POST requests to add a new truck.
@@ -206,13 +208,13 @@ def add_truck(request):
     """
 
     if request.method == 'POST':
-        license_number = request.POST.get('license_number')
-        driver_name = request.POST.get('driver_name')
-        driver_doc = request.POST.get('driver_doc')
-        phone = request.POST.get('phone')
-        status = request.POST.get('status')
-        location = request.POST.get('location')
-        comments = request.POST.get('comments')
+        license_number = request.GET.get('license_number')
+        driver_name = request.GET.get('driver_name')
+        driver_doc = request.GET.get('driver_doc')
+        phone = request.GET.get('phone')
+        status = request.GET.get('status')
+        location = request.GET.get('location')
+        comments = request.GET.get('comments')
 
         # Validate input
         if not license_number:
@@ -258,7 +260,7 @@ def add_anbar(request):
     """
 
     if request.method == 'POST':
-        location_name = request.POST.get('location_name')
+        location_name = request.GET.get('location_name')
 
         # Validate input
         if not location_name:
@@ -311,13 +313,13 @@ def add_reel(request):
 
     elif request.method == 'POST':
         # Validate user input
-        reel_number = request.POST.get('reel_number').strip()
-        width = float(request.POST.get('width')) if request.POST.get('width') else None
-        gsm = float(request.POST.get('gsm')) if request.POST.get('gsm') else None
-        length = float(request.POST.get('length')) if request.POST.get('length') else None
-        breaks = int(request.POST.get('breaks')) if request.POST.get('breaks') else None
-        grade = request.POST.get('grade').strip() if request.POST.get('grade') else None
-        consumption_profile_id = int(request.POST.get('consumption_profile'))
+        reel_number = request.GET.get('reel_number').strip()
+        width = float(request.GET.get('width')) if request.GET.get('width') else None
+        gsm = float(request.GET.get('gsm')) if request.GET.get('gsm') else None
+        length = float(request.GET.get('length')) if request.GET.get('length') else None
+        breaks = int(request.GET.get('breaks')) if request.GET.get('breaks') else None
+        grade = request.GET.get('grade').strip() if request.GET.get('grade') else None
+        consumption_profile_id = int(request.GET.get('consumption_profile'))
 
         errors = {}
         if not reel_number:
@@ -389,12 +391,12 @@ def create_shipment(request):
 
     if request.method == 'POST':
         # Extract data from request.POST
-        license_number = request.POST.get('license_number')
-        supplier_id = request.POST.get('supplier')
-        material_type_id = request.POST.get('material_type')
-        material_id = request.POST.get('material')
-        customer_id = request.POST.get('customer')
-        shipment_type = request.POST.get('shipment_type')
+        license_number = request.GET.get('license_number')
+        supplier_id = request.GET.get('supplier')
+        material_type_id = request.GET.get('material_type')
+        material_id = request.GET.get('material')
+        customer_id = request.GET.get('customer')
+        shipment_type = request.GET.get('shipment_type')
 
         # Check required fields
         errors = []
@@ -446,6 +448,19 @@ def create_shipment(request):
     customers = Customer.objects.filter(status='Active')
     return render(request, 'create_shipment.html', {'trucks': trucks, 'suppliers': suppliers, 'material_types': material_types, 'customers': customers})
 
+@csrf_exempt
+def apiHandler(request, api):
+    if request.method == 'POST':
+        license_number = request.GET.get('license_number')
+        driver_name = request.GET.get('driver_name')
+        driver_doc = request.GET.get('driver_doc')
+        phone = request.GET.get('phone')
+        status = request.GET.get('status')
+        location = request.GET.get('location')
+        comments = request.GET.get('comments')
+        print(dict(request.GET.items()))
 
-def apiHandler(request):
-    return JsonResponse({'status':'ok'})
+        return JsonResponse({'status':'ok'})
+    else:
+        # Handle non-POST requests
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
