@@ -228,7 +228,7 @@ def add_customer(request):
 @csrf_exempt
 def get_materialTypes(request):
     """
-    Handles POST requests to retrieve all material names from the database.
+    Handles GET requests to retrieve all material names from the database.
 
     This view function is designed to be used with a POST request. It queries the
     MaterialType model for all instances and returns the names in a JSON response.
@@ -239,7 +239,7 @@ def get_materialTypes(request):
     Returns:
     - JsonResponse: A JSON response containing all material names.
     """
-    if request.method == 'POST':
+    if request.method == 'GET':
         try:
             # Query the MaterialType model for all instances
             material_types = MaterialType.objects.all()
@@ -256,7 +256,7 @@ def get_materialTypes(request):
 @csrf_exempt
 def get_supplierNames(request):
     """
-    Handles POST requests to retrieve all supplier names from the database.
+    Handles GET requests to retrieve all supplier names from the database.
 
     This view function is designed to be used with a POST request. It queries the
     Supplier model for all instances and returns the names in a JSON response.
@@ -267,7 +267,7 @@ def get_supplierNames(request):
     Returns:
     - JsonResponse: A JSON response containing all supplier names.
     """
-    if request.method == 'POST':
+    if request.method == 'GET':
         try:
             # Query the Supplier model for all instances
             suppliers = Supplier.objects.all()
@@ -277,60 +277,6 @@ def get_supplierNames(request):
         except Exception as e:
             # Handle any exceptions that occur during the query operation
             return JsonResponse({'status': 'error', 'message': f'Error retrieving supplier names: {str(e)}'})
-    else:
-        return JsonResponse({'status': 'error', 'message': 'Invalid request method.'})
-
-
-@csrf_exempt
-def add_RawMaterial(request):
-    if request.method == 'POST':
-        # Extract data from the request
-        customer_name = request.GET.get('customer_name')
-        address = request.GET.get('address')
-        phone = request.GET.get('phone')
-        comments = request.GET.get('comments')
-
-        # Initialize an empty list to collect error messages
-        errors = []
-
-        # Check if all required fields are provided
-        if not customer_name:
-            errors.append({'status': 'error', 'message': 'Customer name is required.'})
-        if not address:
-            errors.append({'status': 'error', 'message': 'Address is required.'})
-        if not phone:
-            errors.append({'status': 'error', 'message': 'Phone is required.'})
-        if not comments:
-            errors.append({'status': 'error', 'message': 'Comments are required.'})
-
-        # Load existing customer names from DB
-        existing_names = [customer.customer_name for customer in
-                          Customer.objects.all().values_list('customer_name')]
-        # Check for duplicate name
-        if customer_name in existing_names:
-            error_message = f"Customer already exists with name '{customer_name}'. Please add full name and try again."
-            errors.append({'status': 'error', 'message': error_message})
-
-        # If there are any errors, return them in the response
-        if errors:
-            return JsonResponse({'status': 'error', 'errors': errors})
-
-        # Create a new Customer object
-        new_customer = Supplier(
-            supplier_name=customer_name,
-            address=address,
-            phone=phone,
-            comments=comments
-        )
-
-        # Save the new Customer object to the database
-        try:
-            new_customer.save()
-            return JsonResponse({'status': 'success',
-                                 'message': f'New Customer {customer_name} has been added to database successfully!'})
-        except Exception as e:
-            # Handle any exceptions that occur during the save operation
-            return JsonResponse({'status': 'error', 'message': f'Error adding Customer: {str(e)}'})
     else:
         return JsonResponse({'status': 'error', 'message': 'Invalid request method.'})
 
