@@ -445,3 +445,7 @@ def create_shipment(request):
     material_types = MaterialType.objects.filter(status='Active')
     customers = Customer.objects.filter(status='Active')
     return render(request, 'create_shipment.html', {'trucks': trucks, 'suppliers': suppliers, 'material_types': material_types, 'customers': customers})
+
+
+def apiHandler(request):
+    return JsonResponse({'status':'ok'})
