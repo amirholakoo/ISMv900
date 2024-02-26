@@ -282,7 +282,7 @@ def get_supplierNames(request):
 
 
 @csrf_exempt
-def add_RawMaterial(request):
+def add_rawMaterial(request):
     """
     Handles POST requests to add a new RawMaterial to the database.
 
@@ -308,7 +308,7 @@ def add_RawMaterial(request):
 
         # Check if all required fields are provided
         if not supplier_name:
-            errors.append({'status': 'error', 'message': 'supplier name name is required.'})
+            errors.append({'status': 'error', 'message': 'supplier name is required.'})
         if not material_type:
             errors.append({'status': 'error', 'message': 'material type is required.'})
         if not material_name:
@@ -344,6 +344,78 @@ def add_RawMaterial(request):
             return JsonResponse({'status': 'error', 'message': f'Error adding Customer: {str(e)}'})
     else:
         return JsonResponse({'status': 'error', 'message': 'Invalid request method.'})
+
+
+@csrf_exempt
+def add_reel(request):
+    if request.method == 'POST':
+        # Extract data from the request
+        reel_number = request.GET.get('reel_number')
+        width = request.GET.get('width')
+        gsm = request.GET.get('gsm')
+        length = request.GET.get('length')
+        breaks = request.GET.get('breaks')
+        grade = request.GET.get('grade')
+        consumption_profile_name = request.GET.get('consumption_profile_name')
+
+
+        # Initialize an empty list to collect error messages
+        errors = []
+
+        # Check if all required fields are provided
+        if not reel_number:
+            errors.append({'status': 'error', 'message': 'reel number is required.'})
+        if not width:
+            errors.append({'status': 'error', 'message': 'width is required.'})
+        if not gsm:
+            errors.append({'status': 'error', 'message': 'gsm is required.'})
+        if not length:
+            errors.append({'status': 'error', 'message': 'length is required.'})
+        if not breaks:
+            errors.append({'status': 'error', 'message': 'breaks is required.'})
+        if not grade:
+            errors.append({'status': 'error', 'message': 'grade is required.'})
+        if not consumption_profile_name:
+            errors.append({'status': 'error', 'message': 'consumption profile name is required.'})
+
+        # If there are any errors, return them in the response
+        if errors:
+            return JsonResponse({'status': 'error', 'errors': errors})
+
+        # Create new product (reel) and consumption objects
+        product = Product.objects.create(
+            reel_number=reel_number,
+            width=width,
+            gsm=gsm,
+            length=length,
+            breaks=breaks,
+            grade=grade,
+            location=Anbar.objects.get(pk=1),
+            status='In-stock',
+        )
+        consumption = Consumption.objects.create(
+            consumption_profile=Consumption.objects.get(pk=consumption_profile_name),
+            material_type=product.reel_number,  # Using reel number as material type
+            material_name='New Material',  # Default material name
+            quantity=1,  # Assuming quantity is 1 for new reels
+            status='Completed',
+        )
+        # Update Anbar_XXX (details needed based on the PDF diagram)
+        # ...
+
+        # Save the new object to the databases
+        try:
+            product.save()
+            consumption.save()
+            # product.save()
+            return JsonResponse({'status': 'success',
+                                 'message': f'New Reel Number:{reel_number} has been added to database successfully!'})
+        except Exception as e:
+            # Handle any exceptions that occur during the save operation
+            return JsonResponse({'status': 'error', 'message': f'Error: Reel No. already exist'})
+    else:
+        return JsonResponse({'status': 'error', 'message': 'Invalid request method.'})
+
 
 
 def add_shipment(request):
@@ -477,7 +549,7 @@ def add_anbar(request):
         return render(request, 'add_anbar.html')
 
 
-def add_reel(request):
+def add_reeel(request):
     """
     Handles requests to add a new reel.
 
