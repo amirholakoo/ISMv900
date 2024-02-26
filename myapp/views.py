@@ -225,6 +225,33 @@ def add_customer(request):
         return JsonResponse({'status': 'error', 'message': 'Invalid request method.'})
 
 
+@csrf_exempt
+def get_materialTypes(request):
+    """
+    Handles POST requests to retrieve all material names from the database.
+
+    This view function is designed to be used with a POST request. It queries the
+    MaterialType model for all instances and returns the names in a JSON response.
+
+    Parameters:
+    - request (HttpRequest): The incoming HTTP request.
+
+    Returns:
+    - JsonResponse: A JSON response containing all material names.
+    """
+    if request.method == 'POST':
+        try:
+            # Query the MaterialType model for all instances
+            material_types = MaterialType.objects.all()
+            # Extract and return the names in a JSON response
+            material_names = [material_type.name for material_type in material_types]
+            return JsonResponse({'status': 'success', 'material_names': material_names})
+        except Exception as e:
+            # Handle any exceptions that occur during the query operation
+            return JsonResponse({'status': 'error', 'message': f'Error retrieving material names: {str(e)}'})
+    else:
+        return JsonResponse({'status': 'error', 'message': 'Invalid request method.'})
+
 
 
 
@@ -243,39 +270,6 @@ def add_shipment(request):
 
     return JsonResponse()
 
-def add_customer_view(request):
-    if request.method == 'POST':
-        # Load existing customer names from DB
-        existing_names = [customer.customer_name for customer in Customer.objects.all().values_list('customer_name')]
-
-        # Validate and process form data
-        customer_name = request.GET.get('customer_name')
-        address = request.GET.get('address')
-        phone = request.GET.get('phone')
-        comments = request.GET.get('comments')
-
-        # Check for duplicate name
-        if customer_name in existing_names:
-            error_message = "Customer already exists with name '{}'. Please add full name and try again.".format(customer_name)
-            return render(request, 'add_customer.html', {'error_message': error_message})
-
-        # Create new customer object
-        new_customer = Customer(
-            customer_name=customer_name,
-            address=address,
-            phone=phone,
-            status="Active",
-            comments=f"Username Created NOW (CVS)"
-        )
-        new_customer.save()
-
-        # Success message
-        success_message = f"Customer '{customer_name}' has been added successfully."
-        return render(request, 'add_customer.html', {'success_message': success_message})
-
-    else:
-        # Display empty form
-        return render(request, 'add_customer.html')
 
 
 def new_material_type(request):
