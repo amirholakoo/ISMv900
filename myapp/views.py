@@ -281,6 +281,71 @@ def get_supplierNames(request):
         return JsonResponse({'status': 'error', 'message': 'Invalid request method.'})
 
 
+@csrf_exempt
+def add_RawMaterial(request):
+    """
+    Handles POST requests to add a new RawMaterial to the database.
+
+    This view function is designed to be used with a POST request containing the necessary
+    data for creating a new RawMaterial object. It checks for the presence of required fields,
+    creates a new RawMaterial object with the provided data, and saves it to the database.
+
+    Parameters:
+    - request (HttpRequest): The incoming HTTP request.
+
+    Returns:
+    - JsonResponse: A JSON response indicating the success or failure of the operation.
+    """
+    if request.method == 'POST':
+        # Extract data from the request
+        supplier_name = request.GET.get('supplier_name')
+        material_type = request.GET.get('material_type')
+        material_name = request.GET.get('material_name')
+        comments = request.GET.get('comments')
+
+        # Initialize an empty list to collect error messages
+        errors = []
+
+        # Check if all required fields are provided
+        if not supplier_name:
+            errors.append({'status': 'error', 'message': 'supplier name name is required.'})
+        if not material_type:
+            errors.append({'status': 'error', 'message': 'material type is required.'})
+        if not material_name:
+            errors.append({'status': 'error', 'message': 'material name is required.'})
+        if not comments:
+            errors.append({'status': 'error', 'message': 'Comments are required.'})
+        # Load existing material names from DB
+        existing_names = [customer.customer_name for customer in RawMaterial.objects.all().values_list('material_name')]
+        # Check for duplicate name
+        if material_name in existing_names:
+            error_message = f"Error: Material Name with name '{material_name}' already exist"
+            errors.append({'status': 'error', 'message': error_message})
+
+        # If there are any errors, return them in the response
+        if errors:
+            return JsonResponse({'status': 'error', 'errors': errors})
+
+        # Create a new Customer object
+        new_RawMaterial = RawMaterial(
+            supplier=supplier_name,
+            material_type=material_type,
+            material_name=material_name,
+            comments=comments
+        )
+
+        # Save the new Customer object to the database
+        try:
+            new_RawMaterial.save()
+            return JsonResponse({'status': 'success',
+                                 'message': f'New Material: {material_name} has been added to database successfully!'})
+        except Exception as e:
+            # Handle any exceptions that occur during the save operation
+            return JsonResponse({'status': 'error', 'message': f'Error adding Customer: {str(e)}'})
+    else:
+        return JsonResponse({'status': 'error', 'message': 'Invalid request method.'})
+
+
 def add_shipment(request):
     """
     Creates a new shipment based on user input.
@@ -351,53 +416,6 @@ def add_unit_success(request, unit_id):
     unit = Unit.objects.get(pk=unit_id)
     return render(request, 'add_unit_success.html', {'unit': unit})
 
-
-
-def new_raw_material(request):
-    """
-    View for adding a new raw material.
-
-    Retrieves existing suppliers and material types, validates form data,
-    and creates a new RawMaterial object if valid.
-
-    Args:
-        request: The HTTP request object.
-
-    Returns:
-        HttpResponse:
-            - Rendered new_material_form.html on GET.
-            - Redirect to add_material_success on successful POST.
-            - Rendered add_material_error.html with error message on failed POST.
-    """
-
-    suppliers = Supplier.objects.all()
-    material_types = MaterialType.objects.all()
-    if request.method == 'POST':
-        supplier_id = request.GET['supplier']
-        material_type_id = request.GET['material_type']
-        name = request.GET['name']
-        comments = request.GET.get('comments', "")  # Handle optional field
-
-        # Check for existing material with same name and supplier
-        if RawMaterial.objects.filter(supplier_id=supplier_id, material_type_id=material_type_id, name=name).exists():
-            error_message = 'Material already exists'
-            return render(request, 'add_material_error.html', {'error': error_message})
-
-        # Optionally capture username for reference
-        username = request.user.username  # If using User model
-
-        # Create new RawMaterial object
-        new_material = RawMaterial.objects.create(
-            supplier_id=supplier_id,
-            material_type_id=material_type_id,
-            name=name,
-            comments=comments,
-            username_created=username
-        )
-
-        return redirect('add_material_success', material_id=new_material.id)
-    else:
-        return render(request, 'new_material_form.html', {'suppliers': suppliers, 'material_types': material_types})
 
 
 def add_material_success(request, material_id):
