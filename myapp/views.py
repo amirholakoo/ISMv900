@@ -5,6 +5,72 @@ from django.views.decorators.csrf import csrf_exempt
 from datetime import datetime
 # Create your views here.
 
+# Incoming process:
+# Add Truck
+# Add Shipment
+# Weight 1
+# Unloading by forklift
+# Weight 2
+# Create Purchase Order
+
+# Operation API:
+@csrf_exempt
+def check_license_number(request):
+    """
+    Handles POST requests to check if a given license number exists in the Truck model.
+
+    This view function is designed to be used with a POST request containing a 'license_number'
+    in the request body. It checks the Truck model for the existence of a truck with the
+    provided license number. If the truck exists, it returns a JSON response indicating
+    that the license number exists. If the truck does not exist, it returns a JSON response
+    indicating that the license number does not exist. If the request method is not POST or
+    if the 'license_number' is not provided, it returns an error response.
+
+    Parameters:
+    - request (HttpRequest): The incoming HTTP request.
+
+    Returns:
+    - JsonResponse: A JSON response indicating the status of the license number check.
+    """
+    # Check if the request method is POST
+    if request.method == 'POST':
+        # Extract the license number from the request data
+        license_number = request.GET.get('license_number')
+        # Check if a license number was provided
+        if license_number:
+            try:
+                # Attempt to retrieve a Truck object with the provided license number
+                truck = Truck.objects.get(license_number=license_number)
+                # If the truck exists, return a success response
+                return JsonResponse({'status': 'exists', 'message': 'License number exists.'})
+            except Truck.DoesNotExist:
+                # If the truck does not exist, return an error response
+                return JsonResponse({'status': 'not_exists', 'message': 'License number does not exist.'})
+        else:
+            # If no license number was provided, return an error response
+            return JsonResponse({'status': 'error', 'message': 'License number not provided.'})
+    else:
+        # If the request method is not POST, return an error response
+        return JsonResponse({'status': 'error', 'message': 'Invalid request method.'})
+
+
+
+
+def add_shipment(request):
+    """
+    Creates a new shipment based on user input.
+
+    Handles both POST and GET requests:
+        - POST: Processes form data and creates a shipment, returning JSON response.
+
+    Validates required fields and performs appropriate actions based on shipment type.
+    """
+    if request.method == 'POST':
+        # Extract data from request.POST
+        data = dict(request.GET.items())
+
+    return JsonResponse()
+
 def add_customer_view(request):
     if request.method == 'POST':
         # Load existing customer names from DB
@@ -194,57 +260,6 @@ def add_material_success(request, material_id):
     return render(request, 'add_material_success.html', {'material': material})
 
 
-
-def add_truck(request):
-    """
-    Handles POST requests to add a new truck.
-
-    Returns:
-        JsonResponse:
-            - success (str): Success message upon successful creation.
-            - error (str): Error message if validation fails or truck already exists.
-        HttpResponse:
-            - Renders the "add_truck.html" template if GET request.
-    """
-
-    if request.method == 'POST':
-        license_number = request.GET.get('license_number')
-        driver_name = request.GET.get('driver_name')
-        driver_doc = request.GET.get('driver_doc')
-        phone = request.GET.get('phone')
-        status = request.GET.get('status')
-        location = request.GET.get('location')
-        comments = request.GET.get('comments')
-
-        # Validate input
-        if not license_number:
-            return JsonResponse({'error': 'License number is required.'}, status=400)
-
-        # Check for existing truck
-        existing_truck = Truck.objects.filter(license_number=license_number).first()
-        if existing_truck:
-            return JsonResponse({'error': 'Truck with this license number already exists.'}, status=400)
-
-        # Create new truck
-        new_truck = Truck(
-            license_number=license_number,
-            driver_name=driver_name,
-            driver_doc=driver_doc,
-            phone=phone,
-            status=status if status in ['Free', 'Busy'] else 'Free',
-            location=location,
-            comments=comments,
-        )
-        new_truck.save()
-
-        # Return success response
-        return JsonResponse({
-            'success': 'Truck added successfully.',
-            'license_number': new_truck.license_number,
-        }, status=201)
-
-    else:
-        return render(request, 'add_truck.html')
 
 
 def add_anbar(request):
@@ -448,19 +463,20 @@ def create_shipment(request):
     customers = Customer.objects.filter(status='Active')
     return render(request, 'create_shipment.html', {'trucks': trucks, 'suppliers': suppliers, 'material_types': material_types, 'customers': customers})
 
-@csrf_exempt
-def apiHandler(request, api):
-    if request.method == 'POST':
-        license_number = request.GET.get('license_number')
-        driver_name = request.GET.get('driver_name')
-        driver_doc = request.GET.get('driver_doc')
-        phone = request.GET.get('phone')
-        status = request.GET.get('status')
-        location = request.GET.get('location')
-        comments = request.GET.get('comments')
-        print(dict(request.GET.items()))
-
-        return JsonResponse({'status':'ok'})
-    else:
-        # Handle non-POST requests
-        return JsonResponse({'error': 'Method not allowed'}, status=405)
+# @csrf_exempt
+# def apiHandler(request, api):
+    # if request.method == 'POST':
+    #     license_number = request.GET.get('license_number')
+    #     driver_name = request.GET.get('driver_name')
+    #     driver_doc = request.GET.get('driver_doc')
+    #     phone = request.GET.get('phone')
+    #     status = request.GET.get('status')
+    #     location = request.GET.get('location')
+    #     comments = request.GET.get('comments')
+    #     print(dict(request.GET.items()))
+    #
+    #     return JsonResponse({'status':'ok'})
+    # else:
+    #     # Handle non-POST requests
+    #     return JsonResponse({'error': 'Method not allowed'}, status=405)
+    # if api == 'add'
