@@ -14,6 +14,8 @@ from datetime import datetime
 # Create Purchase Order
 
 # Operation API:
+
+
 @csrf_exempt
 def check_license_number(request):
     """
@@ -92,6 +94,72 @@ def add_truck(request):
         }, status=201)
 
 
+@csrf_exempt
+def add_supplier(request):
+    """
+    Handles POST requests to add a new Supplier to the database.
+
+    This view function is designed to be used with a POST request containing the necessary
+    data for creating a new Supplier object. It creates a new Supplier object with the provided
+    data and saves it to the database.
+
+    Parameters:
+    - request (HttpRequest): The incoming HTTP request.
+
+    Returns:
+    - JsonResponse: A JSON response indicating the success or failure of the operation.
+    """
+    if request.method == 'POST':
+        # Extract data from the request
+        supplier_name = request.GET.get('supplier_name')
+        address = request.GET.get('address')
+        phone = request.GET.get('phone')
+        comments = request.GET.get('comments')
+
+        # Initialize an empty list to collect error messages
+        errors = []
+
+        # Check if all required fields are provided
+        if not supplier_name:
+            errors.append({'status': 'error', 'message': 'Supplier name is required.'})
+        if not address:
+            errors.append({'status': 'error', 'message': 'Address is required.'})
+        if not phone:
+            errors.append({'status': 'error', 'message': 'Phone is required.'})
+        if not comments:
+            errors.append({'status': 'error', 'message': 'Comments are required.'})
+        # Load existing supplier names from DB
+        existing_names = [supplier.supplier_name for supplier in Supplier.objects.all().values_list('supplier_name')]
+        # Check for duplicate name
+        if supplier_name in existing_names:
+            error_message = "Supplier already exists with name '{}'. Please add full name and try again.".format(supplier_name)
+            errors.append({'status': 'error', 'message': error_message})
+
+        # If there are any errors, return them in the response
+        if errors:
+            return JsonResponse({'status': 'error', 'errors': errors})
+
+        # Create a new Supplier object
+        new_supplier = Supplier(
+            supplier_name=supplier_name,
+            address=address,
+            phone=phone,
+            comments=comments
+        )
+
+        # Save the new Supplier object to the database
+        try:
+            new_supplier.save()
+            return JsonResponse({'status': 'success', 'message': 'Supplier added successfully.'})
+        except Exception as e:
+            # Handle any exceptions that occur during the save operation
+            return JsonResponse({'status': 'error', 'message': f'Error adding supplier: {str(e)}'})
+    else:
+        return JsonResponse({'status': 'error', 'message': 'Invalid request method.'})
+
+
+
+
 
 def add_shipment(request):
     """
@@ -141,42 +209,6 @@ def add_customer_view(request):
     else:
         # Display empty form
         return render(request, 'add_customer.html')
-
-
-def add_supplier_view(request):
-    if request.method == 'POST':
-        # Load existing supplier names from DB
-        existing_names = [supplier.supplier_name for supplier in Supplier.objects.all().values_list('supplier_name')]
-
-        # Validate and process form data
-        supplier_name = request.GET.get('supplier_name')
-        address = request.GET.get('address')
-        phone = request.GET.get('phone')
-        comments = request.GET.get('comments')
-
-        # Check for duplicate name
-        if supplier_name in existing_names:
-            error_message = "Supplier already exists with name '{}'. Please add full name and try again.".format(supplier_name)
-            return render(request, 'add_supplier.html', {'error_message': error_message})
-
-        # Create new supplier object
-        new_supplier = Supplier(
-            supplier_name=supplier_name,
-            address=address,
-            phone=phone,
-            status="Active",
-            comments=f"Username Created NOW (CVS)"
-        )
-        new_supplier.save()
-
-        # Success message
-        success_message = f"Supplier '{supplier_name}' has been added successfully."
-        return render(request, 'add_supplier.html', {'success_message': success_message})
-
-    else:
-        # Display empty form
-        return render(request, 'add_supplier.html')
-
 
 
 def new_material_type(request):
