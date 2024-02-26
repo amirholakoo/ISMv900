@@ -54,6 +54,43 @@ def check_license_number(request):
         return JsonResponse({'status': 'error', 'message': 'Invalid request method.'})
 
 
+@csrf_exempt
+def add_truck(request):
+    """
+    Handles POST requests to add a new Truck to the database.
+
+    This view function is designed to be used with a POST request containing the necessary
+    data for creating a new Truck object. It creates a new Truck object with the provided
+    data and saves it to the database.
+
+    Parameters:
+    - request (HttpRequest): The incoming HTTP request.
+
+    Returns:
+    - JsonResponse: A JSON response indicating the success or failure of the operation.
+    """
+
+    if request.method == 'POST':
+        license_number = request.GET.get('license_number')
+        driver_name = request.GET.get('driver_name')
+        driver_doc = request.GET.get('driver_doc')
+        phone = request.GET.get('phone')
+
+        # Create new truck
+        new_truck = Truck(
+            license_number=license_number,
+            driver_name=driver_name,
+            driver_doc=driver_doc,
+            phone=phone,
+        )
+        new_truck.save()
+
+        # Return success response
+        return JsonResponse({
+            'success': 'Truck added successfully.',
+            'license_number': new_truck.license_number,
+        }, status=201)
+
 
 
 def add_shipment(request):
