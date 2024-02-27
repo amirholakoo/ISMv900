@@ -130,22 +130,64 @@ class Supplier(models.Model):
         return self.supplier_name
 
 
-class Product(models.Model):
-    reel_number = models.CharField(max_length=255, primary_key=True, unique=True)
-    width = models.IntegerField(blank=True, null=True)
-    gsm = models.IntegerField(blank=True, null=True)
-    length = models.IntegerField(blank=True, null=True)
-    grade = models.CharField(max_length=255, blank=True, null=True)
-    breaks = models.CharField(max_length=255, blank=True, null=True)
-    comments = models.TextField(blank=True)
-    qr_code = models.TextField(blank=True)
-    location = models.CharField(max_length=255, blank=True)
-    status = models.CharField(
-        max_length=10, choices=[('In-stock', 'In-stock'), ('Sold', 'Sold'),
-                                 ('Moved', 'Moved'), ('Delivered', 'Delivered')]
-    )
-    receive_date = models.DateTimeField(blank=True, null=True)
-    last_date = models.DateTimeField(blank=True, null=True)
+class Products(models.Model):
+    """
+    Represents a product record in the system.
+    Each record includes details about a product, such as its dimensions, grade,
+    and various attributes related to its physical properties and status.
+    """
+    # Reel number for the product, used as the primary key
+    reel_number = models.CharField(max_length=255, primary_key=True)
+
+    # Width of the product
+    width = models.IntegerField()
+
+    # GSM (Grams per Square Meter) of the product
+    gsm = models.IntegerField()
+
+    # Length of the product
+    length = models.IntegerField()
+
+    # Grade of the product
+    grade = models.CharField(max_length=255)
+
+    # Breaks of the product
+    breaks = models.CharField(max_length=255)
+
+    # Additional comments about the product
+    comments = models.TextField(null=True, blank=True)
+
+    # QR code associated with the product
+    qr_code = models.TextField(null=True, blank=True)
+
+    # Default location of the product
+    location = models.CharField(max_length=255, default='Anbar_Salon_Tolid')
+
+    # Status of the product
+    STATUS_CHOICES = [
+        ('In-stock', 'In-stock'),
+        ('Sold', 'Sold'),
+        ('Moved', 'Moved'),
+        ('Delivered', 'Delivered'),
+    ]
+    status = models.CharField(max_length=50, choices=STATUS_CHOICES)
+
+    # Date and time when the product was received
+    receive_date = models.DateTimeField()
+
+    # Last date the product was updated
+    last_date = models.DateTimeField()
+
+    # Profile name for the product
+    profile_name = models.CharField(max_length=255, null=True, blank=True)
+
+    class Meta:
+        """
+        Metadata for the Products model.
+        """
+        db_table = 'Products'
+        verbose_name = 'Product'
+        verbose_name_plural = 'Products'
 
     def __str__(self):
         return f"Product (Reel Number: {self.reel_number}, Status: {self.status})"
