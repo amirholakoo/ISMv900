@@ -284,28 +284,91 @@ class AnbarSangin(models.Model):
         return f"Anbar Sangin (ID: {self.id}, Reel Number: {self.reel_number})"
 
 
+
 class AnbarSalonTolid(models.Model):
+    """
+    Represents a record in the Anbar Salon Tolid table.
+    Each record includes details about a material, such as the supplier, material type,
+    and various attributes related to the material's physical properties and status.
+    """
+    # Auto-incrementing primary key
     id = models.AutoField(primary_key=True)
-    receive_date = models.DateTimeField(blank=True, null=True)
-    reel_number = models.CharField(max_length=255)
-    supplier = models.ForeignKey(Supplier, on_delete=models.CASCADE)
-    supplier_name = models.CharField(max_length=255, blank=True)
-    material_type = models.CharField(max_length=255)
-    material_name = models.CharField(max_length=255)
-    description = models.TextField(blank=True)
-    status = models.CharField(max_length=10, choices=[('In-stock', 'In-stock'), ('Moved', 'Moved'), ('Used', 'Used')])
-    location = models.CharField(max_length=255, blank=True)
-    last_date = models.DateTimeField(blank=True, null=True)
-    width = models.IntegerField(blank=True, null=True)
-    gsm = models.IntegerField(blank=True, null=True)
-    length = models.IntegerField(blank=True, null=True)
-    grade = models.CharField(max_length=255, blank=True, null=True)
-    breaks = models.CharField(max_length=255, blank=True, null=True)
-    comments = models.TextField(blank=True)
-    qr_code = models.TextField(blank=True)
+
+    # Date and time when the record was received
+    receive_date = models.DateTimeField(null=True, blank=True)
+
+    # Reel number for the material
+    reel_number = models.CharField(max_length=255, null=True, blank=True)
+
+    # Foreign key to the Supplier model (assuming it exists)
+    supplier_id = models.ForeignKey('Supplier', on_delete=models.SET_NULL, null=True, blank=True)
+
+    # Name of the supplier
+    supplier_name = models.CharField(max_length=255, null=True, blank=True)
+
+    # Type of material
+    material_type = models.CharField(max_length=255, null=True, blank=True)
+
+    # Name of the material
+    material_name = models.CharField(max_length=255, null=True, blank=True)
+
+    # Description of the material
+    description = models.TextField(null=True, blank=True)
+
+    # Status of the material
+    STATUS_CHOICES = [
+        ('In-stock', 'In-stock'),
+        ('Sold', 'Sold'),
+        ('Moved', 'Moved'),
+        ('Used', 'Used'),
+        ('Canceled', 'Canceled'),
+    ]
+    status = models.CharField(max_length=50, choices=STATUS_CHOICES, null=True, blank=True)
+
+    # Location of the material
+    location = models.CharField(max_length=255, null=True, blank=True)
+
+    # Last date the material was updated
+    last_date = models.DateTimeField(null=True, blank=True)
+
+    # Width of the material
+    width = models.IntegerField(null=True, blank=True)
+
+    # GSM (Grams per Square Meter) of the material
+    gsm = models.IntegerField(null=True, blank=True)
+
+    # Length of the material
+    length = models.IntegerField(null=True, blank=True)
+
+    # Grade of the material
+    grade = models.CharField(max_length=255, null=True, blank=True)
+
+    # Breaks of the material
+    breaks = models.CharField(max_length=255, null=True, blank=True)
+
+    # Additional comments about the material
+    comments = models.TextField(null=True, blank=True)
+
+    # QR code associated with the material
+    qr_code = models.TextField(null=True, blank=True)
+
+    # Profile name for the material
+    profile_name = models.CharField(max_length=255, null=True, blank=True)
+
+    class Meta:
+        """
+        Metadata for the AnbarSalonTolid model.
+        """
+        db_table = 'Anbar_Salon_Tolid'
+        verbose_name = 'Anbar Salon Tolid'
+        verbose_name_plural = 'Anbar Salon Tolids'
 
     def __str__(self):
-        return f"Anbar Salon Tolid (Reel: {self.reel_number}, Status: {self.status})"
+        """
+        Returns a string representation of the AnbarSalonTolid object.
+        This string is used as the object's identifier in the Django admin site and other places.
+        """
+        return f"Anbar Salon Tolid (Reel: {self.reel_number}, Status: {self.status}), {self.material_name} - {self.supplier_name}"
 
 
 class AnbarParvandeh(models.Model):
