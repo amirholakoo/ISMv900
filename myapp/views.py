@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from .models import *
-from django.http import  JsonResponse
+from django.http import JsonResponse
+from django.core.exceptions import ValidationError
 from django.views.decorators.csrf import csrf_exempt
 from datetime import datetime
 # Create your views here.
@@ -345,7 +346,7 @@ def add_rawMaterial(request):
     else:
         return JsonResponse({'status': 'error', 'message': 'Invalid request method.'})
 
-
+@csrf_exempt
 def get_consumption_profile_names(request):
     """
     Retrieves all profile names from the Consumption model and returns them as a JSON response.
@@ -385,74 +386,126 @@ def get_consumption_profile_names(request):
 
 
 @csrf_exempt
-def add_reel(request):
+def add_new_reel(request):
+    """
+    Handles the addition of a new reel to the system.
+
+    This function processes a POST request to add a new reel, which involves
+    creating new records in the Products and AnbarSalonTolid models, and updating
+    the Consumption model based on the selected consumption profile. The function
+    also validates the form data and handles errors gracefully by returning
+    appropriate HTTP status codes and error messages.
+
+    Parameters:
+        request (HttpRequest): The HTTP request object containing the form data.
+
+    Returns:
+        JsonResponse: A JSON response containing a success message and the new reel number
+                      if the operation is successful, or an error message if an error occurs.
+
+    Raises:
+        ValidationError: If the form data fails validation.
+
+    Example usage:
+        POST /add_new_reel/
+        Form data: {
+            "reel_number": "RN123",
+            "width":  100,
+            "gsm":  80,
+            "length":  200,
+            "breaks": "B10",
+            "grade": "Grade A",
+            "consumption_profile": "Profile1"
+        }
+
+    Example response (success):
+        {
+            "message": "Reel number has been added",
+            "reel_number": "RN124"
+        }
+
+    Example response (error):
+        {
+            "error": "Invalid form data"
+        }
+    """
     if request.method == 'POST':
-        # Extract data from the request
-        reel_number = request.GET.get('reel_number')
-        width = request.GET.get('width')
-        gsm = request.GET.get('gsm')
-        length = request.GET.get('length')
-        breaks = request.GET.get('breaks')
-        grade = request.GET.get('grade')
-        consumption_profile_name = request.GET.get('consumption_profile_name')
-
-
-        # Initialize an empty list to collect error messages
-        errors = []
-
-        # Check if all required fields are provided
-        if not reel_number:
-            errors.append({'status': 'error', 'message': 'reel number is required.'})
-        if not width:
-            errors.append({'status': 'error', 'message': 'width is required.'})
-        if not gsm:
-            errors.append({'status': 'error', 'message': 'gsm is required.'})
-        if not length:
-            errors.append({'status': 'error', 'message': 'length is required.'})
-        if not breaks:
-            errors.append({'status': 'error', 'message': 'breaks is required.'})
-        if not grade:
-            errors.append({'status': 'error', 'message': 'grade is required.'})
-        if not consumption_profile_name:
-            errors.append({'status': 'error', 'message': 'consumption profile name is required.'})
-
-        # If there are any errors, return them in the response
-        if errors:
-            return JsonResponse({'status': 'error', 'errors': errors})
-
-        # Create new product (reel) and consumption objects
-        product = Product.objects.create(
-            reel_number=reel_number,
-            width=width,
-            gsm=gsm,
-            length=length,
-            breaks=breaks,
-            grade=grade,
-            location=Anbar.objects.get(pk=1),
-            status='In-stock',
-        )
-        consumption = Consumption.objects.create(
-            consumption_profile=Consumption.objects.get(pk=consumption_profile_name),
-            material_type=product.reel_number,  # Using reel number as material type
-            material_name='New Material',  # Default material name
-            quantity=1,  # Assuming quantity is 1 for new reels
-            status='Completed',
-        )
-        # Update Anbar_XXX (details needed based on the PDF diagram)
-        # ...
-
-        # Save the new object to the databases
         try:
-            product.save()
-            consumption.save()
-            # product.save()
-            return JsonResponse({'status': 'success',
-                                 'message': f'New Reel Number:{reel_number} has been added to database successfully!'})
+            # Extract form data from the request
+            reel_number = request.GET.get('reel_number')
+            width = request.GET.get('width')
+            gsm = request.GET.get('gsm')
+            length = request.GET.get('length')
+            breaks = request.GET.get('breaks')
+            grade = request.GET.get('grade')
+            consumption_profile_name = request.GET.get('consumption_profile_name')
+
+            # Initialize an empty list to collect error messages
+            errors = []
+
+            # Check if all required fields are provided
+            if not reel_number:
+                errors.append({'status': 'error', 'message': 'reel number is required.'})
+            if not width:
+                errors.append({'status': 'error', 'message': 'width is required.'})
+            if not gsm:
+                errors.append({'status': 'error', 'message': 'gsm is required.'})
+            if not length:
+                errors.append({'status': 'error', 'message': 'length is required.'})
+            if not breaks:
+                errors.append({'status': 'error', 'message': 'breaks is required.'})
+            if not grade:
+                errors.append({'status': 'error', 'message': 'grade is required.'})
+            if not consumption_profile_name:
+                errors.append({'status': 'error', 'message': 'consumption profile name is required.'})
+
+            # If there are any errors, return them in the response
+            if errors:
+                return JsonResponse({'status': 'error', 'errors': errors})
+
+            # Load the last reel number from the Products DB
+            last_reel_number = Products.objects.latest('reel_number').reel_number
+            next_reel_number = f"{last_reel_number[:-1]}{int(last_reel_number[-1]) +   1}"
+
+            # Create a new Products record
+            new_product = Products(
+                reel_number=next_reel_number,
+                width=width,
+                gsm=gsm,
+                length=length,
+                breaks=breaks,
+                grade=grade,
+                profile_name=consumption_profile_name,
+            )
+            new_product.save()
+
+            # Create a new AnbarSalonTolid record
+            new_anbar_record = AnbarSalonTolid(
+                reel_number=next_reel_number,
+                width=width,
+                gsm=gsm,
+                length=length,
+                breaks=breaks,
+                grade=grade,
+                profile_name=consumption_profile_name,
+            )
+            new_anbar_record.save()
+
+            # Update the Consumption DB based on the selected consumption profile
+            # Note: Add your own logic to update the Consumption model here
+
+            # Return a success response
+            return JsonResponse({'message': 'Reel number has been added', 'reel_number': next_reel_number}, status=200)
+
+        except ValidationError as e:
+            # Return a validation error response
+            return JsonResponse({'error': str(e)}, status=400)
+
         except Exception as e:
-            # Handle any exceptions that occur during the save operation
-            return JsonResponse({'status': 'error', 'message': f'Error: Reel No. already exist'})
+            # Return a general error response
+            return JsonResponse({'error': str(e)}, status=500)
     else:
-        return JsonResponse({'status': 'error', 'message': 'Invalid request method.'})
+        return JsonResponse({'error': 'Invalid request method'}, status=405)
 
 
 
@@ -586,92 +639,6 @@ def add_anbar(request):
     else:
         return render(request, 'add_anbar.html')
 
-
-def add_reeel(request):
-    """
-    Handles requests to add a new reel.
-
-    Returns:
-        HttpResponse:
-            - Renders the "add_reel.html" template if GET request.
-        JsonResponse:
-            - Success message and reel data upon successful creation.
-            - Error message and error details upon validation failure or issue.
-    """
-
-    if request.method == 'GET':
-        # Get last reel number and consumption profile data
-        last_reel_number = Product.objects.order_by('reel_number').last().reel_number if Product.objects.exists() else None
-        consumption_profiles = Consumption.objects.all()
-
-        context = {
-            'last_reel_number': last_reel_number,
-            'consumption_profiles': consumption_profiles,
-        }
-        return render(request, 'add_reel.html', context)
-
-    elif request.method == 'POST':
-        # Validate user input
-        reel_number = request.GET.get('reel_number').strip()
-        width = float(request.GET.get('width')) if request.GET.get('width') else None
-        gsm = float(request.GET.get('gsm')) if request.GET.get('gsm') else None
-        length = float(request.GET.get('length')) if request.GET.get('length') else None
-        breaks = int(request.GET.get('breaks')) if request.GET.get('breaks') else None
-        grade = request.GET.get('grade').strip() if request.GET.get('grade') else None
-        consumption_profile_id = int(request.GET.get('consumption_profile'))
-
-        errors = {}
-        if not reel_number:
-            errors['reel_number'] = 'Reel number is required.'
-        elif Product.objects.filter(reel_number=reel_number).exists():
-            errors['reel_number'] = 'Reel number already exists.'
-        if not width:
-            errors['width'] = 'Width is required.'
-        if not gsm:
-            errors['gsm'] = 'GSM is required.'
-        if not length:
-            errors['length'] = 'Length is required.'
-        if not breaks:
-            errors['breaks'] = 'Number of breaks is required.'
-        if not grade:
-            errors['grade'] = 'Grade is required.'
-        if not Consumption.objects.filter(pk=consumption_profile_id).exists():
-            errors['consumption_profile'] = 'Invalid consumption profile.'
-
-        if errors:
-            return JsonResponse({'error': errors})
-
-        # Create new product (reel) and consumption objects
-        product = Product.objects.create(
-            reel_number=reel_number,
-            width=width,
-            gsm=gsm,
-            length=length,
-            breaks=breaks,
-            grade=grade,
-            location=Anbar.objects.get(pk=1),  # Assuming Anbar_Salon_Tolid has ID 1
-            status='In-stock',
-        )
-        consumption = Consumption.objects.create(
-            consumption_profile=Consumption.objects.get(pk=consumption_profile_id),
-            material_type=product.reel_number,  # Using reel number as material type
-            material_name='New Material',  # Default material name
-            quantity=1,  # Assuming quantity is 1 for new reels
-            status='Completed',
-        )
-
-        # Update Anbar_XXX (details needed based on the PDF diagram)
-        # ...
-
-        # Return success response
-        return JsonResponse({
-            'success': 'Reel added successfully!',
-            'reel_number': reel_number,
-            # Add other relevant reel data to the response as needed
-        })
-
-    else:
-        return JsonResponse({'error': 'Invalid request method.'})
 
 
 
