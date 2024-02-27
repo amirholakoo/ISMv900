@@ -460,18 +460,51 @@ class Anbar_Akhal(models.Model):
         return f"Anbar Akhal (Reel Number: {self.reel_number}, Status: {self.status})"
 
 
+from django.db import models
+
+
 class Consumption(models.Model):
+    """
+    Represents a consumption record in the system.
+    Each record includes details about the material consumed,
+    such as the supplier, material type, and quantity.
+    """
+    # Auto-incrementing primary key
     consumption_id = models.AutoField(primary_key=True)
-    date = models.DateTimeField(null=False)
-    supplier = models.ForeignKey(Supplier, on_delete=models.SET_NULL, blank=True, null=True)
-    supplier_name = models.CharField(max_length=255, blank=True)  # redundant if using supplier FK
-    material_type = models.CharField(max_length=255, blank=True)
-    material_name = models.CharField(max_length=255, blank=True)
-    description = models.TextField(blank=True)
-    status = models.CharField(max_length=50, blank=True)
+
+    # Date and time when the consumption was recorded
+    receive_date = models.DateTimeField(null=True, blank=True)
+
+    # Foreign key to the Supplier model (assuming it exists)
+    supplier_id = models.ForeignKey('Supplier', on_delete=models.SET_NULL, null=True, blank=True)
+
+    # Name of the supplier
+    supplier_name = models.CharField(max_length=255, null=True, blank=True)
+
+    # Type of material consumed
+    material_type = models.CharField(max_length=255, null=True, blank=True)
+
+    # Name of the material consumed
+    material_name = models.CharField(max_length=255, null=True, blank=True)
+
+    # Unit of measurement for the material
+    unit = models.CharField(max_length=255, null=True, blank=True)
+
+    # Reel number for the material
+    reel_number = models.CharField(max_length=255, null=True, blank=True)
+
+    # Profile name for the material
+    profile_name = models.CharField(max_length=255, null=True, blank=True)
+
+    # Additional comments about the consumption
+    comments = models.TextField(null=True, blank=True)
+
+    # Status of the consumption
+    status = models.CharField(max_length=50, null=True, blank=True)
 
     def __str__(self):
-        return f"Consumption (ID: {self.consumption_id}, Date: {self.date})"
+        return f"Consumption (ID: {self.consumption_id}, Date: {self.date}, profile name: {self.profile_name})"
+
 
 
 class MaterialType(models.Model):
