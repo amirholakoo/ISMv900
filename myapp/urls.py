@@ -10,5 +10,6 @@ urlpatterns = [
     path("api/getMaterialTypes", get_materialTypes),
     path("api/getSupplierNames", get_supplierNames),
     path("api/addRawMaterial", add_rawMaterial),
-    path("api/addReel", add_reel),
+    path("api/getConsumptionProfileNames", get_consumption_profile_names),
+    path("api/addNewReel", add_new_reel),
 ]
