@@ -346,6 +346,44 @@ def add_rawMaterial(request):
         return JsonResponse({'status': 'error', 'message': 'Invalid request method.'})
 
 
+def get_consumption_profile_names(request):
+    """
+    Retrieves all profile names from the Consumption model and returns them as a JSON response.
+
+    This view function is designed to be accessed via a GET request. It queries the database for all
+    Consumption records, extracts the 'profile_name' attribute from each record, and returns these names
+    in a JSON format. The response includes a list of profile names under the key 'profile_names'.
+
+    If an exception occurs during the process, the function returns a JSON response with an error message
+    and a  500 status code.
+
+    Returns:
+        JsonResponse: A JSON response containing a list of profile names or an error message.
+
+    Example usage:
+        GET /consumption/profile_names/
+
+    Example response:
+        {
+            "profile_names": ["Profile1", "Profile2", "Profile3"]
+        }
+    """
+    if request.method == 'GET':
+        try:
+            # Retrieve all consumption records
+            consumptions = Consumption.objects.all()
+
+            # Extract the profile names from each record
+            profile_names = [consumption.profile_name for consumption in consumptions]
+
+            # Return the profile names as a JSON response
+            return JsonResponse({'profile_names': profile_names}, status=200)
+
+        except Exception as e:
+            # Return a   500 error for any exceptions
+            return JsonResponse({'error': str(e)}, status=500)
+
+
 @csrf_exempt
 def add_reel(request):
     if request.method == 'POST':
