@@ -226,7 +226,6 @@ def add_customer(request):
         return JsonResponse({'status': 'error', 'message': 'Invalid request method.'})
 
 
-@csrf_exempt
 def get_materialTypes(request):
     """
     Handles GET requests to retrieve all material names from the database.
@@ -254,7 +253,6 @@ def get_materialTypes(request):
         return JsonResponse({'status': 'error', 'message': 'Invalid request method.'})
 
 
-@csrf_exempt
 def get_supplierNames(request):
     """
     Handles GET requests to retrieve all supplier names from the database.
@@ -346,7 +344,7 @@ def add_rawMaterial(request):
     else:
         return JsonResponse({'status': 'error', 'message': 'Invalid request method.'})
 
-@csrf_exempt
+
 def get_consumption_profile_names(request):
     """
     Retrieves all profile names from the Consumption model and returns them as a JSON response.
@@ -508,7 +506,40 @@ def add_new_reel(request):
         return JsonResponse({'error': 'Invalid request method'}, status=405)
 
 
+def get_license_numbers(request):
+    """
+    Handles GET requests to retrieve all license numbers of trucks.
 
+    This function queries the Truck model for all records and returns the license numbers
+    in a JSON response. It handles errors by returning appropriate HTTP status codes
+    and error messages.
+
+    Parameters:
+        request (HttpRequest): The HTTP request object.
+
+    Returns:
+        JsonResponse: A JSON response containing a list of all license numbers if the
+                      operation is successful, or an error message if an error occurs.
+    """
+    if request.method == 'GET':
+        try:
+            # Query the Truck model for all records
+            trucks = Truck.objects.all()
+
+            # Extract the license numbers from the queryset
+            license_numbers = [truck.license_number for truck in trucks]
+
+            # Return the license numbers as a JSON response
+            return JsonResponse({'license_numbers': license_numbers}, status=200)
+
+        except Exception as e:
+            # Return a general error response
+            return JsonResponse({'error': str(e)}, status=500)
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=405)
+
+
+@csrf_exempt
 def add_shipment(request):
     """
     Creates a new shipment based on user input.
@@ -519,8 +550,13 @@ def add_shipment(request):
     Validates required fields and performs appropriate actions based on shipment type.
     """
     if request.method == 'POST':
-        # Extract data from request.POST
-        data = dict(request.GET.items())
+        # Extract data from request.GET
+        license_number = request.GET.get('license_number')
+        supplier_name = request.GET.get('supplier_name')
+        material_type = request.GET.get('material_type')
+        material_name = request.GET.get('material_name')
+        shipment_type = request.GET.get('shipment_type')
+        customer_name = request.GET.get('customer_name')
 
     return JsonResponse()
 
