@@ -794,6 +794,48 @@ def create_purchase_order(request):
         return JsonResponse({'success': False, 'message': 'Invalid request method.'})
 
 
+@csrf_exempt
+def create_sales_order(request):
+    """
+    Function to create a Sales Order and update related entities based on the provided algorithm.
+    """
+    if request.method == 'POST':
+        # Assuming the request data is in JSON format
+        data = request.json()
+
+        try:
+            # Retrieve the shipment instance
+            shipment = Shipment.objects.get(shipment_id=data['shipment_id'])
+
+            # Update shipment fields
+            shipment.status = 'Delivered'
+            shipment.location = 'Delivered'
+            shipment.exit_time = timezone.now()
+
+            # Calculate total price
+            total_price = shipment.net_weight * shipment.price_per_kg * (shipment.vat / 100)
+
+            # Update other fields as necessary
+            # This is a simplified example, you might need to adjust based on your actual requirements
+
+            # Save the updated shipment
+            shipment.save()
+
+            # Perform other updates as per the algorithm
+            # This might involve updating other models like Products, Anbar_, Trucks, etc.
+            # This is a simplified example, you might need to adjust based on your actual requirements
+
+            # Return a success response
+            return JsonResponse({'status': 'success', 'message': 'Sales Order created successfully.'})
+
+        except Shipment.DoesNotExist:
+            return JsonResponse({'status': 'error', 'message': 'Shipment not found.'}, status=404)
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+    else:
+        return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=400)
+
+
 def new_material_type(request):
     existing_types = MaterialType.objects.all()
     if request.method == 'POST':
