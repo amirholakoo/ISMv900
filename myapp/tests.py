@@ -235,3 +235,63 @@ class CustomerModelTest(TestCase):
         Test the string representation of a Customer instance.
         """
         self.assertEqual(str(self.customer), 'Test Customer')
+
+
+class RawMaterialModelTest(TestCase):
+    """
+    Test case for the RawMaterial model.
+    """
+
+    def setUp(self):
+        """
+        Set up the test environment.
+        """
+        # Create a supplier instance
+        self.supplier = Supplier.objects.create(name='Test Supplier')
+
+        # Create a RawMaterial instance
+        self.raw_material = RawMaterial.objects.create(
+            supplier=self.supplier,
+            material_type='Cotton',
+            material_name='Pima Cotton',
+            status='Available',
+            comments='High-quality cotton'
+        )
+
+    def test_create_raw_material(self):
+        """
+        Test creating a RawMaterial instance.
+        """
+        self.assertIsInstance(self.raw_material, RawMaterial)
+        self.assertEqual(self.raw_material.__str__(), 'Pima Cotton (ID: 1)')
+
+    def test_update_raw_material(self):
+        """
+        Test updating a RawMaterial instance.
+        """
+        self.raw_material.status = 'Low Stock'
+        self.raw_material.save()
+
+        self.raw_material.refresh_from_db()
+        self.assertEqual(self.raw_material.status, 'Low Stock')
+
+    def test_delete_raw_material(self):
+        """
+        Test deleting a RawMaterial instance.
+        """
+        self.raw_material.delete()
+        with self.assertRaises(RawMaterial.DoesNotExist):
+            RawMaterial.objects.get(id=self.raw_material.id)
+
+    def test_get_raw_material(self):
+        """
+        Test retrieving a RawMaterial instance.
+        """
+        retrieved_material = RawMaterial.objects.get(id=self.raw_material.id)
+        self.assertEqual(retrieved_material, self.raw_material)
+
+    def test_raw_material_str(self):
+        """
+        Test the __str__ method of the RawMaterial model.
+        """
+        self.assertEqual(str(self.raw_material), 'Pima Cotton (ID: 1)')
