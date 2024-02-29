@@ -15,4 +15,5 @@ urlpatterns = [
     path("api/getLicenseNumbers", get_license_numbers),
     path("api/getMaterialNames", get_material_names),
     path("api/addShipment", add_shipment),
+    path("api/updateWeight1", update_weight1),
 ]

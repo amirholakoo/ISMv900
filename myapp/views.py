@@ -3,6 +3,8 @@ from .models import *
 from django.http import JsonResponse
 from django.core.exceptions import ValidationError
 from django.views.decorators.csrf import csrf_exempt
+from django.utils import timezone
+
 from datetime import datetime
 # Create your views here.
 
@@ -539,16 +541,41 @@ def get_license_numbers(request):
         return JsonResponse({'error': 'Invalid request method'}, status=405)
 
 
+def get_material_names(request):
+    """
+    Handles GET requests to retrieve all material names from the RawMaterial model.
+
+    This function queries the RawMaterial model for all records and returns the
+    material names in a JSON response. If an error occurs during the process,
+    it returns an appropriate HTTP status code and error message.
+
+    Parameters:
+        request (HttpRequest): The HTTP request object.
+
+    Returns:
+        JsonResponse: A JSON response containing a list of all material names
+                      if the operation is successful, or an error message if an error occurs.
+    """
+    if request.method == 'GET':
+        try:
+            # Query the RawMaterial model for all records
+            materials = RawMaterial.objects.all()
+
+            # Extract the material names from the queryset
+            material_names = [material.material_name for material in materials]
+
+            # Return the material names in a JSON response
+            return JsonResponse({'material_names': material_names}, status=200)
+
+        except Exception as e:
+            # Return a general error response
+            return JsonResponse({'error': str(e)}, status=500)
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=405)
+
+
 @csrf_exempt
 def add_shipment(request):
-    """
-    Creates a new shipment based on user input.
-
-    Handles both POST and GET requests:
-        - POST: Processes form data and creates a shipment, returning JSON response.
-
-    Validates required fields and performs appropriate actions based on shipment type.
-    """
     if request.method == 'POST':
         # Extract data from request.GET
         license_number = request.GET.get('license_number')
@@ -558,8 +585,121 @@ def add_shipment(request):
         shipment_type = request.GET.get('shipment_type')
         customer_name = request.GET.get('customer_name')
 
-    return JsonResponse()
+        # Check required fields
+        errors = []
+        if not license_number:
+            errors.append('License number is required.')
+        if not supplier_name:
+            errors.append('supplier name is required.')
+        if not material_type:
+            errors.append('material type is required.')
+        if not material_name:
+            errors.append('material name is required.')
+        if not shipment_type:
+            errors.append('shipment type is required.')
+        if not customer_name:
+            errors.append('customer name is required.')
 
+        if errors:
+            return JsonResponse({'status': 'error', 'errors': errors})
+        else:
+            # Process data and create shipment
+            truck = Truck.objects.filter(license_number=license_number, status='Free').first()
+            if not truck:
+                return JsonResponse({'status': 'error', 'message': 'No free truck with that license number.'})
+            else:
+                truck.save()
+
+            shipment = Shipment()
+            shipment.entry_time = timezone.now()
+            shipment.license_number = license_number
+            shipment.shipment_type = shipment_type
+
+            # Handle incoming/outgoing shipment logic
+            if shipment_type == 'Incoming':
+                shipment.supplier = Supplier.objects.get(supplier_name=supplier_name)
+                shipment.material_type = MaterialType.objects.get(material_type=material_type)
+                shipment.material_name = MaterialType.objects.get(material_name=material_name)
+                # Update material quantity if applicable
+                # ...
+
+            elif shipment_type == 'Outgoing':
+                shipment.customer = Customer.objects.get(customer_name=customer_name)
+                # Update customer inventory if applicable
+                # ...
+
+            shipment.save()
+
+            # truck.status = 'Busy'
+            # truck.location = 'Entrance'
+            # truck.save()
+
+            return JsonResponse({'status': 'success', 'message': 'Shipment created successfully!'})
+    else:
+        return JsonResponse({'status': 'error', 'message': 'Invalid request method.'})
+
+
+
+# Weight Station/Create Orders
+
+
+@csrf_exempt
+def update_weight1(request):
+    """
+    Handles a POST request to update the weight1 field of a Shipment instance.
+
+    This view function expects the following data in the POST request:
+    - shipment_id: The UUID of the Shipment instance to update.
+    - weight1: The new weight1 value to set, as a string that can be converted to a float.
+    - username: The username of the user making the request, used for comments.
+
+    It performs the following operations:
+    - Validates that the weight1 value is within the range of 9 to 38000 KG.
+    - Retrieves the Shipment instance by its shipment_id.
+    - Updates the weight1, weight1_time, and comments fields of the Shipment instance.
+    - Saves the changes to the database.
+    - Returns a JSON response indicating success or failure, along with a message.
+
+    Parameters:
+    - request: The Django HttpRequest object.
+
+    Returns:
+    - A JsonResponse object with a success flag and a message.
+    """
+    if request.method == 'POST':
+        # Assuming shipment_id and weight1 are sent in the POST data
+        shipment_id = request.GET.get('shipment_id')
+        weight1 = request.GET.get('weight1')
+        username = request.GET.get('username')
+
+        try:
+            # Convert weight1 to a decimal and validate the range
+            weight1 = float(weight1)
+            if weight1 < 9 or weight1 > 38000:
+                return JsonResponse({'success': False, 'message': 'Weight must be between 9 and 38000 KG.'})
+
+            # Retrieve the shipment instance
+            shipment = Shipment.objects.get(shipment_id=shipment_id)
+
+            # Update the fields
+            shipment.weight1 = weight1
+            shipment.weight1_time = timezone.now()
+            shipment.comments = f"{username} Weight1"
+
+            # Save the changes
+            shipment.save()
+
+            # Return a success response
+            return JsonResponse({'success': True, 'message': f'You entered WEIGHT 1 KG for Shipment for SUPPLIER/CUSTOMER with LICENSE NUMBER: {shipment.license_number} has been added.'})
+
+        except Shipment.DoesNotExist:
+            return JsonResponse({'success': False, 'message': 'Shipment not found.'})
+        except ValueError:
+            return JsonResponse({'success': False, 'message': 'Invalid weight format.'})
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': str(e)})
+
+    return JsonResponse({'success': False, 'message': 'Invalid request method.'})
 
 
 def new_material_type(request):
@@ -587,7 +727,6 @@ def add_material_success(request, material_type_id):
     return render(request, 'add_material_success.html', {'material_type': material_type})
 
 
-
 def new_unit(request):
     existing_units = Unit.objects.all()
     if request.method == 'POST':
@@ -610,11 +749,9 @@ def new_unit(request):
         return render(request, 'new_unit_form.html', {'existing_units': existing_units})
 
 
-
 def add_unit_success(request, unit_id):
     unit = Unit.objects.get(pk=unit_id)
     return render(request, 'add_unit_success.html', {'unit': unit})
-
 
 
 def add_material_success(request, material_id):
@@ -631,8 +768,6 @@ def add_material_success(request, material_id):
 
     material = RawMaterial.objects.get(pk=material_id)
     return render(request, 'add_material_success.html', {'material': material})
-
-
 
 
 def add_anbar(request):
@@ -675,80 +810,6 @@ def add_anbar(request):
     else:
         return render(request, 'add_anbar.html')
 
-
-
-
-from django.utils import timezone
-
-def create_shipment(request):
-    """
-    Creates a new shipment based on user input.
-
-    Handles both POST and GET requests:
-        - POST: Processes form data and creates a shipment, returning JSON response.
-        - GET: Renders the initial form with available trucks, suppliers, etc.
-
-    Validates required fields and performs appropriate actions based on shipment type.
-    """
-
-    if request.method == 'POST':
-        # Extract data from request.POST
-        license_number = request.GET.get('license_number')
-        supplier_id = request.GET.get('supplier')
-        material_type_id = request.GET.get('material_type')
-        material_id = request.GET.get('material')
-        customer_id = request.GET.get('customer')
-        shipment_type = request.GET.get('shipment_type')
-
-        # Check required fields
-        errors = []
-        if not license_number:
-            errors.append('License number is required.')
-        if shipment_type == 'Incoming' and not (supplier_id and material_type_id and material_id):
-            errors.append('Supplier, material type, and material are required for incoming shipments.')
-        if shipment_type == 'Outgoing' and not customer_id:
-            errors.append('Customer is required for outgoing shipments.')
-
-        if errors:
-            return JsonResponse({'status': 'error', 'errors': errors})
-
-        # Process data and create shipment
-        truck = Truck.objects.filter(license_number=license_number, status='Free').first()
-        if not truck:
-            return JsonResponse({'status': 'error', 'message': 'No free truck with that license number.'})
-
-        shipment = Shipment()
-        shipment.entry_time = timezone.now()
-        shipment.license_number = license_number
-        shipment.shipment_type = shipment_type
-
-        # Handle incoming/outgoing shipment logic
-        if shipment_type == 'Incoming':
-            shipment.supplier = Supplier.objects.get(pk=supplier_id)
-            shipment.material_type = MaterialType.objects.get(pk=material_type_id)
-            shipment.material = MaterialType.objects.get(pk=material_id)
-            # Update material quantity if applicable
-            # ...
-
-        elif shipment_type == 'Outgoing':
-            shipment.customer = Customer.objects.get(pk=customer_id)
-            # Update customer inventory if applicable
-            # ...
-
-        shipment.save()
-
-        truck.status = 'Busy'
-        truck.location = 'Entrance'
-        truck.save()
-
-        return JsonResponse({'status': 'success', 'message': 'Shipment created successfully!'})
-
-    # Render initial form or handle GET requests
-    trucks = Truck.objects.filter(status='Free')
-    suppliers = Supplier.objects.filter(status='Active')
-    material_types = MaterialType.objects.filter(status='Active')
-    customers = Customer.objects.filter(status='Active')
-    return render(request, 'create_shipment.html', {'trucks': trucks, 'suppliers': suppliers, 'material_types': material_types, 'customers': customers})
 
 # @csrf_exempt
 # def apiHandler(request, api):
