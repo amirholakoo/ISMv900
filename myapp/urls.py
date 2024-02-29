@@ -22,4 +22,5 @@ urlpatterns = [
     path("api/unload", unload),
     path("api/loaded", loaded),
     path("api/used", used),
+    path("api/moved", moved),
 ]

@@ -1044,6 +1044,83 @@ def used(request):
     else:
         return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=400)
 
+
+@csrf_exempt
+def moved(request):
+    """
+    Handles the movement of materials within the warehouse by updating the AnbarGeneric models.
+
+    This view processes a POST request containing movement details, including the source and destination
+    locations, the type of material (raw or reel), and the specific details of the material (supplier name,
+    material name, unit, quantity, width, reel numbers, and forklift driver). It updates the status,
+    location, and last date of the source AnbarGeneric items to reflect their movement and creates new
+    entries in the destination AnbarGeneric location for the moved materials.
+
+    The view returns a JSON response indicating the success or failure of the operation, including a
+    message detailing the outcome.
+
+    Parameters:
+    - request (HttpRequest): The HTTP request object containing the POST data.
+
+    Returns:
+    - JsonResponse: A JSON response indicating the success or failure of the operation, along with
+                    a message detailing the outcome.
+
+    Raises:
+    - HttpResponse: If an exception occurs during the operation, with a status code indicating the
+                    type of error.
+
+    Example POST data:
+    {
+        "from_anbar": "Weight1",
+        "to_anbar": "Weight2",
+        "material_type": "Raw",
+        "supplier_name": "Supplier A",
+        "material_name": "Material X",
+        "unit": "Unit 1",
+        "quantity": 2,
+        "forklift_driver": "Driver John"
+    }
+    """
+    if request.method == 'POST':
+        # Assuming the request data is in JSON format
+        data = request.json()
+
+        try:
+            # Update source AnbarGeneric items
+            source_items = Anbar_Akhal.objects.filter(
+                location=data['from_anbar'],
+                supplier_name=data['supplier_name'],
+                material_name=data['material_name']
+            )
+            for item in source_items:
+                item.status = 'Moved'
+                item.location = data['to_anbar']
+                item.last_date = timezone.now()
+                item.save()
+
+            # Create new entries in the destination AnbarGeneric location
+            for _ in range(data['quantity']):
+                new_item = Anbar_Akhal(
+                    receive_date=timezone.now(),
+                    location=data['to_anbar'],
+                    status='In-stock',
+                    supplier_name=data['supplier_name'],
+                    material_name=data['material_name'],
+                    # Add other necessary fields as per your model
+                )
+                new_item.save()
+
+            # Return a success response
+            return JsonResponse({'status': 'success', 'message': f'{data["quantity"]} units of {data["material_name"]} have been moved from {data["from_anbar"]} to {data["to_anbar"]}.'})
+
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+    else:
+        return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=400)
+
+
+
 def new_material_type(request):
     existing_types = MaterialType.objects.all()
     if request.method == 'POST':
