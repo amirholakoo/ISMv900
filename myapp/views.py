@@ -906,6 +906,71 @@ def unload(request):
         return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=400)
 
 
+@csrf_exempt
+def loaded(request):
+    """
+    Handles the loading of a shipment by updating the Shipment and AnbarGeneric models.
+
+    This view processes a POST request containing shipment details, including the license number,
+    loading location, width, and selected reel numbers. It updates the status of the shipment to
+    'LoadedUnloaded', sets its location to 'Weight2', and updates the status of the selected
+    reel numbers to 'Sold'. It also stores the list of reel numbers in the shipment's
+    'list_of_reels' field.
+
+    The view returns a JSON response indicating the success or failure of the operation, including a
+    message detailing the outcome.
+
+    Parameters:
+    - request (HttpRequest): The HTTP request object containing the POST data.
+
+    Returns:
+    - JsonResponse: A JSON response indicating the success or failure of the operation, along with
+                    a message detailing the outcome.
+
+    Raises:
+    - Http404: If the shipment with the provided license number does not exist.
+    - HttpResponse: If an exception occurs during the operation, with a status code indicating the
+                    type of error.
+
+    Example POST data:
+    {
+        "license_number": "12345",
+        "loading_location": "Weight2",
+        "width": 25,
+        "reel_numbers": ["RN123", "RN456"]
+    }
+    """
+    if request.method == 'POST':
+        # Assuming the request data is in JSON format
+        data = request.json()
+
+        try:
+            # Retrieve the shipment instance
+            shipment = Shipment.objects.get(license_number=data['license_number'])
+
+            # Update shipment fields
+            shipment.status = 'LoadedUnloaded'
+            shipment.location = 'Weight2'
+            shipment.list_of_reels = ','.join(data['reel_numbers'])
+            shipment.save()
+
+            # Update AnbarGeneric (Anbar_Akhal in this example)
+            for reel_number in data['reel_numbers']:
+                anbar_item = Anbar_Akhal.objects.get(reel_number=reel_number)
+                anbar_item.status = 'Sold'
+                anbar_item.save()
+
+            # Return a success response
+            return JsonResponse({'status': 'success', 'message': f'Width and List of Reels has been added to {data["license_number"]}.'})
+
+        except Shipment.DoesNotExist:
+            return JsonResponse({'status': 'error', 'message': 'Shipment not found.'}, status=404)
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+    else:
+        return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=400)
+
+
 def new_material_type(request):
     existing_types = MaterialType.objects.all()
     if request.method == 'POST':
