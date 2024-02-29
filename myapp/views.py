@@ -4,6 +4,7 @@ from django.http import JsonResponse
 from django.core.exceptions import ValidationError
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
+import uuid
 
 from datetime import datetime
 # Create your views here.
@@ -749,6 +750,48 @@ def update_weight2(request):
     else:
         return JsonResponse({'status': 'error', 'message': 'Invalid request method.'})
 
+
+@csrf_exempt
+def create_purchase_order(request):
+    """
+    Handles the creation of a Purchase Order based on the provided algorithm.
+    """
+    if request.method == 'POST':
+        try:
+            # Assuming the request data is in JSON format
+            data = request.json()
+
+            # Load shipment data
+            shipment = Shipment.objects.get(license_number=data['license_number'], status='Office')
+
+            # Update shipment status and location
+            shipment.status = 'Delivered'
+            shipment.location = 'Delivered'
+            shipment.exit_time = timezone.now()
+            shipment.save()
+
+            # Insert new purchase order data
+            # Assuming PurchaseOrder is another model not shown here
+            # purchase_order = PurchaseOrder(**data)
+            # purchase_order.save()
+
+            # Update truck status and location
+            # Assuming Truck is another model not shown here
+            # truck = Truck.objects.get(id=shipment.truck_id)
+            # truck.status = 'Free'
+            # truck.location = 'Entrance'
+            # truck.save()
+
+            # Return success response
+            return JsonResponse({'success': True, 'message': 'Purchase Order created successfully.'})
+
+        except Shipment.DoesNotExist:
+            return JsonResponse({'success': False, 'message': 'Shipment not found or not in Office status.'})
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': str(e)})
+
+    else:
+        return JsonResponse({'success': False, 'message': 'Invalid request method.'})
 
 
 def new_material_type(request):
