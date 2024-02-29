@@ -3,6 +3,7 @@ from django.test import TestCase
 # Create your tests here.
 from django.test import TestCase
 from datetime import datetime
+from django.utils import timezone
 from .models import *
 
 class TruckTest(TestCase):
@@ -113,10 +114,6 @@ class ShipmentModelTest(TestCase):
             Shipment.objects.create(payment_status="Invalid Payment Status")
 
 
-from django.test import TestCase
-from django.utils import timezone
-from .models import Products
-
 class ProductsModelTest(TestCase):
     """
     Test case for the Products model.
@@ -188,3 +185,53 @@ class ProductsModelTest(TestCase):
                 last_date=timezone.now(),
                 profile_name='Test Profile'
             )
+
+
+class CustomerModelTest(TestCase):
+    """
+    Test case for the Customer model.
+    """
+
+    def setUp(self):
+        """
+        Set up the test environment.
+        """
+        # Create a Customer instance
+        self.customer = Customer.objects.create(
+            customer_name='Test Customer',
+            address='123 Test Street',
+            phone='123-456-7890',
+            status='Active',
+            comments='Test Comments'
+        )
+
+    def test_create_customer(self):
+        """
+        Test creating a Customer instance.
+        """
+        self.assertIsInstance(self.customer, Customer)
+        self.assertEqual(self.customer.__str__(), 'Test Customer')
+
+    def test_update_customer(self):
+        """
+        Test updating a Customer instance.
+        """
+        self.customer.status = 'Inactive'
+        self.customer.save()
+
+        customer_updated = Customer.objects.get(id=self.customer.customer_id)
+        self.assertEqual(customer_updated.status, 'Inactive')
+
+    def test_delete_customer(self):
+        """
+        Test deleting a Customer instance.
+        """
+        self.customer.delete()
+        with self.assertRaises(Customer.DoesNotExist):
+            Customer.objects.get(id=self.customer.customer_id)
+
+    def test_customer_str_representation(self):
+        """
+        Test the string representation of a Customer instance.
+        """
+        self.assertEqual(str(self.customer), 'Test Customer')
