@@ -302,37 +302,12 @@ class Sale(models.Model):
         return f"Sale (ID: {self.sale_id}, Date: {self.date}, Customer: {self.customer})"
 
 
-class AnbarSangin(models.Model):
-    id = models.AutoField(primary_key=True)
-    receive_date = models.DateTimeField()
-    reel_number = models.CharField(max_length=255)
-    supplier = models.ForeignKey(Supplier, on_delete=models.CASCADE)
-    supplier_name = models.CharField(max_length=255)
-    material_type = models.CharField(max_length=255)
-    material_name = models.CharField(max_length=255)
-    description = models.TextField(blank=True)
-    status = models.CharField(max_length=10, choices=[('In-stock', 'In-stock'), ('Moved', 'Moved'), ('Used', 'Used')])
-    location = models.CharField(max_length=255, blank=True)
-    last_date = models.DateTimeField(blank=True, null=True)
-    width = models.IntegerField(blank=True, null=True)
-    gsm = models.IntegerField(blank=True, null=True)
-    length = models.IntegerField(blank=True, null=True)
-    grade = models.CharField(max_length=255, blank=True, null=True)
-    breaks = models.CharField(max_length=255, blank=True, null=True)
-    comments = models.TextField(blank=True)
-    qr_code = models.TextField(blank=True)
-
-    def __str__(self):
-        return f"Anbar Sangin (ID: {self.id}, Reel Number: {self.reel_number})"
-
-
-
-class AnbarSalonTolid(models.Model):
+class AnbarGeneric(models.Model):
     """
-    Represents a record in the Anbar Salon Tolid table.
-    Each record includes details about a material, such as the supplier, material type,
-    and various attributes related to the material's physical properties and status.
+    Abstract base model for generic anbar items.
+    This model provides common fields and behaviors for all anbar items.
     """
+
     # Auto-incrementing primary key
     id = models.AutoField(primary_key=True)
 
@@ -398,171 +373,104 @@ class AnbarSalonTolid(models.Model):
     profile_name = models.CharField(max_length=255, null=True, blank=True)
 
     class Meta:
-        """
-        Metadata for the AnbarSalonTolid model.
-        """
-        db_table = 'Anbar_Salon_Tolid'
-        verbose_name = 'Anbar Salon Tolid'
-        verbose_name_plural = 'Anbar Salon Tolids'
+        abstract = True # Make this model abstract so it's not created in the DB
+
+
+# Define the specific anbar models
+class Anbar_Sangin(AnbarGeneric):
+    """
+    Model representing an anbar item in Sangin.
+    Inherits from AnbarGeneric to reuse common fields and behaviors.
+    """
+    class Meta(AnbarGeneric.Meta):
+        verbose_name_plural = "Anbar Sangin"
 
     def __str__(self):
-        """
-        Returns a string representation of the AnbarSalonTolid object.
-        This string is used as the object's identifier in the Django admin site and other places.
-        """
-        return f"Anbar Salon Tolid (Reel: {self.reel_number}, Status: {self.status}), {self.material_name} - {self.supplier_name}"
+        return f"{self.material_name} ({self.reel_number})"
 
 
-class AnbarParvandeh(models.Model):
-    id = models.AutoField(primary_key=True)
-    receive_date = models.DateTimeField()
-    reel_number = models.CharField(max_length=255)
-    supplier = models.ForeignKey(Supplier, on_delete=models.CASCADE)
-    supplier_name = models.CharField(max_length=255)
-    material_type = models.CharField(max_length=255)
-    material_name = models.CharField(max_length=255)
-    description = models.TextField(blank=True)
-    status = models.CharField(
-        max_length=10, choices=[('In-stock', 'In-stock'), ('Moved', 'Moved'), ('Used', 'Used')]
-    )
-    location = models.CharField(max_length=255, blank=True)
-    last_date = models.DateTimeField(blank=True, null=True)
-    width = models.IntegerField(blank=True, null=True)
-    gsm = models.IntegerField(blank=True, null=True)
-    length = models.IntegerField(blank=True, null=True)
-    grade = models.CharField(max_length=255, blank=True, null=True)
-    breaks = models.CharField(max_length=255, blank=True, null=True)
-    comments = models.TextField(blank=True)
-    qr_code = models.TextField(blank=True)
+class Anbar_Salon_Tolid(AnbarGeneric):
+    """
+    Model representing an anbar item in Salon Tolid.
+    Inherits from AnbarGeneric to reuse common fields and behaviors.
+    """
+    class Meta(AnbarGeneric.Meta):
+        verbose_name_plural = "Anbar Salon Tolid"
 
     def __str__(self):
-        return f"Anbar Parvandeh (Reel Number: {self.reel_number}, Status: {self.status})"
+        return f"{self.material_name} ({self.reel_number})"
 
 
-class AnbarKoochak(models.Model):
-    id = models.AutoField(primary_key=True)
-    receive_date = models.DateTimeField(null=False)
-    reel_number = models.CharField(max_length=255)
-    supplier = models.ForeignKey(Supplier, on_delete=models.CASCADE)
-    supplier_name = models.CharField(max_length=255, blank=True)
-    material_type = models.CharField(max_length=255, blank=True)
-    material_name = models.CharField(max_length=255, blank=True)
-    description = models.TextField(blank=True)
-    status = models.CharField(
-        max_length=10, choices=[('In-stock', 'In-stock'), ('Moved', 'Moved'), ('Used', 'Used')]
-    )
-    location = models.CharField(max_length=255, blank=True)
-    last_date = models.DateTimeField(blank=True, null=True)
-    width = models.IntegerField(blank=True, null=True)
-    gsm = models.IntegerField(blank=True, null=True)
-    length = models.IntegerField(blank=True, null=True)
-    grade = models.CharField(max_length=255, blank=True, null=True)
-    breaks = models.CharField(max_length=255, blank=True, null=True)
-    comments = models.TextField(blank=True)
-    qr_code = models.TextField(blank=True)
+class Anbar_Parvandeh(AnbarGeneric):
+    """
+    Model representing an anbar item in Parvandeh.
+    Inherits from AnbarGeneric to reuse common fields and behaviors.
+    """
+    class Meta(AnbarGeneric.Meta):
+        verbose_name_plural = "Anbar Parvandeh"
 
     def __str__(self):
-        return f"AnbarKoochak (ID: {self.id}, Reel Number: {self.reel_number})"
+        return f"{self.material_name} ({self.reel_number})"
 
 
-class AnbarKhamirGhadim(models.Model):
-    id = models.AutoField(primary_key=True)
-    receive_date = models.DateTimeField(null=True, blank=True)
-    reel_number = models.CharField(max_length=255)
-    supplier = models.ForeignKey(Supplier, on_delete=models.CASCADE)
-    supplier_name = models.CharField(max_length=255, blank=True)
-    material_type = models.CharField(max_length=255, blank=True)
-    material_name = models.CharField(max_length=255, blank=True)
-    description = models.TextField(blank=True)
-    status = models.CharField(max_length=10, choices=[('In-stock', 'In-stock'), ('Moved', 'Moved'), ('Used', 'Used')])
-    location = models.CharField(max_length=255, blank=True)
-    last_date = models.DateTimeField(null=True, blank=True)
-    width = models.IntegerField(blank=True, null=True)
-    gsm = models.IntegerField(blank=True, null=True)
-    length = models.IntegerField(blank=True, null=True)
-    grade = models.CharField(max_length=255, blank=True, null=True)
-    breaks = models.CharField(max_length=255, blank=True, null=True)
-    comments = models.TextField(blank=True)
-    qr_code = models.TextField(blank=True)
+class Anbar_Koochak(AnbarGeneric):
+    """
+    Model representing an anbar item in Koochak.
+    Inherits from AnbarGeneric to reuse common fields and behaviors.
+    """
+    class Meta(AnbarGeneric.Meta):
+        verbose_name_plural = "Anbar Koochak"
 
     def __str__(self):
-        return f"Anbar Khamir Ghadim (ID: {self.id}, Reel Number: {self.reel_number})"
+        return f"{self.material_name} ({self.reel_number})"
 
 
-class Anbar_Khamir_Kordan(models.Model):
-    id = models.AutoField(primary_key=True)
-    receive_date = models.DateTimeField(null=False)
-    reel_number = models.CharField(max_length=255, null=False)
-    supplier = models.ForeignKey(Supplier, on_delete=models.CASCADE)
-    supplier_name = models.CharField(max_length=255, blank=True)  # Assuming retrieved from Supplier
-    material_type = models.CharField(max_length=255, blank=True)
-    material_name = models.CharField(max_length=255, blank=True)
-    description = models.TextField(blank=True)
-    status = models.CharField(
-        max_length=10, choices=[('In-stock', 'In-stock'), ('Moved', 'Moved'), ('Used', 'Used')]
-    )
-    location = models.CharField(max_length=255, blank=True)
-    last_date = models.DateTimeField(blank=True, null=True)
-    width = models.IntegerField(blank=True, null=True)
-    gsm = models.IntegerField(blank=True, null=True)
-    length = models.IntegerField(blank=True, null=True)
-    grade = models.CharField(max_length=255, blank=True, null=True)
-    breaks = models.CharField(max_length=255, blank=True, null=True)
-    comments = models.TextField(blank=True)
-    qr_code = models.TextField(blank=True)
+class Anbar_Khamir_Ghadim(AnbarGeneric):
+    """
+    Model representing an anbar item in Khamir Ghadim.
+    Inherits from AnbarGeneric to reuse common fields and behaviors.
+    """
+    class Meta(AnbarGeneric.Meta):
+        verbose_name_plural = "Anbar Khamir Ghadim"
 
     def __str__(self):
-        return f"Anbar_Khamir_Kordan (ID: {self.id}, Reel Number: {self.reel_number})"
+        return f"{self.material_name} ({self.reel_number})"
 
 
-class AnbarMuhvatehKardan(models.Model):
-    id = models.AutoField(primary_key=True)
-    receive_date = models.DateTimeField(null=True)
-    reel_number = models.CharField(max_length=255)
-    supplier_id = models.ForeignKey(Supplier, on_delete=models.CASCADE)
-    supplier_name = models.CharField(max_length=255, blank=True)
-    material_type = models.CharField(max_length=255)
-    material_name = models.CharField(max_length=255)
-    description = models.TextField(blank=True)
-    status = models.CharField(
-        max_length=10, choices=[('In-stock', 'In-stock'), ('Moved', 'Moved'), ('Used', 'Used')]
-    )
-    location = models.CharField(max_length=255, blank=True)
-    last_date = models.DateTimeField(null=True)
-    width = models.IntegerField(blank=True, null=True)
-    gsm = models.IntegerField(blank=True, null=True)
-    length = models.IntegerField(blank=True, null=True)
-    grade = models.CharField(max_length=255, blank=True, null=True)
-    breaks = models.CharField(max_length=255, blank=True, null=True)
-    comments = models.TextField(blank=True)
-    qr_code = models.TextField(blank=True)
+class Anbar_Khamir_Kordan(AnbarGeneric):
+    """
+    Model representing an anbar item in Khamir Kordan.
+    Inherits from AnbarGeneric to reuse common fields and behaviors.
+    """
+    class Meta(AnbarGeneric.Meta):
+        verbose_name_plural = "Anbar Khamir Kordan"
 
     def __str__(self):
-        return f"AnbarMuhvatehKardan (Reel Number: {self.reel_number}, Status: {self.status})"
+        return f"{self.material_name} ({self.reel_number})"
 
 
-class Anbar_Akhal(models.Model):
-    id = models.AutoField(primary_key=True)
-    receive_date = models.DateTimeField()
-    reel_number = models.CharField(max_length=255)
-    supplier = models.ForeignKey(Supplier, on_delete=models.CASCADE)
-    supplier_name = models.CharField(max_length=255)
-    material_type = models.CharField(max_length=255)
-    material_name = models.CharField(max_length=255)
-    description = models.TextField(blank=True)
-    status = models.CharField(max_length=10, choices=[('In-stock', 'In-stock'), ('Moved', 'Moved'), ('Used', 'Used')])
-    location = models.CharField(max_length=255, blank=True)
-    last_date = models.DateTimeField(blank=True, null=True)
-    width = models.IntegerField(blank=True, null=True)
-    gsm = models.IntegerField(blank=True, null=True)
-    length = models.IntegerField(blank=True, null=True)
-    grade = models.CharField(max_length=255, blank=True, null=True)
-    breaks = models.CharField(max_length=255, blank=True, null=True)
-    comments = models.TextField(blank=True)
-    qr_code = models.TextField(blank=True)
+class Anbar_Muhvateh_Kardan(AnbarGeneric):
+    """
+    Model representing an anbar item in Muhvateh Kardan.
+    Inherits from AnbarGeneric to reuse common fields and behaviors.
+    """
+    class Meta(AnbarGeneric.Meta):
+        verbose_name_plural = "Anbar Muhvateh Kardan"
 
     def __str__(self):
-        return f"Anbar Akhal (Reel Number: {self.reel_number}, Status: {self.status})"
+        return f"{self.material_name} ({self.reel_number})"
+
+
+class Anbar_Akhal(AnbarGeneric):
+    """
+    Model representing an anbar item in Akhal.
+    Inherits from AnbarGeneric to reuse common fields and behaviors.
+    """
+    class Meta(AnbarGeneric.Meta):
+        verbose_name_plural = "Anbar Akhal"
+
+    def __str__(self):
+        return f"{self.material_name} ({self.reel_number})"
 
 
 class Consumption(models.Model):
@@ -606,7 +514,6 @@ class Consumption(models.Model):
 
     def __str__(self):
         return f"Consumption (ID: {self.consumption_id}, Date: {self.date}, profile name: {self.profile_name})"
-
 
 
 class MaterialType(models.Model):
@@ -657,29 +564,3 @@ class Unit(models.Model):
     def __str__(self):
         return self.name
 
-
-class Anbar(models.Model):
-    """
-    Represents an Anbar location for storing materials.
-
-    Attributes:
-        anbar_id (int): Auto-incrementing primary key for the Anbar.
-        location_name (str): Name of the Anbar location (unique, max length 255).
-        comments (str, optional): Additional notes or information about the Anbar.
-        status (str): Current status of the Anbar (choices: 'Active', 'Inactive').
-        created_on (DateTimeField, auto_now_add=True): Date and time the Anbar was created.
-    """
-
-    anbar_id = models.AutoField(primary_key=True)
-    location_name = models.CharField(max_length=255, unique=True)
-    comments = models.TextField(blank=True)
-    status = models.CharField(max_length=20, choices=[('Active', 'Active'), ('Inactive', 'Inactive')], default='Active')
-    created_on = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        """
-        Returns a human-readable representation of the Anbar object.
-
-        Format: "{location_name} ({status})"
-        """
-        return f"{self.location_name} ({self.status})"
