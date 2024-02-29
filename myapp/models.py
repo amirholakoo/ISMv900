@@ -565,9 +565,6 @@ class Anbar_Akhal(models.Model):
         return f"Anbar Akhal (Reel Number: {self.reel_number}, Status: {self.status})"
 
 
-from django.db import models
-
-
 class Consumption(models.Model):
     """
     Represents a consumption record in the system.
