@@ -84,6 +84,29 @@ Open your web browser and navigate to `http://127.0.0.1:8000/`. You should see t
 - **Using a Different Port**: If port 8000 is already in use, you can specify a different port by appending it to the `runserver` command, like so: `python manage.py runserver 8080`.
 - **Running Migrations**: After creating models in your app, you'll need to create and apply migrations to update your database schema. Run `python manage.py makemigrations` followed by `python manage.py migrate`.
 
-### Conclusion
 
-Running a Django project involves creating a project, starting the development server, and accessing the project through a web browser. Remember to activate your virtual environment before running Django commands to ensure that you're using the correct Python interpreter and packages.
+
+### Step 8: Create the Superuser
+
+Run the following command to create a superuser:
+
+```bash
+python manage.py createsuperuser
+```
+
+This command will prompt you to enter a username, email address, and password for the superuser. The email address is optional, but it's recommended to provide one.
+
+### Step 9: Follow the Prompts
+
+You'll be asked to enter the username, email (optional), and password for the superuser. Make sure to choose a strong password.
+
+### Step 10: Access the Django Admin Site
+
+After creating the superuser, you can access the Django admin site by running:
+
+```bash
+python manage.py runserver
+```
+
+Then, open your web browser and navigate to `http://127.0.0.1:8000/admin/`. Log in with the superuser credentials you just created.
+
