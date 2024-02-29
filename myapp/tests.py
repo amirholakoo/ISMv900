@@ -112,43 +112,79 @@ class ShipmentModelTest(TestCase):
         with self.assertRaises(ValueError):
             Shipment.objects.create(payment_status="Invalid Payment Status")
 
-#
-# class PurchaseTest(TestCase):
-#
-#     def test_create_purchase(self):
-#         supplier = Supplier.objects.create(supplier_name="Test Supplier")
-#         truck = Truck.objects.create(license_number="ABC123")
-#         material = Material.objects.create(material_type="Cotton", material_name="Raw Cotton")
-#         shipment = Shipment.objects.create(status="Incoming")
-#
-#         purchase = Purchases.objects.create(
-#             Date=datetime.now(),
-#             ReceiveDate=datetime.now(),
-#             SupplierID=supplier,
-#             TruckID=truck,
-#             MaterialID=material,
-#             MaterialType="Cotton",
-#             MaterialName="Raw Cotton",
-#             Unit="Bale",
-#             Quantity=100,
-#             Weight1=1000,
-#             Weight2=990,
-#             NetWeight=990,
-#             PricePerKG=10,
-#             TotalPrice=9900,
-#             InvoiceStatus="Received",
-#             PaymentStatus="Paid",
-#             ShipmentID=shipment,
-#         )
-#
-#         self.assertEqual(purchase.SupplierID, supplier)
-#         self.assertEqual(purchase.TruckID, truck)
-#         self.assertEqual(purchase.MaterialID, material)
-#         self.assertEqual(purchase.Quantity, 100)
-#         self.assertEqual(purchase.NetWeight, 990)
-#         self.assertEqual(purchase.TotalPrice, 9900)
-#         self.assertEqual(purchase.InvoiceStatus, "Received")
-#         self.assertEqual(purchase.PaymentStatus, "Paid")
-#         self.assertEqual(purchase.ShipmentID, shipment)
-#
-#         # Add more assertions for other fields and relationships as needed
+
+from django.test import TestCase
+from django.utils import timezone
+from .models import Products
+
+class ProductsModelTest(TestCase):
+    """
+    Test case for the Products model.
+    """
+
+    def setUp(self):
+        """
+        Set up the test environment.
+        """
+        # Create a Products instance
+        self.product = Products.objects.create(
+            reel_number='RN123',
+            width=25,
+            gsm=80,
+            length=100,
+            grade='A',
+            breaks='None',
+            comments='Test Comments',
+            qr_code='Test QR Code',
+            location='Anbar_Salon_Tolid',
+            status='In-stock',
+            receive_date=timezone.now(),
+            last_date=timezone.now(),
+            profile_name='Test Profile'
+        )
+
+    def test_create_product(self):
+        """
+        Test creating a Products instance.
+        """
+        self.assertIsInstance(self.product, Products)
+        self.assertEqual(self.product.__str__(), 'Product (Reel Number: RN123, Status: In-stock)')
+
+    def test_update_product(self):
+        """
+        Test updating a Products instance.
+        """
+        self.product.status = 'Sold'
+        self.product.save()
+
+        self.product.refresh_from_db()
+        self.assertEqual(self.product.status, 'Sold')
+
+    def test_delete_product(self):
+        """
+        Test deleting a Products instance.
+        """
+        self.product.delete()
+        with self.assertRaises(Products.DoesNotExist):
+            Products.objects.get(reel_number='RN123')
+
+    def test_product_status_choices(self):
+        """
+        Test that the status field only accepts valid choices.
+        """
+        with self.assertRaises(ValueError):
+            Products.objects.create(
+                reel_number='RN456',
+                width=25,
+                gsm=80,
+                length=100,
+                grade='A',
+                breaks='None',
+                comments='Test Comments',
+                qr_code='Test QR Code',
+                location='Anbar_Salon_Tolid',
+                status='InvalidStatus', # This should raise a ValueError
+                receive_date=timezone.now(),
+                last_date=timezone.now(),
+                profile_name='Test Profile'
+            )
