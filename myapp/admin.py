@@ -34,7 +34,7 @@ class SupplierAdmin(admin.ModelAdmin):
     list_filter = ('status',)
 
 
-@admin.register(Product)
+@admin.register(Products)
 class ProductAdmin(admin.ModelAdmin):
 
     list_display = ('reel_number', 'width', 'gsm', 'length', 'grade', 'status')
