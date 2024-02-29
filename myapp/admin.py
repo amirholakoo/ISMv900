@@ -35,13 +35,14 @@ class SupplierAdmin(admin.ModelAdmin):
 
 
 @admin.register(Products)
-class ProductAdmin(admin.ModelAdmin):
+class ProductsAdmin(admin.ModelAdmin):
 
     list_display = ('reel_number', 'width', 'gsm', 'length', 'grade', 'status')
 
     search_fields = ('reel_number', 'grade')
 
     list_filter = ('status', 'grade')
+
 
 @admin.register(RawMaterial)
 class RawMaterialAdmin(admin.ModelAdmin):
