@@ -1,10 +1,8 @@
 from django.test import TestCase
-
-# Create your tests here.
-from django.test import TestCase
 from datetime import datetime
 from django.utils import timezone
 from .models import *
+# Create your tests here.
 
 class TruckTest(TestCase):
 
