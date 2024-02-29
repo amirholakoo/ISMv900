@@ -21,4 +21,5 @@ urlpatterns = [
     path("api/createSalesOrder", create_sales_order),
     path("api/unload", unload),
     path("api/loaded", loaded),
+    path("api/used", used),
 ]

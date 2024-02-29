@@ -971,6 +971,79 @@ def loaded(request):
         return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=400)
 
 
+@csrf_exempt
+def used(request):
+    """
+    Handles the marking of materials as used by updating the Consumption and AnbarGeneric models.
+
+    This view processes a POST request containing consumption details, including the unloading location,
+    supplier name, material name, unit, quantity, and forklift driver. It creates new entries in the
+    Consumption model for each unit consumed, setting their received date to the current time, status to
+    'Used', and comments to the forklift driver's name. It also updates the status, location, last date,
+    and comments of the corresponding AnbarGeneric items to reflect their consumption.
+
+    The view returns a JSON response indicating the success or failure of the operation, including a
+    message detailing the outcome.
+
+    Parameters:
+    - request (HttpRequest): The HTTP request object containing the POST data.
+
+    Returns:
+    - JsonResponse: A JSON response indicating the success or failure of the operation, along with
+                    a message detailing the outcome.
+
+    Raises:
+    - HttpResponse: If an exception occurs during the operation, with a status code indicating the
+                    type of error.
+
+    Example POST data:
+    {
+        "unloading_location": "Weight2",
+        "supplier_name": "Supplier A",
+        "material_name": "Material X",
+        "unit": "Unit 1",
+        "quantity": 2,
+        "forklift_driver": "Driver John"
+    }
+    """
+    if request.method == 'POST':
+        # Assuming the request data is in JSON format
+        data = request.json()
+
+        try:
+            # Create Consumption records
+            for _ in range(data['quantity']):
+                consumption = Consumption(
+                    receive_date=timezone.now(),
+                    supplier_name=data['supplier_name'],
+                    material_name=data['material_name'],
+                    unit=data['unit'],
+                    status='Used',
+                    comments=data['forklift_driver']
+                )
+                consumption.save()
+
+            # Update AnbarGeneric (Anbar_Akhal in this example)
+            anbar_items = Anbar_Akhal.objects.filter(
+                location=data['unloading_location'],
+                supplier_name=data['supplier_name'],
+                material_name=data['material_name']
+            )
+            for item in anbar_items:
+                item.status = 'Used'
+                item.location = 'Consumption DB'
+                item.last_date = timezone.now()
+                item.comments = data['forklift_driver']
+                item.save()
+
+            # Return a success response
+            return JsonResponse({'status': 'success', 'message': f'{data["quantity"]} units of {data["material_name"]} have been marked as used.'})
+
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+    else:
+        return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=400)
+
 def new_material_type(request):
     existing_types = MaterialType.objects.all()
     if request.method == 'POST':
