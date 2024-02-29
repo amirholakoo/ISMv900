@@ -702,6 +702,55 @@ def update_weight1(request):
     return JsonResponse({'success': False, 'message': 'Invalid request method.'})
 
 
+
+def update_weight2(request):
+    """
+    Handles a POST request to update the weight2 and net_weight of a Shipment instance.
+
+    This function retrieves a Shipment instance based on the provided license number, validates the weight2 and net_weight values,
+    updates the instance with the new weights, and saves the changes to the database. It returns a JSON response indicating
+    the success or failure of the operation, along with appropriate messages.
+    """
+    if request.method == 'POST':
+        # Extract data from the request
+        license_number = request.POST.get('license_number')
+        weight2 = request.POST.get('weight2')
+        net_weight = request.POST.get('net_weight')
+
+        # Validate input
+        if not license_number or not weight2 or not net_weight:
+            return JsonResponse({'status': 'error', 'message': 'All fields are required.'})
+
+        try:
+            weight2 = float(weight2)
+            net_weight = float(net_weight)
+        except ValueError:
+            return JsonResponse({'status': 'error', 'message': 'Weight2 and Net Weight must be numbers.'})
+
+        if not (9 <= weight2 <= 38000) or not (9 <= net_weight <= 38000):
+            return JsonResponse({'status': 'error', 'message': 'Weight2 and Net Weight must be between 9 KG and 38000 KG.'})
+
+        # Update the Shipment instance
+        try:
+            shipment = Shipment.objects.get(license_number=license_number)
+            shipment.weight2 = weight2
+            shipment.weight2_time = timezone.now()
+            shipment.net_weight = net_weight
+            shipment.save()
+
+            # Check if the absolute difference between weight1 and weight2 equals net_weight
+            if abs(shipment.weight1 - weight2) != net_weight:
+                return JsonResponse({'status': 'error', 'message': 'The absolute difference between Weight1 and Weight2 must equal the Net Weight.'})
+
+            return JsonResponse({'status': 'success', 'message': f'Weight2 and Net Weight for Shipment with License Number {license_number} has been updated successfully.'})
+        except Shipment.DoesNotExist:
+            return JsonResponse({'status': 'error', 'message': f'Shipment with License Number {license_number} does not exist.'})
+
+    else:
+        return JsonResponse({'status': 'error', 'message': 'Invalid request method.'})
+
+
+
 def new_material_type(request):
     existing_types = MaterialType.objects.all()
     if request.method == 'POST':
