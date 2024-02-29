@@ -295,3 +295,93 @@ class RawMaterialModelTest(TestCase):
         Test the __str__ method of the RawMaterial model.
         """
         self.assertEqual(str(self.raw_material), 'Pima Cotton (ID: 1)')
+
+
+class PurchasesModelTest(TestCase):
+    """
+    Test case for the Purchases model.
+    """
+
+    def setUp(self):
+        """
+        Set up the test environment.
+        """
+        # Create instances for foreign keys
+        self.supplier = Supplier.objects.create(name='Test Supplier')
+        self.truck = Truck.objects.create(name='Test Truck')
+        self.raw_material = RawMaterial.objects.create(
+            supplier=self.supplier,
+            material_type='Cotton',
+            material_name='Pima Cotton',
+            status='Available'
+        )
+        self.shipment = Shipment.objects.create(name='Test Shipment')
+
+        # Create a Purchases instance
+        self.purchase = Purchases.objects.create(
+            Date=timezone.now(),
+            ReceiveDate=timezone.now(),
+            SupplierID=self.supplier,
+            TruckID=self.truck,
+            MaterialID=self.raw_material,
+            MaterialType='Cotton',
+            MaterialName='Pima Cotton',
+            Unit='KG',
+            Quantity=100,
+            Quality='High',
+            Penalty='None',
+            Weight1=100.00,
+            Weight2=90.00,
+            NetWeight=90.00,
+            PricePerKG=1.00,
+            VAT=0.00,
+            TotalPrice=100.00,
+            ExtraCost=0.00,
+            InvoiceStatus='Received',
+            Status='Paid',
+            PaymentDetail='Cash',
+            PaymentDate=timezone.now(),
+            InvoiceNumber='INV12345',
+            DocumentInfo='Test Document Info',
+            Comments='Test Comments',
+            CancellationReason='None',
+            ShipmentID=self.shipment
+        )
+
+    def test_create_purchase(self):
+        """
+        Test creating a Purchases instance.
+        """
+        self.assertIsInstance(self.purchase, Purchases)
+        self.assertEqual(self.purchase.__str__(), f"Purchase {self.truck.name}")
+
+    def test_update_purchase(self):
+        """
+        Test updating a Purchases instance.
+        """
+        self.purchase.Status = 'Cancelled'
+        self.purchase.save()
+
+        self.purchase.refresh_from_db()
+        self.assertEqual(self.purchase.Status, 'Cancelled')
+
+    def test_delete_purchase(self):
+        """
+        Test deleting a Purchases instance.
+        """
+        self.purchase.delete()
+        with self.assertRaises(Purchases.DoesNotExist):
+            Purchases.objects.get(id=self.purchase.id)
+
+    def test_get_purchase(self):
+        """
+        Test retrieving a Purchases instance.
+        """
+        retrieved_purchase = Purchases.objects.get(id=self.purchase.id)
+        self.assertEqual(retrieved_purchase, self.purchase)
+
+    def test_purchase_str(self):
+        """
+        Test the __str__ method of the Purchases model.
+        """
+        self.assertEqual(str(self.purchase), f"Purchase {self.truck.name}")
