@@ -385,3 +385,77 @@ class PurchasesModelTest(TestCase):
         Test the __str__ method of the Purchases model.
         """
         self.assertEqual(str(self.purchase), f"Purchase {self.truck.name}")
+
+
+class SaleModelTest(TestCase):
+    """
+    Test case for the Sale model.
+    """
+
+    def setUp(self):
+        """
+        Set up the test environment.
+        """
+        # Create instances for foreign keys
+        self.customer = Customer.objects.create(name='Test Customer')
+        self.truck = Truck.objects.create(name='Test Truck')
+        self.shipment = Shipment.objects.create(name='Test Shipment')
+
+        # Create a Sale instance
+        self.sale = Sale.objects.create(
+            date=timezone.now(),
+            customer=self.customer,
+            truck=self.truck,
+            license_number='Test License',
+            list_of_reels='Reel1, Reel2',
+            weight1=100.00,
+            weight2=90.00,
+            net_weight=90.00,
+            shipping_cost=10.00,
+            vat='VAT123',
+            total_price=100.00,
+            invoice_status='Sent',
+            payment_status='Paid',
+            invoice_number='INV12345',
+            document_info='Test Document Info',
+            comments='Test Comments',
+            shipment=self.shipment
+        )
+
+    def test_create_sale(self):
+        """
+        Test creating a Sale instance.
+        """
+        self.assertIsInstance(self.sale, Sale)
+        self.assertEqual(self.sale.__str__(), f"Sale (ID: {self.sale.sale_id}, Date: {self.sale.date}, Customer: {self.customer})")
+
+    def test_update_sale(self):
+        """
+        Test updating a Sale instance.
+        """
+        self.sale.payment_status = 'Cancelled'
+        self.sale.save()
+
+        self.sale.refresh_from_db()
+        self.assertEqual(self.sale.payment_status, 'Cancelled')
+
+    def test_delete_sale(self):
+        """
+        Test deleting a Sale instance.
+        """
+        self.sale.delete()
+        with self.assertRaises(Sale.DoesNotExist):
+            Sale.objects.get(id=self.sale.sale_id)
+
+    def test_get_sale(self):
+        """
+        Test retrieving a Sale instance.
+        """
+        retrieved_sale = Sale.objects.get(id=self.sale.sale_id)
+        self.assertEqual(retrieved_sale, self.sale)
+
+    def test_sale_str(self):
+        """
+        Test the __str__ method of the Sale model.
+        """
+        self.assertEqual(str(self.sale), f"Sale (ID: {self.sale.sale_id}, Date: {self.sale.date}, Customer: {self.customer})")
