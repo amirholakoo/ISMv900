@@ -480,8 +480,8 @@ def add_new_reel(request):
             )
             new_product.save()
 
-            # Create a new AnbarSalonTolid record
-            new_anbar_record = AnbarSalonTolid(
+            # Create a new Anbar_Salon_Tolid record
+            new_anbar_record = Anbar_Salon_Tolid(
                 reel_number=next_reel_number,
                 width=width,
                 gsm=gsm,
@@ -835,6 +835,8 @@ def create_sales_order(request):
     else:
         return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=400)
 
+# Forklift Panel
+
 
 def new_material_type(request):
     existing_types = MaterialType.objects.all()
@@ -924,21 +926,21 @@ def add_anbar(request):
             return JsonResponse({'error': 'Location name is required.'}, status=400)
 
         # Check for existing Anbar
-        existing_anbar = Anbar.objects.filter(location_name=location_name).first()
-        if existing_anbar:
-            return JsonResponse({'error': 'Anbar with this location name already exists.'}, status=400)
+        # existing_anbar = Anbar.objects.filter(location_name=location_name).first()
+        # if existing_anbar:
+        #     return JsonResponse({'error': 'Anbar with this location name already exists.'}, status=400)
 
         # Create new Anbar
-        new_anbar = Anbar(
-            location_name=location_name,
-            comments=f"Automatically Created",
-        )
-        new_anbar.save()
+        # new_anbar = Anbar(
+        #     location_name=location_name,
+        #     comments=f"Automatically Created",
+        # )
+        # new_anbar.save()
 
         # Return success response
         return JsonResponse({
             'success': 'Anbar added successfully.',
-            'location_name': new_anbar.location_name,
+            # 'location_name': new_anbar.location_name,
         }, status=201)
 
     else:
