@@ -837,6 +837,74 @@ def create_sales_order(request):
 
 # Forklift Panel
 
+@csrf_exempt
+def unload(request):
+    """
+    Handles the unloading of a shipment by updating the Shipment and AnbarGeneric models.
+
+    This view processes a POST request containing shipment details, including the license number
+    and the quantity to be unloaded. It updates the status of the shipment to 'LoadedUnloaded' and
+    sets its location to 'Weight2'. Additionally, it creates new entries in the AnbarGeneric model
+    (specifically Anbar_Akhal in this example) for each unit to be unloaded, setting their status to
+    'In-stock' and their receive date to the current time.
+
+    The view returns a JSON response indicating the success or failure of the operation, including a
+    message detailing the outcome.
+
+    Parameters:
+    - request (HttpRequest): The HTTP request object containing the POST data.
+
+    Returns:
+    - JsonResponse: A JSON response indicating the success or failure of the operation, along with
+                    a message detailing the outcome.
+
+    Raises:
+    - Http404: If the shipment with the provided license number does not exist.
+    - HttpResponse: If an exception occurs during the operation, with a status code indicating the
+                    type of error.
+
+    Example POST data:
+    {
+        "license_number": "12345",
+        "quantity": 5
+    }
+    """
+    if request.method == 'POST':
+        # Assuming the request data is in JSON format
+        data = request.json()
+
+        try:
+            # Retrieve the shipment instance
+            shipment = Shipment.objects.get(license_number=data['license_number'])
+
+            # Update shipment fields
+            shipment.status = 'LoadedUnloaded'
+            shipment.location = 'Weight2'
+            shipment.save()
+
+            # Calculate the quantity to be unloaded
+            quantity_to_unload = data['quantity']
+
+            # Assuming Anbar_Akhal is used for unloading location
+            # Update AnbarGeneric (Anbar_Akhal in this case)
+            for _ in range(quantity_to_unload):
+                anbar_item = Anbar_Akhal(
+                    status='In-stock',
+                    receive_date=timezone.now(),
+                    # Add other necessary fields as per your model
+                )
+                anbar_item.save()
+
+            # Return a success response
+            return JsonResponse({'status': 'success', 'message': f'{quantity_to_unload} units have been added to {data["license_number"]}.'})
+
+        except Shipment.DoesNotExist:
+            return JsonResponse({'status': 'error', 'message': 'Shipment not found.'}, status=404)
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+    else:
+        return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=400)
+
 
 def new_material_type(request):
     existing_types = MaterialType.objects.all()
