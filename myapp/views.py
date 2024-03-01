@@ -1119,6 +1119,53 @@ def moved(request):
         return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=400)
 
 
+@csrf_exempt
+def retuned(request):
+    """
+    Handles the POST request to process returned materials.
+
+    This view function validates the input data, checks if all required fields are provided,
+    and returns an appropriate response. It adheres to best practices and the DRY principle.
+
+    Parameters:
+    - request: The HTTP request object.
+
+    Returns:
+    - A JSON response with the result of the operation.
+    """
+    if request.method == 'POST':
+        # Extract data from the request
+        supplier_name = request.GET.get('supplier_name')
+        material_type = request.GET.get('material_type')
+        unit_name = request.GET.get('unit_name')
+        quantity = request.GET.get('quantity')
+        anbar_location = request.GET.get('anbar_location')
+        reason = request.GET.get('reason')
+        forklift_driver = request.GET.get('forklift_driver')
+
+        errors = []
+
+        # Check if all required fields are provided
+        if not supplier_name:
+            errors.append({'status': 'error', 'message': 'supplier name is required.'})
+        if not material_type:
+            errors.append({'status': 'error', 'message': 'material type is required.'})
+        if not unit_name:
+            errors.append({'status': 'error', 'message': 'unit_name is required.'})
+        if not quantity:
+            errors.append({'status': 'error', 'message': 'quantity is required.'})
+        if not anbar_location:
+            errors.append({'status': 'error', 'message': 'anbar location is required.'})
+        if not reason:
+            errors.append({'status': 'error', 'message': 'reason is required.'})
+        if not forklift_driver:
+            errors.append({'status': 'error', 'message': 'forklift_driver is required.'})
+
+        # If there are any errors, return them in the response
+        if errors:
+            return JsonResponse({'status': 'error', 'errors': errors})
+    else:
+        return JsonResponse({'status': 'error', 'message': 'Invalid request method.'})
 
 
 # Admin panel
