@@ -551,7 +551,6 @@ class Unit(models.Model):
         count (float, optional): Value representing the unit's capacity in kilograms (e.g., 25 for 25kg bag).
         username (str, blank=True): Username of the user who created the unit (optional).
         date (datetime): Date and time the unit was created.
-        status (str, default="Active"): Current status of the unit (e.g., Active, Archived).
     """
 
     id = models.AutoField(primary_key=True)
