@@ -23,4 +23,8 @@ urlpatterns = [
     path("api/loaded", loaded),
     path("api/used", used),
     path("api/moved", moved),
+    path("api/addNewAnbar", add_new_anbar),
+    path("api/addMaterialType", add_material_type),
+    path("api/addUnit", add_unit),
+    path("api/addConsumptionProfile", add_consumption_profile),
 ]
