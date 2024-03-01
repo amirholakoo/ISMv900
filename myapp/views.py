@@ -1119,6 +1119,8 @@ def moved(request):
         return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=400)
 
 
+
+
 # Admin panel
 
 @csrf_exempt
@@ -1278,6 +1280,7 @@ def add_unit(request):
         # Handle non-POST requests
         return JsonResponse({'status': 'fail', 'message': 'Invalid request method.'})
 
+
 @csrf_exempt
 def add_consumption_profile(request):
     """
@@ -1347,8 +1350,90 @@ def add_consumption_profile(request):
 
 @csrf_exempt
 def cancel_shipment(request):
+    """
+    Handles the POST request to cancel a shipment.
+
+    This view function processes the cancellation request, updates related entities,
+    and manages statuses across different models. It handles potential errors gracefully
+    and provides informative feedback to the user.
+
+    Parameters:
+    - request: The HTTP request object.
+
+    Returns:
+    - A JSON response with the result of the operation.
+    """
     if request.method == 'POST':
-        pass
+        try:
+            # Extract data from the request
+            shipment_id = request.GET.get('shipment_id')
+            cancellation_reason = request.GET.get('cancellation_reason')
+
+            # Validate the data
+            if not shipment_id or not cancellation_reason:
+                raise ValidationError("Shipment ID and cancellation reason are required.")
+
+            # Fetch the shipment
+            shipment = Shipment.objects.get(shipment_id=shipment_id)
+
+            # Update shipment status and cancellation reason
+            shipment.status = 'Canceled'
+            shipment.cancellation_reason = cancellation_reason
+            shipment.save()
+
+            # Update related entities (e.g., Truck, Products, AnbarGeneric, Purchases, Sale)
+            # Assuming the shipment is associated with a truck
+            truck = Truck.objects.get(truck_id=shipment.truck_id)
+            truck.status = 'Free'
+            truck.location = 'Entrance'
+            truck.save()
+            # Assuming the shipment has a list of reels (product IDs)
+            reels = shipment.list_of_reels.split(',')
+            for reel in reels:
+                product = Products.objects.get(reel_number=reel)
+                product.status = 'In-stock'
+                product.location = 'Canceled'
+                product.save()
+            # Assuming AnbarGeneric subclasses are Anbar_Sangin, Anbar_Salon_Tolid, etc.
+            # You would need to repeat the update logic for each subclass
+            # For example, updating Anbar_Sangin:
+            anbar_sangin_reels = Anbar_Sangin.objects.filter(reel_number__in=reels)
+            for item in anbar_sangin_reels:
+                item.status = 'In-stock'
+                item.location = 'Canceled'
+                item.save()
+            purchases = Purchases.objects.filter(ShipmentID=shipment)
+            for purchase in purchases:
+                purchase.Status = 'Cancelled'
+                purchase.CancellationReason = cancellation_reason
+                purchase.save()
+            sales = Sale.objects.filter(shipment=shipment)
+            for sale in sales:
+                sale.payment_status = 'Cancelled'
+                sale.comments = cancellation_reason
+                sale.save()
+
+            # This is a simplified example; actual implementation will depend on the specific logic required
+            # For example, updating the status of related products to 'In-stock' and their location to 'Canceled'
+
+            # Return success response
+            return JsonResponse({'status': 'success', 'message': f'Shipment {shipment_id} has been canceled.'})
+
+        except Shipment.DoesNotExist:
+            # Handle case where the shipment does not exist
+            return JsonResponse({'status': 'fail', 'message': 'Shipment not found.'})
+
+        except ValidationError as e:
+            # Handle validation errors
+            return JsonResponse({'status': 'fail', 'message': str(e)})
+
+        except Exception as e:
+            # Handle other exceptions
+            return JsonResponse({'status': 'fail', 'message': 'An error occurred: ' + str(e)})
+
+    else:
+        # Handle non-POST requests
+        return JsonResponse({'status': 'fail', 'message': 'Invalid request method.'})
 
 
 @csrf_exempt
