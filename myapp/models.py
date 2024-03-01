@@ -42,8 +42,6 @@ class Truck(models.Model):
         return f"Truck {self.license_number} - {self.status}"
 
 
-
-
 class Shipment(models.Model):
     """
     Model representing a shipment with various attributes related to its status, location, and associated entities.
@@ -518,27 +516,30 @@ class Consumption(models.Model):
 
 class MaterialType(models.Model):
     """
-    Represents a type of material used in production.
+    MaterialType model represents different types of materials supplied by suppliers.
 
-    Attributes:
-        material_type_id (int): Auto-incrementing primary key for the material type.
-        name (str): Name of the material type (unique).
-        username_created (str, optional): Username of the user who created the material type (not enforced in this implementation).
-        created_on (datetime): Date and time the material type was created.
-        status (str, default="Active"): Current status of the material type (e.g., Active, Archived).
+    Fields:
+    - id: Auto-incrementing primary key.
+    - supplier_name: Name of the supplier. Can be null or blank.
+    - material_type: Type of material. Required field.
+    - username: Username associated with the material type. Can be null or blank.
+    - data: Date and time when the material type was added. Auto-populated on creation.
     """
-
-    material_type_id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=255, unique=True)
-    username_created = models.CharField(max_length=255, blank=True)
-    created_on = models.DateTimeField(auto_now_add=True)
-    status = models.CharField(max_length=255, default="Active")
+    id = models.AutoField(primary_key=True)
+    supplier_name = models.CharField(max_length=255, null=True, blank=True)
+    # Ensure material_type is always provided to avoid empty entries
+    material_type = models.CharField(max_length=255)
+    username = models.CharField(max_length=255, blank=True)
+    # Auto-populated on creation to track when the material type was added
+    data = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         """
-        Returns a human-readable representation of the MaterialType object.
+        Returns a string representation of the MaterialType object, including the supplier name, material type, and username.
+        This method is used to display a human-readable representation of the object.
         """
-        return self.name
+        return f"{self.supplier_name} - {self.material_type} - {self.username}"
+
 
 
 class Unit(models.Model):
