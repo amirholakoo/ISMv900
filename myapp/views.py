@@ -1278,6 +1278,72 @@ def add_unit(request):
         # Handle non-POST requests
         return JsonResponse({'status': 'fail', 'message': 'Invalid request method.'})
 
+@csrf_exempt
+def add_consumption_profile(request):
+    """
+    Handles the POST request to add a new consumption profile.
+
+    This view function processes the form data, validates it, and saves a new Consumption instance to the database.
+    It handles potential errors gracefully and provides informative feedback to the user.
+
+    Parameters:
+    - request: The HTTP request object.
+
+    Returns:
+    - A JSON response with the result of the operation.
+    """
+    if request.method == 'POST':
+        # Extract data from the request
+        supplier_name = request.GET.get('supplier_name')
+        material_name = request.GET.get('material_name')
+        unit = request.GET.get('unit')
+        quantity = request.GET.get('quantity')
+        profile_name = request.GET.get('profile_name')
+        username = request.GET.get('username')
+
+        # Initialize an empty list to collect error messages
+        errors = []
+
+        # Check if all required fields are provided
+        if not supplier_name:
+            errors.append({'status': 'error', 'message': 'supplier name is required.'})
+        if not material_name:
+            errors.append({'status': 'error', 'message': 'material name is required.'})
+        if not unit:
+            errors.append({'status': 'error', 'message': 'unit is required.'})
+        if not quantity:
+            errors.append({'status': 'error', 'message': 'quantity is required.'})
+        if not profile_name:
+            errors.append({'status': 'error', 'message': 'profile name is required.'})
+        if not username:
+            errors.append({'status': 'error', 'message': 'username is required.'})
+
+        # If there are any errors, return them in the response
+        if errors:
+            return JsonResponse({'status': 'error', 'errors': errors})
+
+        # Create a new Consumption instance
+        new_consumption = Consumption(
+            supplier_name=supplier_name,
+            material_name=material_name,
+            unit=unit,
+            quantity=quantity,
+            profile_name=profile_name,
+            username=username
+        )
+
+        # Save the new Customer object to the database
+        try:
+            new_consumption.save()
+            # Return success response
+            return JsonResponse({'status': 'success', 'message': 'Consumption profile has been added.'})
+        except Exception as e:
+                # Handle any exceptions that occur during the save operation
+                return JsonResponse({'status': 'error', 'message': f'Error adding consumption: {str(e)}'})
+    else:
+        # Handle non-POST requests
+        return JsonResponse({'status': 'fail', 'message': 'Invalid request method.'})
+
 
 @csrf_exempt
 def apiHandler(request, api):
