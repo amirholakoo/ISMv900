@@ -554,7 +554,9 @@ class Unit(models.Model):
     """
 
     id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=255, unique=True)
+    supplier_name = models.CharField(max_length=255, null=True, blank=True)
+    material_type = models.CharField(max_length=255)
+    unit_name = models.CharField(max_length=255, unique=True)
     count = models.FloatField(blank=True, null=True)
     username = models.CharField(max_length=255, blank=True)
     date = models.DateTimeField(auto_now_add=True)
