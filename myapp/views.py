@@ -247,7 +247,7 @@ def get_materialTypes(request):
             # Query the MaterialType model for all instances
             material_types = MaterialType.objects.all()
             # Extract and return the names in a JSON response
-            material_names = [material_type.name for material_type in material_types]
+            material_names = [material_type.material_type for material_type in material_types]
             return JsonResponse({'status': 'success', 'material_names': material_names})
         except Exception as e:
             # Handle any exceptions that occur during the query operation
@@ -1120,30 +1120,104 @@ def moved(request):
         return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=400)
 
 
+# Admin panel
 
-def new_material_type(request):
-    existing_types = MaterialType.objects.all()
+@csrf_exempt
+def add_new_anbar(request):
+    """
+    Handles the creation of a new anbar based on the provided location name and username.
+    Expects a POST request with 'location_name' and 'username' in the request body.
+
+    Returns a JSON response indicating success or failure, along with relevant messages.
+    """
     if request.method == 'POST':
-        name = request.GET['name']
-        if MaterialType.objects.filter(name=name).exists():
-            # Material type already exists
-            error_message = 'Material type already exists'
-            return render(request, 'add_material_error.html', {'error': error_message})
-        else:
-            # Optionally capture username for reference
-            # username = request.user.username  # If using User model
-            new_type = MaterialType.objects.create(
-                name=name
-                # username_created=username  # Uncomment if capturing username
-            )
-            return redirect('add_material_success', material_type_id=new_type.id)
+        try:
+            # Extract data from the request
+            location_name = request.GET.get('location_name')
+            username = request.GET.get('username')
+
+            # Check if the location already exists
+            if AnbarGeneric.objects.filter(location=location_name).exists():
+                return JsonResponse({'status': 'fail', 'message': 'Anbar location already exists.'})
+
+            # Create a new anbar entry
+            anbar = AnbarGeneric(location=location_name, comments=f'Username Created on {username} (CVS)')
+            anbar.save()
+
+            # Return success response
+            return JsonResponse({'status': 'success', 'message': f'Anbar {location_name} has been added.'})
+
+        except ValidationError as e:
+            # Handle validation errors
+            return JsonResponse({'status': 'fail', 'message': str(e)})
+        except Exception as e:
+            # Handle unexpected errors
+            return JsonResponse({'status': 'fail', 'message': 'An unexpected error occurred.'})
+
     else:
-        return render(request, 'new_material_form.html', {'existing_types': existing_types})
+        return JsonResponse({'status': 'fail', 'message': 'Invalid request method.'})
 
 
-def add_material_success(request, material_type_id):
-    material_type = MaterialType.objects.get(pk=material_type_id)
-    return render(request, 'add_material_success.html', {'material_type': material_type})
+@csrf_exempt
+def add_material_type(request):
+    """
+    Handles the POST request to add a new material type.
+
+    This view function processes the form data, validates it, and saves a new MaterialType instance to the database.
+    It handles potential errors gracefully and provides informative feedback to the user.
+
+    Parameters:
+    - request: The HTTP request object.
+
+    Returns:
+    - A JSON response with the result of the operation.
+    """
+    if request.method == 'POST':
+        try:
+            # Extract data from the request
+            supplier_name = request.POST.get('supplier_name')
+            material_type = request.POST.get('material_type')
+            username = request.POST.get('username')
+
+            # Initialize an empty list to collect error messages
+            errors = []
+
+            # Check if all required fields are provided
+            if not supplier_name:
+                errors.append({'status': 'error', 'message': 'supplier name is required.'})
+            if not material_type:
+                errors.append({'status': 'error', 'message': 'material type is required.'})
+            if not username:
+                errors.append({'status': 'error', 'message': 'username is required.'})
+
+            # If there are any errors, return them in the response
+            if errors:
+                return JsonResponse({'status': 'error', 'errors': errors})
+
+            # Create a new MaterialType instance
+            new_material_type = MaterialType(
+                supplier_name=supplier_name,
+                material_type=material_type,
+                username=username
+            )
+            # Save the new Customer object to the database
+            try:
+                new_material_type.save()
+                # Return success response
+                return JsonResponse({'status': 'success', 'message': 'Material type has been added.'})
+            except Exception as e:
+                # Handle any exceptions that occur during the save operation
+                return JsonResponse({'status': 'error', 'message': f'Error adding Material type: {str(e)}'})
+
+        except Exception as e:
+            # Handle other exceptions
+            return JsonResponse({'status': 'fail', 'message': 'An error occurred: ' + str(e)})
+
+    else:
+        # Handle non-POST requests
+        return JsonResponse({'status': 'fail', 'message': 'Invalid request method.'})
+
+
 
 
 def new_unit(request):
@@ -1172,21 +1246,6 @@ def add_unit_success(request, unit_id):
     unit = Unit.objects.get(pk=unit_id)
     return render(request, 'add_unit_success.html', {'unit': unit})
 
-
-def add_material_success(request, material_id):
-    """
-    View for displaying success message after adding a new raw material.
-
-    Args:
-        request: The HTTP request object.
-        material_id: ID of the newly created RawMaterial object.
-
-    Returns:
-        HttpResponse: Rendered add_material_success.html with material details.
-    """
-
-    material = RawMaterial.objects.get(pk=material_id)
-    return render(request, 'add_material_success.html', {'material': material})
 
 
 def add_anbar(request):
@@ -1230,20 +1289,13 @@ def add_anbar(request):
         return render(request, 'add_anbar.html')
 
 
-# @csrf_exempt
-# def apiHandler(request, api):
-    # if request.method == 'POST':
-    #     license_number = request.GET.get('license_number')
-    #     driver_name = request.GET.get('driver_name')
-    #     driver_doc = request.GET.get('driver_doc')
-    #     phone = request.GET.get('phone')
-    #     status = request.GET.get('status')
-    #     location = request.GET.get('location')
-    #     comments = request.GET.get('comments')
-    #     print(dict(request.GET.items()))
-    #
-    #     return JsonResponse({'status':'ok'})
-    # else:
-    #     # Handle non-POST requests
-    #     return JsonResponse({'error': 'Method not allowed'}, status=405)
-    # if api == 'add'
+@csrf_exempt
+def apiHandler(request, api):
+    if request.method == 'POST':
+        print(dict(request.GET.items()))
+        print(request.json())
+
+        return JsonResponse({'status':'ok'})
+    else:
+        # Handle non-POST requests
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
