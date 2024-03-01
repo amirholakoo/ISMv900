@@ -561,5 +561,9 @@ class Unit(models.Model):
     date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.name
+        """
+        Returns a string representation of the Unit object, including the Unit name, count, and username.
+        This method is used to display a human-readable representation of the object.
+        """
+        return f"{self.name} - {self.count} - {self.username}"
 
