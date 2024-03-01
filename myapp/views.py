@@ -703,7 +703,6 @@ def update_weight1(request):
     return JsonResponse({'success': False, 'message': 'Invalid request method.'})
 
 
-
 def update_weight2(request):
     """
     Handles a POST request to update the weight2 and net_weight of a Shipment instance.
@@ -1218,75 +1217,66 @@ def add_material_type(request):
         return JsonResponse({'status': 'fail', 'message': 'Invalid request method.'})
 
 
-
-
-def new_unit(request):
-    existing_units = Unit.objects.all()
-    if request.method == 'POST':
-        name = request.GET['name']
-        count_kg = request.GET.get('count_kg', None)  # Handle optional field
-        if Unit.objects.filter(name=name).exists():
-            # Unit already exists
-            error_message = 'Unit already exists'
-            return render(request, 'add_unit_error.html', {'error': error_message})
-        else:
-            # Optionally capture username for reference
-            username = request.user.username  # If using User model
-            new_unit = Unit.objects.create(
-                name=name,
-                count_kg=count_kg,
-                username_created=username
-            )
-            return redirect('add_unit_success', unit_id=new_unit.id)
-    else:
-        return render(request, 'new_unit_form.html', {'existing_units': existing_units})
-
-
-def add_unit_success(request, unit_id):
-    unit = Unit.objects.get(pk=unit_id)
-    return render(request, 'add_unit_success.html', {'unit': unit})
-
-
-
-def add_anbar(request):
+@csrf_exempt
+def add_unit(request):
     """
-    Handles POST requests to add a new Anbar.
+    Handles the POST request to add a new unit.
+
+    This view function processes the form data, validates it, and saves a new Unit instance to the database.
+    It handles potential errors gracefully and provides informative feedback to the user.
+
+    Parameters:
+    - request: The HTTP request object.
 
     Returns:
-        JsonResponse:
-            - success (str): Success message upon successful creation.
-            - error (str): Error message if validation fails or Anbar already exists.
-        HttpResponse:
-            - Renders the "add_anbar.html" template if GET request.
+    - A JSON response with the result of the operation.
     """
-
     if request.method == 'POST':
-        location_name = request.GET.get('location_name')
+        # Extract data from the request
+        supplier_name = request.GET.get('supplier_name')
+        material_type = request.GET.get('material_type')
+        unit_name = request.GET.get('unit_name')
+        count = request.GET.get('count')
+        username = request.GET.get('username')
 
-        # Validate input
-        if not location_name:
-            return JsonResponse({'error': 'Location name is required.'}, status=400)
+        errors = []
 
-        # Check for existing Anbar
-        # existing_anbar = Anbar.objects.filter(location_name=location_name).first()
-        # if existing_anbar:
-        #     return JsonResponse({'error': 'Anbar with this location name already exists.'}, status=400)
+        # Check if all required fields are provided
+        if not supplier_name:
+            errors.append({'status': 'error', 'message': 'supplier name is required.'})
+        if not material_type:
+            errors.append({'status': 'error', 'message': 'material type is required.'})
+        if not unit_name:
+            errors.append({'status': 'error', 'message': 'unit_name is required.'})
+        if not count:
+            errors.append({'status': 'error', 'message': 'count are required.'})
+        if not username:
+            errors.append({'status': 'error', 'message': 'username are required.'})
 
-        # Create new Anbar
-        # new_anbar = Anbar(
-        #     location_name=location_name,
-        #     comments=f"Automatically Created",
-        # )
-        # new_anbar.save()
+        # If there are any errors, return them in the response
+        if errors:
+            return JsonResponse({'status': 'error', 'errors': errors})
 
-        # Return success response
-        return JsonResponse({
-            'success': 'Anbar added successfully.',
-            # 'location_name': new_anbar.location_name,
-        }, status=201)
+        # Create a new Unit instance
+        new_unit = Unit(
+            supplier_name=supplier_name,
+            material_type=material_type,
+            unit_name=unit_name,
+            count=count,
+            username=username
+        )
 
+        # Save the new Customer object to the database
+        try:
+            new_unit.save()
+            # Return success response
+            return JsonResponse({'status': 'success', 'message': 'Unit has been added.'})
+        except Exception as e:
+            # Handle any exceptions that occur during the save operation
+            return JsonResponse({'status': 'error', 'message': f'Error adding Unit: {str(e)}'})
     else:
-        return render(request, 'add_anbar.html')
+        # Handle non-POST requests
+        return JsonResponse({'status': 'fail', 'message': 'Invalid request method.'})
 
 
 @csrf_exempt
