@@ -1346,6 +1346,12 @@ def add_consumption_profile(request):
 
 
 @csrf_exempt
+def cancel_shipment(request):
+    if request.method == 'POST':
+        pass
+
+
+@csrf_exempt
 def apiHandler(request, api):
     if request.method == 'POST':
         print(dict(request.GET.items()))

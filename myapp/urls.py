@@ -27,4 +27,5 @@ urlpatterns = [
     path("api/addMaterialType", add_material_type),
     path("api/addUnit", add_unit),
     path("api/addConsumptionProfile", add_consumption_profile),
+    path("api/cancelShipment", cancel_shipment),
 ]
