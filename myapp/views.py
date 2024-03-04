@@ -311,6 +311,7 @@ def add_rawMaterial(request):
         material_type = request.GET.get('material_type')
         material_name = request.GET.get('material_name')
         comments = request.GET.get('comments')
+        username = request.GET.get('username')
 
         # Initialize an empty list to collect error messages
         errors = []
@@ -352,7 +353,7 @@ def add_rawMaterial(request):
             # Handle any exceptions that occur during the save operation
             return JsonResponse({'status': 'error', 'message': f'Error adding Customer: {str(e)}'})
     else:
-        return JsonResponse({'status': 'error', 'message': 'Invalid request method.'})
+        return render(request, 'add_rawMaterial.html')
 
 
 def get_consumption_profile_names(request):

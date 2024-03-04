@@ -3,6 +3,7 @@ import HomeView from '../views/HomeView.vue'
 import addTruck from "@/components/addTruck.vue";
 import addSupplier from "@/components/addSupplier.vue";
 import addCustomer from "@/components/addCustomer.vue";
+import addRawMaterial from "@/components/addRawMaterial.vue";
 
 const routes = [
   {
@@ -32,6 +33,11 @@ const routes = [
     path: '/myapp/addCustomer/',
     name: 'addCustomer',
     component: addCustomer
+  },
+  {
+    path: '/myapp/addRawMaterial/',
+    name: 'addRawMaterial',
+    component: addRawMaterial
   },
 ]
 
