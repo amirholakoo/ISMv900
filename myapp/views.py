@@ -514,7 +514,7 @@ def add_new_reel(request):
             # Return a general error response
             return JsonResponse({'error': str(e)}, status=500)
     else:
-        return JsonResponse({'error': 'Invalid request method'}, status=405)
+        return render(request, 'add_new_reel.html')
 
 
 def get_license_numbers(request):

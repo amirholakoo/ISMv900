@@ -4,6 +4,7 @@ import addTruck from "@/components/addTruck.vue";
 import addSupplier from "@/components/addSupplier.vue";
 import addCustomer from "@/components/addCustomer.vue";
 import addRawMaterial from "@/components/addRawMaterial.vue";
+import addNewReel from "@/components/addNewReel.vue";
 
 const routes = [
   {
@@ -38,6 +39,11 @@ const routes = [
     path: '/myapp/addRawMaterial/',
     name: 'addRawMaterial',
     component: addRawMaterial
+  },
+  {
+    path: '/myapp/addNewReel/',
+    name: 'addNewReel',
+    component: addNewReel
   },
 ]
 

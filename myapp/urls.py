@@ -12,7 +12,7 @@ urlpatterns = [
     path("api/getSupplierNames", get_supplierNames),
     path("addRawMaterial/", add_rawMaterial),
     path("api/getConsumptionProfileNames", get_consumption_profile_names),
-    path("api/addNewReel", add_new_reel),
+    path("addNewReel/", add_new_reel),
     path("api/getLicenseNumbers", get_license_numbers),
     path("api/getMaterialNames", get_material_names),
     path("api/addShipment", add_shipment),
