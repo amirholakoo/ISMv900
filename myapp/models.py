@@ -9,7 +9,7 @@ class Truck(models.Model):
     Represents a truck used for transportation purposes.
 
     Attributes:
-        truck_id (int): Auto-incrementing primary key for the truck.
+        id (int): Auto-incrementing primary key for the truck.
         license_number (str): Unique license number of the truck (max length 255).
         driver_name (str, optional): Name of the driver assigned to the truck (max length 255).
         driver_doc (str, optional): doc of the driver assigned to the truck (max length 255).
@@ -89,7 +89,7 @@ class Shipments(models.Model):
         """
         String representation of the Shipment instance.
         """
-        return f"Shipment {self.shipment_id} ({self.shipment_type})"
+        return f"Shipment {self.id} ({self.shipment_type})"
 
 
 class Supplier(models.Model):
@@ -212,7 +212,7 @@ class RawMaterial(models.Model):
 
         Format: "{material_name} (ID: {material_id})"
         """
-        return f"{self.material_name} (ID: {self.material_id})  (ID: {self.supplier}) (ID: {self.status})"
+        return f"{self.material_name} (ID: {self.id})  (ID: {self.supplier}) (ID: {self.status})"
 
 
 class Purchases(models.Model):
@@ -300,7 +300,7 @@ class Purchases(models.Model):
         """
         String representation of the Purchase instance.
         """
-        return f"Purchase {self.purchase_id} on {self.date}"
+        return f"Purchase {self.id} on {self.date}"
 
 
 class Sales(models.Model):
@@ -366,7 +366,7 @@ class Sales(models.Model):
         db_table = 'Sales'
 
     def __str__(self):
-        return f"Sale (ID: {self.sale_id}, Date: {self.date}, Customer: {self.customer})"
+        return f"Sale (ID: {self.id}, Date: {self.date}, Customer: {self.customer})"
 
 
 class AnbarGeneric(models.Model):
@@ -587,7 +587,7 @@ class Consumption(models.Model):
         """
         String representation of the Consumption instance.
         """
-        return f"Consumption {self.consumption_id}: {self.supplier_name} - {self.material_type} - {self.material_name}"
+        return f"Consumption {self.id}: {self.supplier_name} - {self.material_type} - {self.material_name}"
 
 
 class MaterialType(models.Model):

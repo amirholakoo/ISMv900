@@ -13,7 +13,7 @@ from datetime import datetime
 
 # Incoming process:
 # Add Truck
-# Add Shipment
+# Add Shipments
 # Weight 1
 # Unloading by forklift
 # Weight 2
@@ -619,7 +619,7 @@ def add_shipment(request):
             else:
                 truck.save()
 
-            shipment = Shipment()
+            shipment = Shipments()
             shipment.entry_time = timezone.now()
             shipment.license_number = license_number
             shipment.shipment_type = shipment_type
@@ -643,7 +643,7 @@ def add_shipment(request):
             # truck.location = 'Entrance'
             # truck.save()
 
-            return JsonResponse({'status': 'success', 'message': 'Shipment created successfully!'})
+            return JsonResponse({'status': 'success', 'message': 'Shipments created successfully!'})
     else:
         return JsonResponse({'status': 'error', 'message': 'Invalid request method.'})
 
@@ -655,17 +655,17 @@ def add_shipment(request):
 @csrf_exempt
 def update_weight1(request):
     """
-    Handles a POST request to update the weight1 field of a Shipment instance.
+    Handles a POST request to update the weight1 field of a Shipments instance.
 
     This view function expects the following data in the POST request:
-    - shipment_id: The UUID of the Shipment instance to update.
+    - shipment_id: The UUID of the Shipments instance to update.
     - weight1: The new weight1 value to set, as a string that can be converted to a float.
     - username: The username of the user making the request, used for comments.
 
     It performs the following operations:
     - Validates that the weight1 value is within the range of 9 to 38000 KG.
-    - Retrieves the Shipment instance by its shipment_id.
-    - Updates the weight1, weight1_time, and comments fields of the Shipment instance.
+    - Retrieves the Shipments instance by its shipment_id.
+    - Updates the weight1, weight1_time, and comments fields of the Shipments instance.
     - Saves the changes to the database.
     - Returns a JSON response indicating success or failure, along with a message.
 
@@ -688,7 +688,7 @@ def update_weight1(request):
                 return JsonResponse({'success': False, 'message': 'Weight must be between 9 and 38000 KG.'})
 
             # Retrieve the shipment instance
-            shipment = Shipment.objects.get(shipment_id=shipment_id)
+            shipment = Shipments.objects.get(shipment_id=shipment_id)
 
             # Update the fields
             shipment.weight1 = weight1
@@ -699,10 +699,10 @@ def update_weight1(request):
             shipment.save()
 
             # Return a success response
-            return JsonResponse({'success': True, 'message': f'You entered WEIGHT 1 KG for Shipment for SUPPLIER/CUSTOMER with LICENSE NUMBER: {shipment.license_number} has been added.'})
+            return JsonResponse({'success': True, 'message': f'You entered WEIGHT 1 KG for Shipments for SUPPLIER/CUSTOMER with LICENSE NUMBER: {shipment.license_number} has been added.'})
 
-        except Shipment.DoesNotExist:
-            return JsonResponse({'success': False, 'message': 'Shipment not found.'})
+        except Shipments.DoesNotExist:
+            return JsonResponse({'success': False, 'message': 'Shipments not found.'})
         except ValueError:
             return JsonResponse({'success': False, 'message': 'Invalid weight format.'})
         except Exception as e:
@@ -713,9 +713,9 @@ def update_weight1(request):
 
 def update_weight2(request):
     """
-    Handles a POST request to update the weight2 and net_weight of a Shipment instance.
+    Handles a POST request to update the weight2 and net_weight of a Shipments instance.
 
-    This function retrieves a Shipment instance based on the provided license number, validates the weight2 and net_weight values,
+    This function retrieves a Shipments instance based on the provided license number, validates the weight2 and net_weight values,
     updates the instance with the new weights, and saves the changes to the database. It returns a JSON response indicating
     the success or failure of the operation, along with appropriate messages.
     """
@@ -738,9 +738,9 @@ def update_weight2(request):
         if not (9 <= weight2 <= 38000) or not (9 <= net_weight <= 38000):
             return JsonResponse({'status': 'error', 'message': 'Weight2 and Net Weight must be between 9 KG and 38000 KG.'})
 
-        # Update the Shipment instance
+        # Update the Shipments instance
         try:
-            shipment = Shipment.objects.get(license_number=license_number)
+            shipment = Shipments.objects.get(license_number=license_number)
             shipment.weight2 = weight2
             shipment.weight2_time = timezone.now()
             shipment.net_weight = net_weight
@@ -750,9 +750,9 @@ def update_weight2(request):
             if abs(shipment.weight1 - weight2) != net_weight:
                 return JsonResponse({'status': 'error', 'message': 'The absolute difference between Weight1 and Weight2 must equal the Net Weight.'})
 
-            return JsonResponse({'status': 'success', 'message': f'Weight2 and Net Weight for Shipment with License Number {license_number} has been updated successfully.'})
-        except Shipment.DoesNotExist:
-            return JsonResponse({'status': 'error', 'message': f'Shipment with License Number {license_number} does not exist.'})
+            return JsonResponse({'status': 'success', 'message': f'Weight2 and Net Weight for Shipments with License Number {license_number} has been updated successfully.'})
+        except Shipments.DoesNotExist:
+            return JsonResponse({'status': 'error', 'message': f'Shipments with License Number {license_number} does not exist.'})
 
     else:
         return JsonResponse({'status': 'error', 'message': 'Invalid request method.'})
@@ -769,7 +769,7 @@ def create_purchase_order(request):
             data = request.json()
 
             # Load shipment data
-            shipment = Shipment.objects.get(license_number=data['license_number'], status='Office')
+            shipment = Shipments.objects.get(license_number=data['license_number'], status='Office')
 
             # Update shipment status and location
             shipment.status = 'Delivered'
@@ -792,8 +792,8 @@ def create_purchase_order(request):
             # Return success response
             return JsonResponse({'success': True, 'message': 'Purchase Order created successfully.'})
 
-        except Shipment.DoesNotExist:
-            return JsonResponse({'success': False, 'message': 'Shipment not found or not in Office status.'})
+        except Shipments.DoesNotExist:
+            return JsonResponse({'success': False, 'message': 'Shipments not found or not in Office status.'})
         except Exception as e:
             return JsonResponse({'success': False, 'message': str(e)})
 
@@ -812,7 +812,7 @@ def create_sales_order(request):
 
         try:
             # Retrieve the shipment instance
-            shipment = Shipment.objects.get(shipment_id=data['shipment_id'])
+            shipment = Shipments.objects.get(shipment_id=data['shipment_id'])
 
             # Update shipment fields
             shipment.status = 'Delivered'
@@ -835,8 +835,8 @@ def create_sales_order(request):
             # Return a success response
             return JsonResponse({'status': 'success', 'message': 'Sales Order created successfully.'})
 
-        except Shipment.DoesNotExist:
-            return JsonResponse({'status': 'error', 'message': 'Shipment not found.'}, status=404)
+        except Shipments.DoesNotExist:
+            return JsonResponse({'status': 'error', 'message': 'Shipments not found.'}, status=404)
         except Exception as e:
             return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
     else:
@@ -847,7 +847,7 @@ def create_sales_order(request):
 @csrf_exempt
 def unload(request):
     """
-    Handles the unloading of a shipment by updating the Shipment and AnbarGeneric models.
+    Handles the unloading of a shipment by updating the Shipments and AnbarGeneric models.
 
     This view processes a POST request containing shipment details, including the license number
     and the quantity to be unloaded. It updates the status of the shipment to 'LoadedUnloaded' and
@@ -882,7 +882,7 @@ def unload(request):
 
         try:
             # Retrieve the shipment instance
-            shipment = Shipment.objects.get(license_number=data['license_number'])
+            shipment = Shipments.objects.get(license_number=data['license_number'])
 
             # Update shipment fields
             shipment.status = 'LoadedUnloaded'
@@ -905,8 +905,8 @@ def unload(request):
             # Return a success response
             return JsonResponse({'status': 'success', 'message': f'{quantity_to_unload} units have been added to {data["license_number"]}.'})
 
-        except Shipment.DoesNotExist:
-            return JsonResponse({'status': 'error', 'message': 'Shipment not found.'}, status=404)
+        except Shipments.DoesNotExist:
+            return JsonResponse({'status': 'error', 'message': 'Shipments not found.'}, status=404)
         except Exception as e:
             return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
     else:
@@ -916,7 +916,7 @@ def unload(request):
 @csrf_exempt
 def loaded(request):
     """
-    Handles the loading of a shipment by updating the Shipment and AnbarGeneric models.
+    Handles the loading of a shipment by updating the Shipments and AnbarGeneric models.
 
     This view processes a POST request containing shipment details, including the license number,
     loading location, width, and selected reel numbers. It updates the status of the shipment to
@@ -953,7 +953,7 @@ def loaded(request):
 
         try:
             # Retrieve the shipment instance
-            shipment = Shipment.objects.get(license_number=data['license_number'])
+            shipment = Shipments.objects.get(license_number=data['license_number'])
 
             # Update shipment fields
             shipment.status = 'LoadedUnloaded'
@@ -970,8 +970,8 @@ def loaded(request):
             # Return a success response
             return JsonResponse({'status': 'success', 'message': f'Width and List of Reels has been added to {data["license_number"]}.'})
 
-        except Shipment.DoesNotExist:
-            return JsonResponse({'status': 'error', 'message': 'Shipment not found.'}, status=404)
+        except Shipments.DoesNotExist:
+            return JsonResponse({'status': 'error', 'message': 'Shipments not found.'}, status=404)
         except Exception as e:
             return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
     else:
@@ -1426,10 +1426,10 @@ def cancel_shipment(request):
 
             # Validate the data
             if not shipment_id or not cancellation_reason:
-                raise ValidationError("Shipment ID and cancellation reason are required.")
+                raise ValidationError("Shipments ID and cancellation reason are required.")
 
             # Fetch the shipment
-            shipment = Shipment.objects.get(shipment_id=shipment_id)
+            shipment = Shipments.objects.get(shipment_id=shipment_id)
 
             # Update shipment status and cancellation reason
             shipment.status = 'Canceled'
@@ -1462,7 +1462,7 @@ def cancel_shipment(request):
                 purchase.Status = 'Cancelled'
                 purchase.CancellationReason = cancellation_reason
                 purchase.save()
-            sales = Sale.objects.filter(shipment=shipment)
+            sales = Sales.objects.filter(shipment=shipment)
             for sale in sales:
                 sale.payment_status = 'Cancelled'
                 sale.comments = cancellation_reason
@@ -1472,11 +1472,11 @@ def cancel_shipment(request):
             # For example, updating the status of related products to 'In-stock' and their location to 'Canceled'
 
             # Return success response
-            return JsonResponse({'status': 'success', 'message': f'Shipment {shipment_id} has been canceled.'})
+            return JsonResponse({'status': 'success', 'message': f'Shipments {shipment_id} has been canceled.'})
 
-        except Shipment.DoesNotExist:
+        except Shipments.DoesNotExist:
             # Handle case where the shipment does not exist
-            return JsonResponse({'status': 'fail', 'message': 'Shipment not found.'})
+            return JsonResponse({'status': 'fail', 'message': 'Shipments not found.'})
 
         except ValidationError as e:
             # Handle validation errors
