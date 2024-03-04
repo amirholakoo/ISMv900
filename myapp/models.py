@@ -599,7 +599,6 @@ class MaterialType(models.Model):
     - supplier_name: Name of the supplier. Can be null or blank.
     - material_type: Type of material. Required field.
     - username: Username associated with the material type. Can be null or blank.
-    - data: Date and time when the material type was added. Auto-populated on creation.
     """
     id = models.AutoField(primary_key=True)
     supplier_name = models.CharField(max_length=255, null=True, blank=True)
@@ -624,10 +623,13 @@ class Unit(models.Model):
 
     Attributes:
         id (int): Auto-incrementing primary key for the unit.
-        name (str): Name of the unit (unique).
-        count (float, optional): Value representing the unit's capacity in kilograms (e.g., 25 for 25kg bag).
-        username (str, blank=True): Username of the user who created the unit (optional).
-        date (datetime): Date and time the unit was created.
+        supplier_name (str, null=True, blank=True): Name of the supplier associated with the unit.
+        material_type (str): Type of material the unit is associated with.
+        unit_name (str): Name of the unit, unique across all units.
+        count (float, optional): Value representing the unit's capacity in kilograms (e.g., 25 for a 25kg bag).
+        username (str, blank=True): Username of the user who created the unit, if applicable.
+        date (datetime): Date and time the unit was created, defaults to the current time.
+        logs (str, blank=True): Text field for storing logs or additional information about the unit.
     """
 
     id = models.AutoField(primary_key=True)
