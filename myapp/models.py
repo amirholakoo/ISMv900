@@ -102,7 +102,7 @@ class Supplier(models.Model):
     logs = models.TextField(blank=True)
 
     def __str__(self):
-        return self.supplier_name
+        return f"{self.supplier_name} (ID: {self.status})"
 
 
 class Products(models.Model):
@@ -145,7 +145,7 @@ class Products(models.Model):
         ('Moved', 'Moved'),
         ('Delivered', 'Delivered'),
     ]
-    status = models.CharField(max_length=50, choices=STATUS_CHOICES)
+    status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='In-stock')
 
     # Date and time when the product was received
     receive_date = models.DateTimeField(blank=True, null=True)
@@ -179,7 +179,7 @@ class Customer(models.Model):
     logs = models.TextField(blank=True)
 
     def __str__(self):
-        return self.customer_name
+        return f"{self.customer_name} (ID: {self.status})"
 
 
 class RawMaterial(models.Model):
@@ -211,7 +211,7 @@ class RawMaterial(models.Model):
 
         Format: "{material_name} (ID: {material_id})"
         """
-        return f"{self.material_name} (ID: {self.material_id})"
+        return f"{self.material_name} (ID: {self.material_id})  (ID: {self.supplier}) (ID: {self.status})"
 
 
 class Purchases(models.Model):
@@ -290,6 +290,7 @@ class Purchases(models.Model):
     cancellation_reason = models.TextField(blank=True, null=True)
 
     shipment_id = models.ForeignKey('Shipment', on_delete=models.SET_NULL, blank=True, null=True)
+    logs = models.TextField(blank=True)
 
     class Meta:
         db_table = "Purchases"
@@ -301,31 +302,67 @@ class Purchases(models.Model):
         return f"Purchase {self.purchase_id} on {self.date}"
 
 
-class Sale(models.Model):
+class Sales(models.Model):
+    """
+    Model representing a sales record.
+
+    Each instance of this model represents a sale transaction, including details such as the date of the sale, the customer involved, the truck used, and various financial details. The model also includes references to related entities such as the customer, truck, and shipment involved in the sale.
+
+    Fields:
+    - sale_id: An auto-incrementing primary key for each sale record.
+    - date: The date and time when the sale was made.
+    - customer: A foreign key to the Customers model, representing the customer involved in the sale.
+    - truck: A foreign key to the Trucks model, representing the truck used in the sale.
+    - license_number: The license number of the truck used in the sale.
+    - list_of_reels: A text field containing a list of reels involved in the sale.
+    - profile_name: The name of the profile associated with the sale.
+    - weight1, weight2, net_weight: Decimal fields representing various weights associated with the sale.
+    - price_per_kg: A decimal field representing the price per kilogram for the sale.
+    - vat: A decimal field representing the VAT amount for the sale.
+    - total_price: A decimal field representing the total price of the sale.
+    - extra_cost: A decimal field representing any extra costs associated with the sale.
+    - invoice_status: A char field indicating the status of the invoice, with choices for 'Sent' and 'NA'.
+    - invoice_number: A char field containing the invoice number for the sale.
+    - status: A char field indicating the status of the sale, with choices for 'Paid', 'Terms', and 'Cancelled'.
+    - payment_details: A char field containing details about the payment made for the sale.
+    - payment_date: A datetime field representing the date and time when the payment was made.
+    - document_info: A text field containing information about any documents associated with the sale.
+    - comments: A text field for any comments or notes about the sale.
+    - cancellation_reason: A text field containing the reason for cancellation, if applicable.
+    - shipment: A foreign key to the Shipments model, representing the shipment associated with the sale.
+
+    Relationships:
+    - Each sale is related to one customer, one truck, and one shipment.
+    - The customer, truck, and shipment fields are foreign keys, establishing a relationship with the Customers, Trucks, and Shipments models, respectively.
+    """
+    # Fields
     sale_id = models.AutoField(primary_key=True)
-    date = models.DateTimeField(default=timezone.now, blank=True)
-    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
-    truck = models.ForeignKey(Truck, on_delete=models.CASCADE)
-    license_number = models.CharField(max_length=255, blank=True)
-    list_of_reels = models.TextField(blank=True)
-    weight1 = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
-    weight2 = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
-    net_weight = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
-    shipping_cost = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
-    vat = models.CharField(max_length=255, blank=True)
-    total_price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
-    invoice_status = models.CharField(
-        max_length=10, choices=[('Sent', 'Sent'), ('NA', 'NA')]
-    )
-    payment_status = models.CharField(
-        max_length=10, choices=[('Paid', 'Paid'), ('Terms', 'Terms'),
-                                 ('Unknown', 'Unknown'), ('Cancelled', 'Cancelled')]
-    )
-    invoice_number = models.CharField(max_length=255, blank=True)
-    document_info = models.TextField(blank=True)
-    comments = models.TextField(blank=True)
-    shipment = models.ForeignKey('Shipment', on_delete=models.CASCADE, blank=True, null=True)
+    date = models.DateTimeField(null=True)
+    customer = models.ForeignKey('Customers', on_delete=models.CASCADE, null=True)
+    truck = models.ForeignKey('Trucks', on_delete=models.CASCADE, null=True)
+    license_number = models.CharField(max_length=255, null=True)
+    list_of_reels = models.TextField(null=True)
+    profile_name = models.CharField(max_length=255, null=True)
+    weight1 = models.DecimalField(max_digits=10, decimal_places=2, null=True)
+    weight2 = models.DecimalField(max_digits=10, decimal_places=2, null=True)
+    net_weight = models.DecimalField(max_digits=10, decimal_places=2, null=True)
+    price_per_kg = models.DecimalField(max_digits=10, decimal_places=0, null=True)
+    vat = models.DecimalField(max_digits=10, decimal_places=2, null=True) # Assuming VAT is a decimal field
+    total_price = models.DecimalField(max_digits=10, decimal_places=2, null=True)
+    extra_cost = models.DecimalField(max_digits=10, decimal_places=2, null=True)
+    invoice_status = models.CharField(max_length=255, choices=[('Sent', 'Sent'), ('NA', 'NA')], null=True)
+    invoice_number = models.CharField(max_length=255, null=True)
+    status = models.CharField(max_length=255, choices=[('Paid', 'Paid'), ('Terms', 'Terms'), ('Cancelled', 'Cancelled')], null=True)
+    payment_details = models.CharField(max_length=255, null=True)
+    payment_date = models.DateTimeField(null=True)
+    document_info = models.TextField(null=True)
+    comments = models.TextField(null=True)
+    cancellation_reason = models.TextField(null=True)
+    shipment = models.ForeignKey('Shipments', on_delete=models.CASCADE, null=True)
     logs = models.TextField(blank=True)
+    # Meta
+    class Meta:
+        db_table = 'Sales'
 
     def __str__(self):
         return f"Sale (ID: {self.sale_id}, Date: {self.date}, Customer: {self.customer})"
@@ -372,7 +409,7 @@ class AnbarGeneric(models.Model):
     status = models.CharField(max_length=50, choices=STATUS_CHOICES, null=True, blank=True)
 
     # Location of the material
-    location = models.CharField(max_length=255, null=True, blank=True)
+    location = models.CharField(max_length=255, null=True, blank=True, default='Entrance')
 
     # Last date the material was updated
     last_date = models.DateTimeField(null=True, blank=True)
@@ -546,7 +583,10 @@ class Consumption(models.Model):
     logs = models.TextField(blank=True)
 
     def __str__(self):
-        return f"Consumption (ID: {self.consumption_id}, Date: {self.date}, profile name: {self.profile_name})"
+        """
+        String representation of the Consumption instance.
+        """
+        return f"Consumption {self.consumption_id}: {self.supplier_name} - {self.material_type} - {self.material_name}"
 
 
 class MaterialType(models.Model):
