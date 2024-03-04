@@ -19,7 +19,7 @@ class Truck(models.Model):
         comments (str, optional): Additional notes or information about the truck.
     """
 
-    truck_id = models.AutoField(primary_key=True)
+    id = models.AutoField(primary_key=True)
     license_number = models.CharField(max_length=255, unique=True)
     driver_name = models.CharField(max_length=255, blank=True)
     driver_doc = models.CharField(max_length=255, blank=True)
@@ -43,7 +43,7 @@ class Shipments(models.Model):
     Model representing a shipment record.
     """
     # Fields
-    shipment_id = models.AutoField(primary_key=True)
+    id = models.AutoField(primary_key=True)
     shipment_type = models.CharField(max_length=255, choices=[('Incoming', 'Incoming'), ('Outgoing', 'Outgoing')], null=True)
     status = models.CharField(max_length=255, choices=[('Registered', 'Registered'), ('LoadingUnloading', 'LoadingUnloading'), ('LoadedUnloaded', 'LoadedUnloaded'), ('Offiffice', 'Offiffice'), ('Delivered', 'Delivered'), ('Canceled', 'Canceled')], null=True)
     location = models.CharField(max_length=255, choices=[('Entrance', 'Entrance'), ('Weight1', 'Weight1'), ('Weight2', 'Weight2'), ('Offiffice', 'Offiffice'), ('Delivered', 'Delivered')], null=True)
@@ -93,7 +93,7 @@ class Shipments(models.Model):
 
 
 class Supplier(models.Model):
-    supplier_id = models.AutoField(primary_key=True)
+    id = models.AutoField(primary_key=True)
     supplier_name = models.CharField(max_length=255, null=False)
     address = models.TextField(blank=True)
     phone = models.CharField(max_length=20, blank=True)
@@ -111,8 +111,9 @@ class Products(models.Model):
     Each record includes details about a product, such as its dimensions, grade,
     and various attributes related to its physical properties and status.
     """
-    # Reel number for the product, used as the primary key
-    reel_number = models.CharField(max_length=255, primary_key=True)
+    id = models.AutoField(primary_key=True)
+    # Reel number for the product
+    reel_number = models.CharField(max_length=255)
 
     # Width of the product
     width = models.IntegerField()
@@ -170,7 +171,7 @@ class Products(models.Model):
 
 
 class Customer(models.Model):
-    customer_id = models.AutoField(primary_key=True)
+    id = models.AutoField(primary_key=True)
     customer_name = models.CharField(max_length=255, null=False)
     address = models.TextField(blank=True)
     phone = models.CharField(max_length=20, blank=True)
@@ -187,7 +188,7 @@ class RawMaterial(models.Model):
     Represents a raw material used in production.
 
     Attributes:
-        material_id (int): Auto-incrementing primary key for the raw material.
+        id (int): Auto-incrementing primary key for the raw material.
         supplier (ForeignKey): Foreign key to the Supplier model representing the raw material's source.
         material_type (str): Type of the raw material (e.g., cotton, wool, plastic).
         material_name (str): Name of the specific raw material (e.g., Pima cotton, Merino wool).
@@ -196,7 +197,7 @@ class RawMaterial(models.Model):
         comments (str, optional): Additional comments or notes about the raw material.
     """
 
-    material_id = models.AutoField(primary_key=True)
+    id = models.AutoField(primary_key=True)
     supplier = models.ForeignKey(Supplier, on_delete=models.SET_NULL, null=True, related_name='raw_materials')
     material_type = models.CharField(max_length=255)
     material_name = models.CharField(max_length=255)
@@ -250,7 +251,7 @@ class Purchases(models.Model):
 
     """
     # Fields
-    purchase_id = models.AutoField(primary_key=True)
+    id = models.AutoField(primary_key=True)
     date = models.DateTimeField(default=timezone.now, blank=True)
     receive_date = models.DateTimeField(blank=True, null=True)
 
@@ -336,7 +337,7 @@ class Sales(models.Model):
     - The customer, truck, and shipment fields are foreign keys, establishing a relationship with the Customers, Trucks, and Shipments models, respectively.
     """
     # Fields
-    sale_id = models.AutoField(primary_key=True)
+    id = models.AutoField(primary_key=True)
     date = models.DateTimeField(null=True)
     customer = models.ForeignKey('Customers', on_delete=models.CASCADE, null=True)
     truck = models.ForeignKey('Trucks', on_delete=models.CASCADE, null=True)
@@ -548,7 +549,7 @@ class Consumption(models.Model):
     such as the supplier, material type, and quantity.
     """
     # Auto-incrementing primary key
-    consumption_id = models.AutoField(primary_key=True)
+    id = models.AutoField(primary_key=True)
 
     # Date and time when the consumption was recorded
     receive_date = models.DateTimeField(null=True, blank=True)
