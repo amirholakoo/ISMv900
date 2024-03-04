@@ -1,7 +1,7 @@
 {% extends '_base.html' %}
 
 {% block html %}
-<html lang="">
+<html dir="rtl">
   <head>
       {% block head %}{{ block.super }}{% endblock %}
   <script defer src="http://localhost:8080/js/chunk-vendors.js"></script><script defer src="http://localhost:8080/js/app.js"></script></head>
@@ -11,7 +11,7 @@
     <noscript>
       <strong>We're sorry but vue-games doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
     </noscript>
-    <div id="app"></div>
+    <div id="app" class="bg-gray-100"></div>
     <!-- built files will be auto injected -->
   {% endblock body%}
   </body>
