@@ -1,3 +1,5 @@
+import json
+
 from django.shortcuts import render, redirect
 from .models import *
 from django.http import JsonResponse
@@ -77,26 +79,30 @@ def add_truck(request):
     """
 
     if request.method == 'POST':
+        # Extract data from the request
         license_number = request.GET.get('license_number')
         driver_name = request.GET.get('driver_name')
         driver_doc = request.GET.get('driver_doc')
         phone = request.GET.get('phone')
-
+        username = request.GET.get('username')
+        print(license_number, driver_name)
+        print(type(license_number))
         # Create new truck
-        new_truck = Truck(
-            license_number=license_number,
-            driver_name=driver_name,
-            driver_doc=driver_doc,
-            phone=phone,
-        )
-        new_truck.save()
-
-        # Return success response
+        # new_truck = Truck(
+        #     license_number=license_number,
+        #     driver_name=driver_name,
+        #     driver_doc=driver_doc,
+        #     phone=phone,
+        # )
+        # new_truck.save()
+        #
+        # # Return success response
         return JsonResponse({
             'success': 'Truck added successfully.',
-            'license_number': new_truck.license_number,
+            # 'license_number': new_truck.license_number,
         }, status=201)
-
+    if request.method == 'GET':
+        return render(request, 'add_truck.html')
 
 @csrf_exempt
 def add_supplier(request):
@@ -160,7 +166,7 @@ def add_supplier(request):
             # Handle any exceptions that occur during the save operation
             return JsonResponse({'status': 'error', 'message': f'Error adding supplier: {str(e)}'})
     else:
-        return JsonResponse({'status': 'error', 'message': 'Invalid request method.'})
+        return render(request, 'add_supplier.html')
 
 
 @csrf_exempt
@@ -226,7 +232,7 @@ def add_customer(request):
             # Handle any exceptions that occur during the save operation
             return JsonResponse({'status': 'error', 'message': f'Error adding Customer: {str(e)}'})
     else:
-        return JsonResponse({'status': 'error', 'message': 'Invalid request method.'})
+        return render(request, 'add_customer.html')
 
 
 def get_materialTypes(request):
@@ -1484,12 +1490,24 @@ def cancel_shipment(request):
 
 
 @csrf_exempt
-def apiHandler(request, api):
+def apiHandler(request):
     if request.method == 'POST':
         print(dict(request.GET.items()))
-        print(request.json())
+        # print(request.json())
+        # Extract data from the request
+        data = request.GET
+        print(data)
+        # Define required fields
+        required_fields = ['supplier_name', 'material_type', 'unit_name', 'quantity', 'anbar_location', 'reason', 'forklift_driver']
 
-        return JsonResponse({'status':'ok'})
+        # Validate required fields
+        errors = [{'status': 'error', 'message': f'{field} is required.'} for field in required_fields if not data.get(field)]
+
+        # If there are any errors, return them in the response
+        if errors:
+            return JsonResponse({'status': 'error', 'errors': errors})
+
+        return JsonResponse({'status':'ok', 'data': data, 'error': errors})
     else:
         # Handle non-POST requests
         return JsonResponse({'error': 'Method not allowed'}, status=405)
