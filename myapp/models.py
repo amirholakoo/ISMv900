@@ -1,12 +1,7 @@
-import uuid
-
-from django.db import models
+from django.utils import timezone
 from datetime import datetime
-
-
-# Create your models here.
 from django.db import models
-import uuid
+# Create your models here.
 
 
 class Truck(models.Model):
@@ -43,79 +38,58 @@ class Truck(models.Model):
         return f"Truck {self.license_number} - {self.status}"
 
 
-class Shipment(models.Model):
+class Shipments(models.Model):
     """
-    Model representing a shipment with various attributes related to its status, location, and associated entities.
+    Model representing a shipment record.
     """
-    # Enum choices definition
-    SHIPMENT_TYPE_CHOICES = [
-        ('Incoming','Incoming'),
-        ('Outgoing','Outgoing')
-    ]
-    STATUS_CHOICES = [
-        ('Registered', 'Registered'),
-        ('LoadingUnloading', 'Loading/Unloading'),
-        ('LoadedUnloaded', 'Loaded/Unloaded'),
-        ('Office', 'Office'),
-        ('Delivered','Delivered'),
-        ('Canceled', 'Canceled')
-    ]
-    LOCATION_CHOICES = [
-        ('Entrance', 'Entrance'),
-        ('Weight1', 'Weight1'),
-        ('Weight2', 'Weight2'),
-        ('Office', 'Office'),
-        ('Delivered','Delivered'),
-    ]
-    INVOICE_STATUS_CHOICES = [
-        ('NA', 'Not Applicable'),
-        ('Sent', 'Sent'),
-        ('Received', 'Received'),
-    ]
-    PAYMENT_STATUS_CHOICES = [
-        ('Terms', 'Terms'),
-        ('Paid', 'Paid'),
-    ]
-    shipment_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    shipment_type = models.CharField(max_length=10, choices=SHIPMENT_TYPE_CHOICES, default=None, null=True)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=None, null=True)
-    location = models.CharField(max_length=10, choices=LOCATION_CHOICES, default=None, null=True)
-    truck_id = models.IntegerField(null=True) #Assuming Truck is another model
-    license_number = models.CharField(max_length=225, null=True)
+    # Fields
+    shipment_id = models.AutoField(primary_key=True)
+    shipment_type = models.CharField(max_length=255, choices=[('Incoming', 'Incoming'), ('Outgoing', 'Outgoing')], null=True)
+    status = models.CharField(max_length=255, choices=[('Registered', 'Registered'), ('LoadingUnloading', 'LoadingUnloading'), ('LoadedUnloaded', 'LoadedUnloaded'), ('Offiffice', 'Offiffice'), ('Delivered', 'Delivered'), ('Canceled', 'Canceled')], null=True)
+    location = models.CharField(max_length=255, choices=[('Entrance', 'Entrance'), ('Weight1', 'Weight1'), ('Weight2', 'Weight2'), ('Offiffice', 'Offiffice'), ('Delivered', 'Delivered')], null=True)
+    truck_id = models.IntegerField(null=True)
+    license_number = models.CharField(max_length=255, null=True)
     receive_date = models.DateTimeField(null=True)
-    entry_time = models.DateTimeField(null=True, blank=True)
-    customer_name = models.CharField(max_length=225, null=True) #Assuming Customer is another model
-    supplier_name = models.CharField(max_length=225, null=True) #Assuming Supplier is another model
+    entry_time = models.DateTimeField(null=True)
+    customer_name = models.CharField(max_length=255, null=True)
+    supplier_name = models.CharField(max_length=255, null=True)
     weight1 = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     weight1_time = models.DateTimeField(null=True)
-    unload_location = models.CharField(max_length=225, null=True)
-    unit = models.CharField(max_length=225, null=True)
+    unload_location = models.CharField(max_length=255, null=True)
+    unit = models.CharField(max_length=255, null=True)
     quantity = models.IntegerField(null=True)
-    penalty = models.CharField(max_length=225, null=True)
+    quality = models.CharField(max_length=255, null=True)
+    penalty = models.CharField(max_length=255, null=True)
     weight2 = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     weight2_time = models.DateTimeField(null=True)
-    net_weight = models.DecimalField(max_digits=10, decimal_places=2, null=True)
+    net_weight = models.CharField(max_length=10, null=True)
     list_of_reels = models.TextField(null=True)
-    profile_name = models.CharField(max_length=225, null=True)
+    profile_name = models.CharField(max_length=255, null=True)
     sales_id = models.IntegerField(null=True)
     price_per_kg = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     extra_cost = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     supplier_id = models.IntegerField(null=True)
     material_id = models.IntegerField(null=True)
-    material_type = models.CharField(max_length=225, null=True)
-    material_name = models.CharField(max_length=225, null=True)
+    material_type = models.CharField(max_length=255, null=True)
+    material_name = models.CharField(max_length=255, null=True)
     purchase_id = models.IntegerField(null=True)
-    vat = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
-    invoice_status = models.CharField(max_length=10, choices=INVOICE_STATUS_CHOICES, default='NA', null=True)
-    payment_status = models.CharField(max_length=10, choices=PAYMENT_STATUS_CHOICES, default=None, null=True)
+    vat = models.DecimalField(max_digits=10, decimal_places=2, null=True) # Assuming VAT is a decimal field
+    invoice_status = models.CharField(max_length=255, choices=[('NA', 'NA'), ('Sent', 'Sent'), ('Received', 'Received')], null=True)
+    payment_status = models.CharField(max_length=255, choices=[('Terms', 'Terms'), ('Paid', 'Paid')], null=True)
     exit_time = models.DateTimeField(null=True)
     document_info = models.TextField(null=True)
     comments = models.TextField(null=True)
     cancellation_reason = models.TextField(null=True)
-    logs = models.TextField(blank=True)
+
+    # Meta
+    class Meta:
+        db_table = 'Shipments'
 
     def __str__(self):
-        return self.license_number
+        """
+        String representation of the Shipment instance.
+        """
+        return f"Shipment {self.shipment_id} ({self.shipment_type})"
 
 
 class Supplier(models.Model):
@@ -242,40 +216,89 @@ class RawMaterial(models.Model):
 
 class Purchases(models.Model):
     """
-    Model representing a purchase with various attributes related to the purchase details.
-    """
+    Represents a purchase transaction in the inventory management system.
 
-    Date = models.DateTimeField(null=True)
-    ReceiveDate = models.DateTimeField(null=True)
-    SupplierID = models.ForeignKey(Supplier, on_delete=models.CASCADE, null=True)
-    TruckID = models.ForeignKey(Truck, on_delete=models.CASCADE, null=True)
-    MaterialID = models.ForeignKey(RawMaterial, on_delete=models.CASCADE, null=True)
-    MaterialType = models.CharField(max_length=225, null=True)
-    MaterialName = models.CharField(max_length=225, null=True)
-    Unit = models.CharField(max_length=225, null=True)
-    Quantity = models.IntegerField(null=True)
-    Quality = models.CharField(max_length=225, null=True)
-    Penalty = models.CharField(max_length=225, null=True)
-    Weight1 = models.DecimalField(max_digits=10, decimal_places=2, null=True)
-    Weight2 = models.DecimalField(max_digits=10, decimal_places=2, null=True)
-    NetWeight = models.DecimalField(max_digits=10, decimal_places=2, null=True)
-    PricePerKG = models.DecimalField(max_digits=10, decimal_places=2, null=True)
-    VAT = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
-    TotalPrice = models.DecimalField(max_digits=10, decimal_places=2, null=True)
-    ExtraCost = models.DecimalField(max_digits=10, decimal_places=2, null=True)
-    InvoiceStatus = models.CharField(max_length=10, choices=[('Received', 'Received'), ('NA', 'Not Applicable')], default=None, null=True)
-    Status = models.CharField(max_length=10, choices=[('Paid', 'Paid'), ('Terms', 'Terms'), ('Cancelled', 'Cancelled')], default=None, null=True)
-    PaymentDetail = models.CharField(max_length=225, null=True)
-    PaymentDate = models.DateTimeField(null=True)
-    InvoiceNumber = models.CharField(max_length=225, null=True)
-    DocumentInfo = models.TextField(null=True)
-    Comments = models.TextField(null=True)
-    CancellationReason = models.TextField(null=True)
-    ShipmentID = models.ForeignKey(Shipment, on_delete=models.CASCADE, null=True)
-    logs = models.TextField(blank=True)
+    Fields:
+        purchase_id (int): Unique identifier for the purchase (auto-incrementing).
+        date (datetime): Date of the purchase.
+        receive_date (datetime): Date the purchase was received.
+        supplier (ForeignKey): Reference to the Supplier who provided the materials.
+        truck (ForeignKey): Reference to the Truck that delivered the materials (optional).
+        material (ForeignKey): Reference to the specific material purchased.
+        material_type (CharField): Type of material (e.g., "Wood", "Steel").
+        material_name (CharField): Name of the material.
+        unit (CharField): Unit of measurement (e.g., "Kg", "Litre").
+        quantity (IntegerField): Quantity of the material purchased.
+        quality (CharField): Quality of the material (e.g., "Good", "Fair").
+        penalty (CharField): Any penalty or fee associated with the purchase (optional).
+        weight1 (DecimalField): First weight measurement (optional).
+        weight2 (DecimalField): Second weight measurement (optional).
+        net_weight (DecimalField): Calculated net weight of the material.
+        price_per_kg (DecimalField): Price per kilogram of the material.
+        vat (DecimalField): Value-Added Tax (optional).
+        total_price (DecimalField): Total price of the purchase, including VAT.
+        extra_cost (DecimalField): Any additional costs incurred (optional).
+        invoice_status (CharField): Status of the invoice (e.g., "Received", "NA"). Choices: 'RECEIVED', 'NA'
+        status (CharField): Status of the payment (e.g., "Paid", "Terms", "Cancelled"). Choices: 'PAID', 'TERMS', 'CANCELLED'
+        payment_details (TextField): Details about the payment method (optional).
+        payment_date (datetime): Date the payment was made (optional).
+        invoice_number (CharField): Invoice number associated with the purchase.
+        document_info (TextField): Additional information from documents (optional).
+        comments (TextField): Comments or notes related to the purchase.
+        cancellation_reason (TextField): Reason for cancellation, if applicable.
+        shipment (ForeignKey): Reference to the Shipment related to the purchase (optional).
+
+    """
+    # Fields
+    purchase_id = models.AutoField(primary_key=True)
+    date = models.DateTimeField(default=timezone.now, blank=True)
+    receive_date = models.DateTimeField(blank=True, null=True)
+
+    supplier_id = models.ForeignKey('Supplier', on_delete=models.SET_NULL, blank=True, null=True)
+    truck_id = models.ForeignKey('Truck', on_delete=models.SET_NULL, blank=True, null=True)
+    material_id = models.ForeignKey('Material', on_delete=models.SET_NULL, blank=True, null=True)
+
+    material_type = models.CharField(max_length=255, blank=True, null=True)
+    material_name = models.CharField(max_length=255, blank=True, null=True)
+    unit = models.CharField(max_length=255, blank=True, null=True)
+    quantity = models.IntegerField(blank=True, null=True)
+
+    quality = models.CharField(max_length=255, blank=True, null=True)
+    penalty = models.CharField(max_length=255, blank=True, null=True)
+
+    weight1 = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    weight2 = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    net_weight = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+
+    price_per_kg = models.DecimalField(max_digits=10, decimal_places=0, blank=True, null=True)
+
+    # VAT field needs further information on data type
+    vat = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+
+    total_price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    extra_cost = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+
+    invoice_status = models.CharField(max_length=7, choices=[('Received', 'Received'), ('NA', 'NA')], blank=True, null=True)
+    status = models.CharField(max_length=5, choices=[('Paid', 'Paid'), ('Terms', 'Terms'), ('Cancelled', 'Cancelled')], blank=True, null=True)
+
+    payment_details = models.CharField(max_length=255, blank=True, null=True)
+    payment_date = models.DateTimeField(blank=True, null=True)
+
+    invoice_number = models.CharField(max_length=255, blank=True, null=True)
+    document_info = models.TextField(blank=True, null=True)
+    comments = models.TextField(blank=True, null=True)
+    cancellation_reason = models.TextField(blank=True, null=True)
+
+    shipment_id = models.ForeignKey('Shipment', on_delete=models.SET_NULL, blank=True, null=True)
+
+    class Meta:
+        db_table = "Purchases"
 
     def __str__(self):
-        return f"Purchase {self.TruckID}"
+        """
+        String representation of the Purchase instance.
+        """
+        return f"Purchase {self.purchase_id} on {self.date}"
 
 
 class Sale(models.Model):
