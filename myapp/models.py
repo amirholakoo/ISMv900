@@ -32,6 +32,7 @@ class Truck(models.Model):
     status = models.CharField(max_length=10, choices=[('Free', 'Free'), ('Busy', 'Busy')], default='Free')
     location = models.CharField(max_length=255, blank=True)
     comments = models.TextField(blank=True)
+    logs = models.TextField(blank=True)
 
     def __str__(self):
         """
@@ -82,7 +83,7 @@ class Shipment(models.Model):
     truck_id = models.IntegerField(null=True) #Assuming Truck is another model
     license_number = models.CharField(max_length=225, null=True)
     receive_date = models.DateTimeField(null=True)
-    entry_time = models.DateTimeField(auto_now_add=True)
+    entry_time = models.DateTimeField(null=True, blank=True)
     customer_name = models.CharField(max_length=225, null=True) #Assuming Customer is another model
     supplier_name = models.CharField(max_length=225, null=True) #Assuming Supplier is another model
     weight1 = models.DecimalField(max_digits=10, decimal_places=2, null=True)
@@ -111,6 +112,7 @@ class Shipment(models.Model):
     document_info = models.TextField(null=True)
     comments = models.TextField(null=True)
     cancellation_reason = models.TextField(null=True)
+    logs = models.TextField(blank=True)
 
     def __str__(self):
         return self.license_number
@@ -123,6 +125,7 @@ class Supplier(models.Model):
     phone = models.CharField(max_length=20, blank=True)
     status = models.CharField(max_length=255, blank=True)
     comments = models.TextField(blank=True)
+    logs = models.TextField(blank=True)
 
     def __str__(self):
         return self.supplier_name
@@ -178,6 +181,7 @@ class Products(models.Model):
 
     # Profile name for the product
     profile_name = models.CharField(max_length=255, null=True, blank=True)
+    logs = models.TextField(blank=True)
 
     class Meta:
         """
@@ -198,6 +202,7 @@ class Customer(models.Model):
     phone = models.CharField(max_length=20, blank=True)
     status = models.CharField(max_length=255, blank=True)
     comments = models.TextField(blank=True)
+    logs = models.TextField(blank=True)
 
     def __str__(self):
         return self.customer_name
@@ -224,6 +229,7 @@ class RawMaterial(models.Model):
     description = models.CharField(max_length=255, blank=True)
     status = models.CharField(max_length=255)
     comments = models.TextField(blank=True)
+    logs = models.TextField(blank=True)
 
     def __str__(self):
         """
@@ -266,6 +272,7 @@ class Purchases(models.Model):
     Comments = models.TextField(null=True)
     CancellationReason = models.TextField(null=True)
     ShipmentID = models.ForeignKey(Shipment, on_delete=models.CASCADE, null=True)
+    logs = models.TextField(blank=True)
 
     def __str__(self):
         return f"Purchase {self.TruckID}"
@@ -295,6 +302,7 @@ class Sale(models.Model):
     document_info = models.TextField(blank=True)
     comments = models.TextField(blank=True)
     shipment = models.ForeignKey(Shipment, on_delete=models.CASCADE, blank=True, null=True)
+    logs = models.TextField(blank=True)
 
     def __str__(self):
         return f"Sale (ID: {self.sale_id}, Date: {self.date}, Customer: {self.customer})"
@@ -369,6 +377,8 @@ class AnbarGeneric(models.Model):
 
     # Profile name for the material
     profile_name = models.CharField(max_length=255, null=True, blank=True)
+
+    logs = models.TextField(blank=True)
 
     class Meta:
         abstract = True # Make this model abstract so it's not created in the DB
@@ -510,6 +520,8 @@ class Consumption(models.Model):
     # Status of the consumption
     status = models.CharField(max_length=50, null=True, blank=True)
 
+    logs = models.TextField(blank=True)
+
     def __str__(self):
         return f"Consumption (ID: {self.consumption_id}, Date: {self.date}, profile name: {self.profile_name})"
 
@@ -530,8 +542,9 @@ class MaterialType(models.Model):
     # Ensure material_type is always provided to avoid empty entries
     material_type = models.CharField(max_length=255)
     username = models.CharField(max_length=255, blank=True)
-    # Auto-populated on creation to track when the material type was added
-    data = models.DateTimeField(auto_now_add=True)
+
+    data = models.DateTimeField(null=True, blank=True)
+    logs = models.TextField(blank=True)
 
     def __str__(self):
         """
@@ -559,12 +572,13 @@ class Unit(models.Model):
     unit_name = models.CharField(max_length=255, unique=True)
     count = models.FloatField(blank=True, null=True)
     username = models.CharField(max_length=255, blank=True)
-    date = models.DateTimeField(auto_now_add=True)
+    date = models.DateTimeField(null=True, blank=True)
+    logs = models.TextField(blank=True)
 
     def __str__(self):
         """
         Returns a string representation of the Unit object, including the Unit name, count, and username.
         This method is used to display a human-readable representation of the object.
         """
-        return f"{self.name} - {self.count} - {self.username}"
+        return f"{self.supplier_name} - {self.count} - {self.username}"
 
