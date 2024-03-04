@@ -7,7 +7,7 @@ urlpatterns = [
     path("api/addTruck", add_truck),
     path("addTruck/", add_truck),
     path("addSupplier/", add_supplier),
-    path("api/addCustomer", add_customer),
+    path("addCustomer/", add_customer),
     path("api/getMaterialTypes", get_materialTypes),
     path("api/getSupplierNames", get_supplierNames),
     path("api/addRawMaterial", add_rawMaterial),

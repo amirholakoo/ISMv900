@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import addTruck from "@/components/addTruck.vue";
 import addSupplier from "@/components/addSupplier.vue";
+import addCustomer from "@/components/addCustomer.vue";
 
 const routes = [
   {
@@ -26,6 +27,11 @@ const routes = [
     path: '/myapp/addSupplier/',
     name: 'addSupplier',
     component: addSupplier
+  },
+  {
+    path: '/myapp/addCustomer/',
+    name: 'addCustomer',
+    component: addCustomer
   },
 ]
 

@@ -191,6 +191,7 @@ def add_customer(request):
         address = request.GET.get('address')
         phone = request.GET.get('phone')
         comments = request.GET.get('comments')
+        username = request.GET.get('username')
 
         # Initialize an empty list to collect error messages
         errors = []
