@@ -49,19 +49,19 @@ class Shipments(models.Model):
     location = models.CharField(max_length=255, choices=[('Entrance', 'Entrance'), ('Weight1', 'Weight1'), ('Weight2', 'Weight2'), ('Offiffice', 'Offiffice'), ('Delivered', 'Delivered')], null=True)
     truck_id = models.IntegerField(null=True)
     license_number = models.CharField(max_length=255, null=True)
-    receive_date = models.DateTimeField(null=True)
-    entry_time = models.DateTimeField(null=True)
+    receive_date = models.DateTimeField(blank=True, null=True)
+    entry_time = models.DateTimeField(blank=True, null=True)
     customer_name = models.CharField(max_length=255, null=True)
     supplier_name = models.CharField(max_length=255, null=True)
     weight1 = models.DecimalField(max_digits=10, decimal_places=2, null=True)
-    weight1_time = models.DateTimeField(null=True)
+    weight1_time = models.DateTimeField(blank=True, null=True)
     unload_location = models.CharField(max_length=255, null=True)
     unit = models.CharField(max_length=255, null=True)
     quantity = models.IntegerField(null=True)
     quality = models.CharField(max_length=255, null=True)
     penalty = models.CharField(max_length=255, null=True)
     weight2 = models.DecimalField(max_digits=10, decimal_places=2, null=True)
-    weight2_time = models.DateTimeField(null=True)
+    weight2_time = models.DateTimeField(blank=True, null=True)
     net_weight = models.CharField(max_length=10, null=True)
     list_of_reels = models.TextField(null=True)
     profile_name = models.CharField(max_length=255, null=True)
@@ -76,7 +76,7 @@ class Shipments(models.Model):
     vat = models.DecimalField(max_digits=10, decimal_places=2, null=True) # Assuming VAT is a decimal field
     invoice_status = models.CharField(max_length=255, choices=[('NA', 'NA'), ('Sent', 'Sent'), ('Received', 'Received')], null=True)
     payment_status = models.CharField(max_length=255, choices=[('Terms', 'Terms'), ('Paid', 'Paid')], null=True)
-    exit_time = models.DateTimeField(null=True)
+    exit_time = models.DateTimeField(blank=True, null=True)
     document_info = models.TextField(null=True)
     comments = models.TextField(null=True)
     cancellation_reason = models.TextField(null=True)
@@ -148,10 +148,10 @@ class Products(models.Model):
     status = models.CharField(max_length=50, choices=STATUS_CHOICES)
 
     # Date and time when the product was received
-    receive_date = models.DateTimeField()
+    receive_date = models.DateTimeField(blank=True, null=True)
 
     # Last date the product was updated
-    last_date = models.DateTimeField()
+    last_date = models.DateTimeField(blank=True, null=True)
 
     # Profile name for the product
     profile_name = models.CharField(max_length=255, null=True, blank=True)
@@ -303,7 +303,7 @@ class Purchases(models.Model):
 
 class Sale(models.Model):
     sale_id = models.AutoField(primary_key=True)
-    date = models.DateTimeField()
+    date = models.DateTimeField(default=timezone.now, blank=True)
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
     truck = models.ForeignKey(Truck, on_delete=models.CASCADE)
     license_number = models.CharField(max_length=255, blank=True)
@@ -324,7 +324,7 @@ class Sale(models.Model):
     invoice_number = models.CharField(max_length=255, blank=True)
     document_info = models.TextField(blank=True)
     comments = models.TextField(blank=True)
-    shipment = models.ForeignKey(Shipment, on_delete=models.CASCADE, blank=True, null=True)
+    shipment = models.ForeignKey('Shipment', on_delete=models.CASCADE, blank=True, null=True)
     logs = models.TextField(blank=True)
 
     def __str__(self):
@@ -566,7 +566,7 @@ class MaterialType(models.Model):
     material_type = models.CharField(max_length=255)
     username = models.CharField(max_length=255, blank=True)
 
-    data = models.DateTimeField(null=True, blank=True)
+    date = models.DateTimeField(default=timezone.now, blank=True)
     logs = models.TextField(blank=True)
 
     def __str__(self):
@@ -595,7 +595,7 @@ class Unit(models.Model):
     unit_name = models.CharField(max_length=255, unique=True)
     count = models.FloatField(blank=True, null=True)
     username = models.CharField(max_length=255, blank=True)
-    date = models.DateTimeField(null=True, blank=True)
+    date = models.DateTimeField(default=timezone.now, blank=True)
     logs = models.TextField(blank=True)
 
     def __str__(self):
