@@ -13,7 +13,7 @@ export default {
     <strong>{{ title }}</strong>
   </header>
   <hr class="border-0 w-full h-px bg-gray-200 shadow">
-  <main class="flex-grow w-full overflow-y-scroll"><slot></slot></main>
+  <main class="flex-grow w-full"><slot></slot></main>
   <footer class="w-full flex flex-row justify-center">
     <span class="flex w-16 h-3 bg-gray-200 dark:bg-gray-700 rounded-md"></span>
   </footer>

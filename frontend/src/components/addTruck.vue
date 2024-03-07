@@ -1,11 +1,15 @@
 <script>
 import { initFlowbite } from 'flowbite'
 import Card from './Card'
+import modal from "@/components/Modal.vue";
+import Alert from "@/components/Alert.vue";
 
 export default {
   name: "addTruck",
   components: {
-    Card
+    Card,
+    modal,
+    Alert
   },
   mounted() {
     initFlowbite();
@@ -20,23 +24,34 @@ export default {
       driver_name: '',
       driver_doc: '',
       phone: 0,
-      username: ''
+      username: '',
+      success: false
     }
   },
   methods: {
+    async check_license_number() {
+      const params = {
+        "license_number": this.license_code1.val + this.license_code2.val + this.license_code3.val +"ir"+ this.license_code4.val,
+      };
+      const response = await this.axios.post('/myapp/api/checkLicenseNumber', {}, {params: params})
+      // console.log(response.data); // Access response data
+      // console.log(JSON.parse(response.data['isExists'])); // Access response data
+      this.form = JSON.parse(response.data['isExists'])
+
+    },
     async addTruck() {
       const params = {
-        "license_number": this.license_code1.val + this.license_code2.val + this.license_code3.val + this.license_code4.val,
+        "license_number": this.license_code1.val + this.license_code2.val + this.license_code3.val +"ir"+ this.license_code4.val,
         "driver_name": this.driver_name,
         "driver_doc": this.driver_doc,
         "phone": this.phone,
         "username": this.username,
-        "comments": ''
       };
       const response = await this.axios.post('/myapp/addTruck/', {}, {params: params})
       console.log(response.data); // Access response data
-
-    }
+      this.success = JSON.parse(response.data['success'])
+    },
+    cancel(){},
   },
   watch: {
     "license_code2.val"(c, p){
@@ -70,7 +85,11 @@ export default {
           ایران
           <p class="place-self-center text-4xl">{{ license_code4.val }}</p>
         </label>
-        <label class="flex-grow flex flex-row justify-center p-4 font-mono text-5xl font-bold">{{ license_code3.val }}-{{ license_code2.val }}-{{ license_code1.val }}</label>
+        <label class="flex-grow flex flex-row gap-4 justify-center p-4 font-mono text-5xl font-bold">
+          <h>{{ license_code3.val }}</h>
+          <h>{{ license_code2.val }}</h>
+          <h>{{ license_code1.val }}</h>
+        </label>
         <label class="flex flex-none flex-col items-end justify-between px-1 py-2 bg-blue-700 border-s-4 border-black font-bold text-sm text-white">
           <img src="@/assets/Flag_of_Iran.svg.png" class="h-5">
           <span class="flex flex-col items-end">
@@ -103,7 +122,8 @@ export default {
     </div>
     <p v-if="license_code2.error" class="mt-2 text-sm text-red-600 dark:text-red-500"><span class="font-medium">خطا! </span>لطفا از حروف فارسی استفاده کنید</p>
     <p id="helper-text-explanation" class="text-sm text-gray-500 dark:text-gray-400">لطفا پلاک مورد نطر را وارد کرده و سپس بر روی دکمه چک کردن کلیک کنید.</p>
-    <button @click="form = !form" class="block text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="submit"> چک کردن </button>
+<!--    <button @click="form = !form" class="block text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="submit"> چک کردن </button>-->
+    <button @click="check_license_number" class="block text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="button"> چک کردن </button>
   </form>
   <form v-else class="flex flex-col items-center mt-5 gap-4">
     <div class="relative ">
@@ -122,8 +142,33 @@ export default {
       <input v-model="username" type="text" id="username" class="block px-2.5 pb-2.5 pt-4 w-full text-sm text-gray-900 bg-transparent rounded-lg border-1 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" placeholder="" />
       <label for="username" class="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white dark:bg-gray-900 px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1">اسم یوزر</label>
     </div>
-    <button @click="addTruck" class="block text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">اضافه کردن کامیون جدید</button>
+    <modal type="confirm" v-if="success==false">
+      <template v-slot:button>اضافه کردن کامیون جدید</template>
+      <template v-slot:title>اضافه کردن کامیون جدید</template>
+      <template v-slot:text>
+        <div class="flex flex-col gap-2 font-bold">
+          <div class="flex-grow flex flex-row">
+            <h>{{ license_code3.val }}</h>
+            <h>{{ license_code2.val }}</h>
+            <h>{{ license_code1.val }}</h>
+            <h>ir</h>
+            <h>{{ license_code4.val }}</h>
+          </div>
+          <p>اسم راننده: {{ driver_name }}</p>
+          <p>شماره گواهی نامه: {{ driver_doc }}</p>
+          <p>شماره همراه: {{ phone }}</p>
+          <p>نام کاربری: {{ username }}</p>
+        </div>
+      </template>
+      <template v-slot:btns>
+        <div>
+          <button data-modal-hide="popup-modal" aria-label="Close" @click="addTruck" type="button" class="inline-flex justify-center w-full px-2 py-1.5 text-xs font-medium text-center text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-500 dark:hover:bg-blue-600 dark:focus:ring-blue-800">اضافه کردن</button>
+        </div>
+      </template>
+    </modal>
   </form>
+  <Alert v-if="form == false" type="Danger"></Alert>
+  <Alert v-if="success" type="Success"></Alert>
 </Card>
 </template>
 
