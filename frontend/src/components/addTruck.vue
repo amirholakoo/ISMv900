@@ -51,7 +51,6 @@ export default {
       console.log(response.data); // Access response data
       this.success = JSON.parse(response.data['success'])
     },
-    cancel(){},
   },
   watch: {
     "license_code2.val"(c, p){

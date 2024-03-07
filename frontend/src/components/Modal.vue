@@ -74,13 +74,15 @@ export default {
                 </div>
                 <div class="ms-3 text-sm font-normal flex flex-col gap-2">
                     <span class="mb-1 text-sm font-semibold text-gray-900 dark:text-white">
-                      <slot name="title"></slot>
+                      ایا این اطلاعات درست است؟
                     </span>
-                    <div class="mb-2 text-sm font-normal"><slot name="text"></slot></div>
+                    <div class="mb-2 text-sm font-normal">
+                      <slot name="text"></slot>
+                    </div>
                     <div class="grid grid-cols-2 gap-2 items-center justify-center">
                       <slot name="btns"></slot>
                       <div>
-                        <button data-modal-hide="popup-modal" aria-label="Close" type="button" class="inline-flex justify-center w-full px-2 py-1.5 text-xs font-medium text-center text-gray-900 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 dark:bg-gray-600 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-700 dark:focus:ring-gray-700">لغو</button>
+                        <button data-modal-hide="popup-modal" aria-label="Close" type="button" class="inline-flex justify-center w-full px-2 py-1.5 text-xs font-medium text-center text-gray-900 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 dark:bg-gray-600 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-700 dark:focus:ring-gray-700">ویرایش</button>
                       </div>
                     </div>
                 </div>
