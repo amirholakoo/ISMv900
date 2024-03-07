@@ -46,14 +46,14 @@ def check_license_number(request):
         license_number = request.GET.get('license_number')
         # Check if a license number was provided
         if license_number:
-            try:
-                # Attempt to retrieve a Truck object with the provided license number
-                truck = Truck.objects.get(license_number=license_number)
+            # Attempt to retrieve a Truck object with the provided license number
+            # truck = Truck.objects.get(license_number=license_number)
+            if Truck.objects.filter(license_number=license_number).exists():
                 # If the truck exists, return a success response
-                return JsonResponse({'status': 'exists', 'message': 'License number exists.'})
-            except Truck.DoesNotExist:
+                return JsonResponse({'isExists': 'true', 'message': 'License number exists.'})
+            else:
                 # If the truck does not exist, return an error response
-                return JsonResponse({'status': 'not_exists', 'message': 'License number does not exist.'})
+                return JsonResponse({'isExists': 'false', 'message': 'License number does not exist.'})
         else:
             # If no license number was provided, return an error response
             return JsonResponse({'status': 'error', 'message': 'License number not provided.'})
@@ -86,20 +86,21 @@ def add_truck(request):
         phone = request.GET.get('phone')
         username = request.GET.get('username')
         print(license_number, driver_name)
-        print(type(license_number))
         # Create new truck
-        # new_truck = Truck(
-        #     license_number=license_number,
-        #     driver_name=driver_name,
-        #     driver_doc=driver_doc,
-        #     phone=phone,
-        # )
-        # new_truck.save()
-        #
-        # # Return success response
+        new_truck = Truck(
+            license_number=license_number,
+            driver_name=driver_name,
+            driver_doc=driver_doc,
+            phone=phone,
+            username=username,
+            logs=f'license number: {license_number}, added by: ({username})'
+        )
+        new_truck.save()
+
+        # Return success response
         return JsonResponse({
-            'success': 'Truck added successfully.',
-            # 'license_number': new_truck.license_number,
+            'success': True,
+            'license_number': new_truck.license_number,
         }, status=201)
     if request.method == 'GET':
         return render(request, 'add_truck.html')
