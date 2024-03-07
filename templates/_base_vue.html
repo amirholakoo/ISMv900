@@ -1,19 +1,17 @@
-{% extends '_base.html' %}
-
-{% block html %}
+<!DOCTYPE html>
 <html dir="rtl">
   <head>
-      {% block head %}{{ block.super }}{% endblock %}
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <link rel="icon" href="http://localhost:8080/favicon.ico">
+    <title>frontend</title>
   <script defer src="http://localhost:8080/js/chunk-vendors.js"></script><script defer src="http://localhost:8080/js/app.js"></script></head>
-  <body>
-  {% block body %}
-    {{ block.super }}
+  <body class="bg-gray-100">
     <noscript>
-      <strong>We're sorry but vue-games doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
+      <strong>We're sorry but frontend doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
     </noscript>
-    <div id="app" class="bg-gray-100"></div>
+    <div id="app"></div>
     <!-- built files will be auto injected -->
-  {% endblock body%}
   </body>
 </html>
-{% endblock html %}
