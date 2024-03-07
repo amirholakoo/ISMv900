@@ -16,18 +16,20 @@ class Truck(models.Model):
         phone (str, optional): Phone number of the driver (max length 20).
         status (str): Current status of the truck (choices: 'Free', 'Busy').
         location (str, optional): Current location of the truck (max length 255).
-        comments (str, optional): Additional notes or information about the truck.
+        username (str, optional): username.
     """
-
-    id = models.AutoField(primary_key=True)
     license_number = models.CharField(max_length=255, unique=True)
     driver_name = models.CharField(max_length=255, blank=True)
     driver_doc = models.CharField(max_length=255, blank=True)
     phone = models.CharField(max_length=20, blank=True)
     status = models.CharField(max_length=10, choices=[('Free', 'Free'), ('Busy', 'Busy')], default='Free')
     location = models.CharField(max_length=255, blank=True)
-    comments = models.TextField(blank=True)
+    username = models.TextField(blank=True)
     logs = models.TextField(blank=True)
+
+    # Meta
+    class Meta:
+        db_table = 'Truck'
 
     def __str__(self):
         """
@@ -43,7 +45,6 @@ class Shipments(models.Model):
     Model representing a shipment record.
     """
     # Fields
-    id = models.AutoField(primary_key=True)
     shipment_type = models.CharField(max_length=255, choices=[('Incoming', 'Incoming'), ('Outgoing', 'Outgoing')], null=True)
     status = models.CharField(max_length=255, choices=[('Registered', 'Registered'), ('LoadingUnloading', 'LoadingUnloading'), ('LoadedUnloaded', 'LoadedUnloaded'), ('Offiffice', 'Offiffice'), ('Delivered', 'Delivered'), ('Canceled', 'Canceled')], null=True)
     location = models.CharField(max_length=255, choices=[('Entrance', 'Entrance'), ('Weight1', 'Weight1'), ('Weight2', 'Weight2'), ('Offiffice', 'Offiffice'), ('Delivered', 'Delivered')], null=True)
@@ -80,6 +81,7 @@ class Shipments(models.Model):
     document_info = models.TextField(null=True)
     comments = models.TextField(null=True)
     cancellation_reason = models.TextField(null=True)
+    logs = models.TextField(blank=True)
 
     # Meta
     class Meta:
@@ -93,13 +95,16 @@ class Shipments(models.Model):
 
 
 class Supplier(models.Model):
-    id = models.AutoField(primary_key=True)
     supplier_name = models.CharField(max_length=255, null=False)
     address = models.TextField(blank=True)
     phone = models.CharField(max_length=20, blank=True)
     status = models.CharField(max_length=255, blank=True)
     comments = models.TextField(blank=True)
     logs = models.TextField(blank=True)
+
+    # Meta
+    class Meta:
+        db_table = 'Supplier'
 
     def __str__(self):
         return f"{self.supplier_name} (ID: {self.status})"
@@ -111,7 +116,7 @@ class Products(models.Model):
     Each record includes details about a product, such as its dimensions, grade,
     and various attributes related to its physical properties and status.
     """
-    id = models.AutoField(primary_key=True)
+
     # Reel number for the product
     reel_number = models.CharField(max_length=255)
 
@@ -171,13 +176,16 @@ class Products(models.Model):
 
 
 class Customer(models.Model):
-    id = models.AutoField(primary_key=True)
     customer_name = models.CharField(max_length=255, null=False)
     address = models.TextField(blank=True)
     phone = models.CharField(max_length=20, blank=True)
     status = models.CharField(max_length=255, blank=True)
     comments = models.TextField(blank=True)
     logs = models.TextField(blank=True)
+
+    # Meta
+    class Meta:
+        db_table = 'Customer'
 
     def __str__(self):
         return f"{self.customer_name} (ID: {self.status})"
@@ -197,7 +205,7 @@ class RawMaterial(models.Model):
         comments (str, optional): Additional comments or notes about the raw material.
     """
 
-    id = models.AutoField(primary_key=True)
+
     supplier = models.ForeignKey(Supplier, on_delete=models.SET_NULL, null=True, related_name='raw_materials')
     material_type = models.CharField(max_length=255)
     material_name = models.CharField(max_length=255)
@@ -205,6 +213,10 @@ class RawMaterial(models.Model):
     status = models.CharField(max_length=255)
     comments = models.TextField(blank=True)
     logs = models.TextField(blank=True)
+
+    # Meta
+    class Meta:
+        db_table = 'RawMaterial'
 
     def __str__(self):
         """
@@ -251,13 +263,13 @@ class Purchases(models.Model):
 
     """
     # Fields
-    id = models.AutoField(primary_key=True)
+
     date = models.DateTimeField(default=timezone.now, blank=True)
     receive_date = models.DateTimeField(blank=True, null=True)
 
     supplier_id = models.ForeignKey('Supplier', on_delete=models.SET_NULL, blank=True, null=True)
     truck_id = models.ForeignKey('Truck', on_delete=models.SET_NULL, blank=True, null=True)
-    material_id = models.ForeignKey('Material', on_delete=models.SET_NULL, blank=True, null=True)
+    material_id = models.ForeignKey('MaterialType', on_delete=models.SET_NULL, blank=True, null=True)
 
     material_type = models.CharField(max_length=255, blank=True, null=True)
     material_name = models.CharField(max_length=255, blank=True, null=True)
@@ -279,8 +291,8 @@ class Purchases(models.Model):
     total_price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     extra_cost = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
 
-    invoice_status = models.CharField(max_length=7, choices=[('Received', 'Received'), ('NA', 'NA')], blank=True, null=True)
-    status = models.CharField(max_length=5, choices=[('Paid', 'Paid'), ('Terms', 'Terms'), ('Cancelled', 'Cancelled')], blank=True, null=True)
+    invoice_status = models.CharField(max_length=255, choices=[('Received', 'Received'), ('NA', 'NA')], blank=True, null=True)
+    status = models.CharField(max_length=225, choices=[('Paid', 'Paid'), ('Terms', 'Terms'), ('Cancelled', 'Cancelled')], blank=True, null=True)
 
     payment_details = models.CharField(max_length=255, blank=True, null=True)
     payment_date = models.DateTimeField(blank=True, null=True)
@@ -290,7 +302,7 @@ class Purchases(models.Model):
     comments = models.TextField(blank=True, null=True)
     cancellation_reason = models.TextField(blank=True, null=True)
 
-    shipment_id = models.ForeignKey('Shipment', on_delete=models.SET_NULL, blank=True, null=True)
+    shipment_id = models.ForeignKey('Shipments', on_delete=models.SET_NULL, blank=True, null=True)
     logs = models.TextField(blank=True)
 
     class Meta:
@@ -337,10 +349,10 @@ class Sales(models.Model):
     - The customer, truck, and shipment fields are foreign keys, establishing a relationship with the Customers, Trucks, and Shipments models, respectively.
     """
     # Fields
-    id = models.AutoField(primary_key=True)
+
     date = models.DateTimeField(null=True)
-    customer = models.ForeignKey('Customers', on_delete=models.CASCADE, null=True)
-    truck = models.ForeignKey('Trucks', on_delete=models.CASCADE, null=True)
+    customer = models.ForeignKey('Customer', on_delete=models.CASCADE, null=True)
+    truck = models.ForeignKey('Truck', on_delete=models.CASCADE, null=True)
     license_number = models.CharField(max_length=255, null=True)
     list_of_reels = models.TextField(null=True)
     profile_name = models.CharField(max_length=255, null=True)
@@ -374,9 +386,6 @@ class AnbarGeneric(models.Model):
     Abstract base model for generic anbar items.
     This model provides common fields and behaviors for all anbar items.
     """
-
-    # Auto-incrementing primary key
-    id = models.AutoField(primary_key=True)
 
     # Date and time when the record was received
     receive_date = models.DateTimeField(null=True, blank=True)
@@ -453,6 +462,7 @@ class Anbar_Sangin(AnbarGeneric):
     """
     class Meta(AnbarGeneric.Meta):
         verbose_name_plural = "Anbar Sangin"
+        db_table = 'Anbar_Sangin'
 
     def __str__(self):
         return f"{self.material_name} ({self.reel_number})"
@@ -465,6 +475,7 @@ class Anbar_Salon_Tolid(AnbarGeneric):
     """
     class Meta(AnbarGeneric.Meta):
         verbose_name_plural = "Anbar Salon Tolid"
+        db_table = 'Anbar_Salon_Tolid'
 
     def __str__(self):
         return f"{self.material_name} ({self.reel_number})"
@@ -477,6 +488,7 @@ class Anbar_Parvandeh(AnbarGeneric):
     """
     class Meta(AnbarGeneric.Meta):
         verbose_name_plural = "Anbar Parvandeh"
+        db_table = 'Anbar_Parvandeh'
 
     def __str__(self):
         return f"{self.material_name} ({self.reel_number})"
@@ -489,6 +501,7 @@ class Anbar_Koochak(AnbarGeneric):
     """
     class Meta(AnbarGeneric.Meta):
         verbose_name_plural = "Anbar Koochak"
+        db_table = 'Anbar_Koochak'
 
     def __str__(self):
         return f"{self.material_name} ({self.reel_number})"
@@ -501,6 +514,7 @@ class Anbar_Khamir_Ghadim(AnbarGeneric):
     """
     class Meta(AnbarGeneric.Meta):
         verbose_name_plural = "Anbar Khamir Ghadim"
+        db_table = 'Anbar_Khamir_Ghadim'
 
     def __str__(self):
         return f"{self.material_name} ({self.reel_number})"
@@ -513,6 +527,7 @@ class Anbar_Khamir_Kordan(AnbarGeneric):
     """
     class Meta(AnbarGeneric.Meta):
         verbose_name_plural = "Anbar Khamir Kordan"
+        db_table = 'Anbar_Khamir_Kordan'
 
     def __str__(self):
         return f"{self.material_name} ({self.reel_number})"
@@ -525,6 +540,7 @@ class Anbar_Muhvateh_Kardan(AnbarGeneric):
     """
     class Meta(AnbarGeneric.Meta):
         verbose_name_plural = "Anbar Muhvateh Kardan"
+        db_table = 'Anbar_Muhvateh_Kardan'
 
     def __str__(self):
         return f"{self.material_name} ({self.reel_number})"
@@ -537,6 +553,7 @@ class Anbar_Akhal(AnbarGeneric):
     """
     class Meta(AnbarGeneric.Meta):
         verbose_name_plural = "Anbar Akhal"
+        db_table = 'Anbar_Akhal'
 
     def __str__(self):
         return f"{self.material_name} ({self.reel_number})"
@@ -548,8 +565,6 @@ class Consumption(models.Model):
     Each record includes details about the material consumed,
     such as the supplier, material type, and quantity.
     """
-    # Auto-incrementing primary key
-    id = models.AutoField(primary_key=True)
 
     # Date and time when the consumption was recorded
     receive_date = models.DateTimeField(null=True, blank=True)
@@ -583,11 +598,15 @@ class Consumption(models.Model):
 
     logs = models.TextField(blank=True)
 
+    # Meta
+    class Meta:
+        db_table = 'Consumption'
+
     def __str__(self):
         """
         String representation of the Consumption instance.
         """
-        return f"Consumption {self.id}: {self.supplier_name} - {self.material_type} - {self.material_name}"
+        return f"Consumption {self.supplier_name} - {self.material_type} - {self.material_name}"
 
 
 class MaterialType(models.Model):
@@ -600,7 +619,7 @@ class MaterialType(models.Model):
     - material_type: Type of material. Required field.
     - username: Username associated with the material type. Can be null or blank.
     """
-    id = models.AutoField(primary_key=True)
+
     supplier_name = models.CharField(max_length=255, null=True, blank=True)
     # Ensure material_type is always provided to avoid empty entries
     material_type = models.CharField(max_length=255)
@@ -608,6 +627,10 @@ class MaterialType(models.Model):
 
     date = models.DateTimeField(default=timezone.now, blank=True)
     logs = models.TextField(blank=True)
+
+    # Meta
+    class Meta:
+        db_table = 'MaterialType'
 
     def __str__(self):
         """
@@ -632,7 +655,6 @@ class Unit(models.Model):
         logs (str, blank=True): Text field for storing logs or additional information about the unit.
     """
 
-    id = models.AutoField(primary_key=True)
     supplier_name = models.CharField(max_length=255, null=True, blank=True)
     material_type = models.CharField(max_length=255)
     unit_name = models.CharField(max_length=255, unique=True)
@@ -640,6 +662,10 @@ class Unit(models.Model):
     username = models.CharField(max_length=255, blank=True)
     date = models.DateTimeField(default=timezone.now, blank=True)
     logs = models.TextField(blank=True)
+
+    # Meta
+    class Meta:
+        db_table = 'Unit'
 
     def __str__(self):
         """
