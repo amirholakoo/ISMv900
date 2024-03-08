@@ -24,7 +24,7 @@ class Truck(models.Model):
     phone = models.CharField(max_length=20, blank=True)
     status = models.CharField(max_length=10, choices=[('Free', 'Free'), ('Busy', 'Busy')], default='Free')
     location = models.CharField(max_length=255, blank=True)
-    username = models.TextField(blank=True)
+    username = models.CharField(max_length=255, null=False, blank=True)
     logs = models.TextField(blank=True)
 
     # Meta
@@ -46,7 +46,7 @@ class Shipments(models.Model):
     """
     # Fields
     shipment_type = models.CharField(max_length=255, choices=[('Incoming', 'Incoming'), ('Outgoing', 'Outgoing')], null=True)
-    status = models.CharField(max_length=255, choices=[('Registered', 'Registered'), ('LoadingUnloading', 'LoadingUnloading'), ('LoadedUnloaded', 'LoadedUnloaded'), ('Offiffice', 'Offiffice'), ('Delivered', 'Delivered'), ('Canceled', 'Canceled')], null=True)
+    status = models.CharField(max_length=255, choices=[('Registered', 'Registered'), ('LoadingUnloading', 'LoadingUnloading'), ('LoadedUnloaded', 'LoadedUnloaded'), ('Office', 'Office'), ('Delivered', 'Delivered'), ('Canceled', 'Canceled')], null=True)
     location = models.CharField(max_length=255, choices=[('Entrance', 'Entrance'), ('Weight1', 'Weight1'), ('Weight2', 'Weight2'), ('Offiffice', 'Offiffice'), ('Delivered', 'Delivered')], null=True)
     truck_id = models.IntegerField(null=True)
     license_number = models.CharField(max_length=255, null=True)
@@ -81,6 +81,7 @@ class Shipments(models.Model):
     document_info = models.TextField(null=True)
     comments = models.TextField(null=True)
     cancellation_reason = models.TextField(null=True)
+    username = models.CharField(max_length=255, null=False, blank=True)
     logs = models.TextField(blank=True)
 
     # Meta
@@ -100,6 +101,7 @@ class Supplier(models.Model):
     phone = models.CharField(max_length=20, blank=True)
     status = models.CharField(max_length=255, blank=True)
     comments = models.TextField(blank=True)
+    username = models.CharField(max_length=255, null=False, blank=True)
     logs = models.TextField(blank=True)
 
     # Meta
@@ -161,6 +163,7 @@ class Products(models.Model):
 
     # Profile name for the product
     profile_name = models.CharField(max_length=255, null=True, blank=True)
+    username = models.CharField(max_length=255, null=False, blank=True)
     logs = models.TextField(blank=True)
 
     class Meta:
@@ -172,7 +175,7 @@ class Products(models.Model):
         verbose_name_plural = 'Products'
 
     def __str__(self):
-        return f"Product (Reel Number: {self.reel_number}, Status: {self.status})"
+        return f"Product (Product Location: {self.location}, Reel Number: {self.reel_number}, Status: {self.status})"
 
 
 class Customer(models.Model):
@@ -181,6 +184,7 @@ class Customer(models.Model):
     phone = models.CharField(max_length=20, blank=True)
     status = models.CharField(max_length=255, blank=True)
     comments = models.TextField(blank=True)
+    username = models.CharField(max_length=255, null=False, blank=True)
     logs = models.TextField(blank=True)
 
     # Meta
@@ -212,6 +216,7 @@ class RawMaterial(models.Model):
     description = models.CharField(max_length=255, blank=True)
     status = models.CharField(max_length=255)
     comments = models.TextField(blank=True)
+    username = models.CharField(max_length=255, null=False, blank=True)
     logs = models.TextField(blank=True)
 
     # Meta
@@ -303,6 +308,7 @@ class Purchases(models.Model):
     cancellation_reason = models.TextField(blank=True, null=True)
 
     shipment_id = models.ForeignKey('Shipments', on_delete=models.SET_NULL, blank=True, null=True)
+    username = models.CharField(max_length=255, null=False, blank=True)
     logs = models.TextField(blank=True)
 
     class Meta:
@@ -372,6 +378,7 @@ class Sales(models.Model):
     comments = models.TextField(null=True)
     cancellation_reason = models.TextField(null=True)
     shipment = models.ForeignKey('Shipments', on_delete=models.CASCADE, null=True)
+    username = models.CharField(max_length=255, null=False, blank=True)
     logs = models.TextField(blank=True)
     # Meta
     class Meta:
@@ -447,7 +454,7 @@ class AnbarGeneric(models.Model):
 
     # Profile name for the material
     profile_name = models.CharField(max_length=255, null=True, blank=True)
-
+    username = models.CharField(max_length=255, null=False, blank=True)
     logs = models.TextField(blank=True)
 
     class Meta:
@@ -595,7 +602,7 @@ class Consumption(models.Model):
 
     # Status of the consumption
     status = models.CharField(max_length=50, null=True, blank=True)
-
+    username = models.CharField(max_length=255, null=False, blank=True)
     logs = models.TextField(blank=True)
 
     # Meta
@@ -623,7 +630,7 @@ class MaterialType(models.Model):
     supplier_name = models.CharField(max_length=255, null=True, blank=True)
     # Ensure material_type is always provided to avoid empty entries
     material_type = models.CharField(max_length=255)
-    username = models.CharField(max_length=255, blank=True)
+    username = models.CharField(max_length=255, null=False, blank=True)
 
     date = models.DateTimeField(default=timezone.now, blank=True)
     logs = models.TextField(blank=True)
@@ -659,7 +666,7 @@ class Unit(models.Model):
     material_type = models.CharField(max_length=255)
     unit_name = models.CharField(max_length=255, unique=True)
     count = models.FloatField(blank=True, null=True)
-    username = models.CharField(max_length=255, blank=True)
+    username = models.CharField(max_length=255, null=False, blank=True)
     date = models.DateTimeField(default=timezone.now, blank=True)
     logs = models.TextField(blank=True)
 
