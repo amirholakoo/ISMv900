@@ -85,7 +85,6 @@ def add_truck(request):
         driver_doc = request.GET.get('driver_doc')
         phone = request.GET.get('phone')
         username = request.GET.get('username')
-        print(license_number, driver_name)
         # Create new truck
         new_truck = Truck(
             license_number=license_number,
@@ -126,27 +125,27 @@ def add_supplier(request):
         address = request.GET.get('address')
         phone = request.GET.get('phone')
         comments = request.GET.get('comments')
+        username = request.GET.get('username')
 
         # Initialize an empty list to collect error messages
         errors = []
 
         # Check if all required fields are provided
         if not supplier_name:
-            errors.append({'status': 'error', 'message': 'Supplier name is required.'})
+            errors.append({'error': 'supplier_name', 'message': 'نام تامین کننده را وارد کنید.'})
         if not address:
-            errors.append({'status': 'error', 'message': 'Address is required.'})
+            errors.append({'error': 'address', 'message': 'ادرس را وارد کنید.'})
         if not phone:
-            errors.append({'status': 'error', 'message': 'Phone is required.'})
+            errors.append({'error': 'phone', 'message': 'شماره همراه را وارد کنید.'})
+        if not username:
+            errors.append({'error': 'username', 'message': 'نام کاربری را وارد کنید.'})
         if not comments:
-            errors.append({'status': 'error', 'message': 'Comments are required.'})
+            errors.append({'error': 'comments', 'message': 'فرم نطر را پر کنید.'})
         # Load existing supplier names from DB
-        existing_names = [supplier.supplier_name for supplier in Supplier.objects.all().values_list('supplier_name')]
-        # Check for duplicate name
-        if supplier_name in existing_names:
-            error_message = "Supplier already exists with name '{}'. Please add full name and try again.".format(
-                supplier_name)
+        if Supplier.objects.filter(supplier_name=supplier_name).exists():
+            error_message = f"در حال حاضر یک تامین کننده با نام {supplier_name} در دیتابیس وجود دارد."
             errors.append({'status': 'error', 'message': error_message})
-
+        # Check for duplicate name
         # If there are any errors, return them in the response
         if errors:
             return JsonResponse({'status': 'error', 'errors': errors})
@@ -156,7 +155,9 @@ def add_supplier(request):
             supplier_name=supplier_name,
             address=address,
             phone=phone,
-            comments=comments
+            comments=comments,
+            username=username,
+            logs=f'supplier name: {supplier_name}, added by: ({username})'
         )
 
         # Save the new Supplier object to the database
@@ -199,19 +200,19 @@ def add_customer(request):
 
         # Check if all required fields are provided
         if not customer_name:
-            errors.append({'status': 'error', 'message': 'Customer name is required.'})
+            errors.append({'status': 'error', 'message': 'اسم مشتری را وارد کنید'})
         if not address:
-            errors.append({'status': 'error', 'message': 'Address is required.'})
+            errors.append({'status': 'error', 'message': 'آدرس مشتری را وارد کنید'})
         if not phone:
-            errors.append({'status': 'error', 'message': 'Phone is required.'})
+            errors.append({'status': 'error', 'message': 'شماره همراه مشتری را وارد کنید'})
         if not comments:
-            errors.append({'status': 'error', 'message': 'Comments are required.'})
+            errors.append({'status': 'error', 'message': 'فرم کانت را پرکنید'})
+        if not username:
+            errors.append({'error': 'username', 'message': 'نام کاربری را وارد کنید.'})
 
-        # Load existing customer names from DB
-        existing_names = [customer.customer_name for customer in Customer.objects.all().values_list('customer_name')]
-        # Check for duplicate name
-        if customer_name in existing_names:
-            error_message = f"Customer already exists with name '{customer_name}'. Please add full name and try again."
+        # Load existing customer names from DB Check for duplicate name
+        if Customer.objects.filter(customer_name=customer_name).exists():
+            error_message = f"در حال حاضر یک مشتری با نام {customer_name} در دیتابیس وجود دارد."
             errors.append({'status': 'error', 'message': error_message})
 
         # If there are any errors, return them in the response
@@ -219,11 +220,13 @@ def add_customer(request):
             return JsonResponse({'status': 'error', 'errors': errors})
 
         # Create a new Customer object
-        new_customer = Supplier(
-            supplier_name=customer_name,
+        new_customer = Customer(
+            customer_name=customer_name,
             address=address,
             phone=phone,
-            comments=comments
+            comments=comments,
+            logs=f'customer name: {customer_name}, added by: ({username})'
+
         )
 
         # Save the new Customer object to the database
@@ -474,38 +477,38 @@ def add_new_reel(request):
                 return JsonResponse({'status': 'error', 'errors': errors})
 
             # Load the last reel number from the Products DB
-            last_reel_number = Products.objects.latest('reel_number').reel_number
-            next_reel_number = f"{last_reel_number[:-1]}{int(last_reel_number[-1]) +   1}"
-
-            # Create a new Products record
-            new_product = Products(
-                reel_number=next_reel_number,
-                width=width,
-                gsm=gsm,
-                length=length,
-                breaks=breaks,
-                grade=grade,
-                profile_name=consumption_profile_name,
-            )
-            new_product.save()
-
-            # Create a new Anbar_Salon_Tolid record
-            new_anbar_record = Anbar_Salon_Tolid(
-                reel_number=next_reel_number,
-                width=width,
-                gsm=gsm,
-                length=length,
-                breaks=breaks,
-                grade=grade,
-                profile_name=consumption_profile_name,
-            )
-            new_anbar_record.save()
+            # last_reel_number = Products.objects.latest('reel_number').reel_number
+            # next_reel_number = f"{last_reel_number[:-1]}{int(last_reel_number[-1]) +   1}"
+            #
+            # # Create a new Products record
+            # new_product = Products(
+            #     reel_number=next_reel_number,
+            #     width=width,
+            #     gsm=gsm,
+            #     length=length,
+            #     breaks=breaks,
+            #     grade=grade,
+            #     profile_name=consumption_profile_name,
+            # )
+            # new_product.save()
+            #
+            # # Create a new Anbar_Salon_Tolid record
+            # new_anbar_record = Anbar_Salon_Tolid(
+            #     reel_number=next_reel_number,
+            #     width=width,
+            #     gsm=gsm,
+            #     length=length,
+            #     breaks=breaks,
+            #     grade=grade,
+            #     profile_name=consumption_profile_name,
+            # )
+            # new_anbar_record.save()
 
             # Update the Consumption DB based on the selected consumption profile
             # Note: Add your own logic to update the Consumption model here
 
             # Return a success response
-            return JsonResponse({'message': 'Reel number has been added', 'reel_number': next_reel_number}, status=200)
+            return JsonResponse({'status': 'success', 'message': 'Reel number has been added'}, status=200)
 
         except ValidationError as e:
             # Return a validation error response
@@ -844,6 +847,9 @@ def create_sales_order(request):
         return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=400)
 
 # Forklift Panel
+def forklift_panel(request):
+    if request.method == 'GET':
+        return render(request, 'forklift_panel.html')
 
 @csrf_exempt
 def unload(request):

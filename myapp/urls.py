@@ -20,6 +20,7 @@ urlpatterns = [
     path("api/updateWeight2", update_weight2),
     path("api/createPurchaseOrder", create_purchase_order),
     path("api/createSalesOrder", create_sales_order),
+    path("forkliftPanel/", forklift_panel),
     path("api/unload", unload),
     path("api/loaded", loaded),
     path("api/used", used),
