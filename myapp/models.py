@@ -356,7 +356,7 @@ class Sales(models.Model):
     """
     # Fields
 
-    date = models.DateTimeField(null=True)
+    date = models.DateTimeField(default=timezone.now, null=True)
     customer = models.ForeignKey('Customer', on_delete=models.CASCADE, null=True)
     truck = models.ForeignKey('Truck', on_delete=models.CASCADE, null=True)
     license_number = models.CharField(max_length=255, null=True)
