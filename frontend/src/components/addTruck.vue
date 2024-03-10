@@ -31,7 +31,7 @@ export default {
   methods: {
     async check_license_number() {
       const params = {
-        "license_number": this.license_code1.val + this.license_code2.val + this.license_code3.val +"ir"+ this.license_code4.val,
+        "license_number": this.license_code1.val + this.license_code2.val + this.license_code3.val +"ایران"+ this.license_code4.val,
       };
       const response = await this.axios.post('/myapp/api/checkLicenseNumber', {}, {params: params})
       // console.log(response.data); // Access response data
@@ -41,7 +41,7 @@ export default {
     },
     async addTruck() {
       const params = {
-        "license_number": this.license_code1.val + this.license_code2.val + this.license_code3.val +"ir"+ this.license_code4.val,
+        "license_number": this.license_code1.val + this.license_code2.val + this.license_code3.val +"ایران"+ this.license_code4.val,
         "driver_name": this.driver_name,
         "driver_doc": this.driver_doc,
         "phone": this.phone,
@@ -167,7 +167,16 @@ export default {
     </modal>
   </form>
   <Alert v-if="form == false" type="Danger"></Alert>
-  <Alert v-if="success" type="Success"></Alert>
+  <Alert v-if="success" type="Success">
+    <template v-slot:DangerContent>
+      پلاک مورد نظر در دیتا بیس وجود دارد.
+    </template>
+  </Alert>
+  <Alert v-if="success" type="Success">
+    <template v-slot:SuccessContent>
+      کامیون مورد نظر به نام راننده {{ driver_name }} ناموفقیت به دیتابیس اضافه شد
+    </template>
+  </Alert>
 </Card>
 </template>
 

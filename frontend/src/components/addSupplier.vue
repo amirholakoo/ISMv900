@@ -24,7 +24,6 @@ export default {
       success: false,
       error: false,
       errors: [],
-      message: ''
     }
   },
   methods: {
