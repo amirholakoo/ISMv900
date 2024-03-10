@@ -649,8 +649,7 @@ def add_shipment(request):
 
             return JsonResponse({'status': 'success', 'message': 'Shipments created successfully!'})
     else:
-        return JsonResponse({'status': 'error', 'message': 'Invalid request method.'})
-
+        return render(request, 'add_shipment.html')
 
 
 # Weight Station/Create Orders
@@ -712,7 +711,7 @@ def update_weight1(request):
         except Exception as e:
             return JsonResponse({'success': False, 'message': str(e)})
 
-    return JsonResponse({'success': False, 'message': 'Invalid request method.'})
+    return render(request, 'update_weight1.html')
 
 
 def update_weight2(request):
@@ -759,7 +758,7 @@ def update_weight2(request):
             return JsonResponse({'status': 'error', 'message': f'Shipments with License Number {license_number} does not exist.'})
 
     else:
-        return JsonResponse({'status': 'error', 'message': 'Invalid request method.'})
+        return render(request, 'update_weight2.html')
 
 
 @csrf_exempt
@@ -802,7 +801,7 @@ def create_purchase_order(request):
             return JsonResponse({'success': False, 'message': str(e)})
 
     else:
-        return JsonResponse({'success': False, 'message': 'Invalid request method.'})
+        return render(request, 'create_purchase_order.html')
 
 
 @csrf_exempt
@@ -844,7 +843,26 @@ def create_sales_order(request):
         except Exception as e:
             return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
     else:
-        return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=400)
+        return render(request, 'create_sales_order.html')
+
+
+from django.db import connection
+def get_anbar_table_names(request):
+    if request.method == 'GET':
+        # Get all table names from the database
+        all_table_names = connection.introspection.table_names()
+        # Filter table names to include only those that start with 'Anbar_'
+        anbar_table_names = [name for name in all_table_names if name.startswith('Anbar_')]
+        return JsonResponse({'status':'success', 'data': anbar_table_names })
+
+
+def get_unit_names(request):
+    if request.method == 'GET':
+        units = Unit.objects.all()
+        unit_names = [unit.unit_name for unit in units]
+        return JsonResponse({'unit_names':unit_names}, safe=False)
+    else:
+        return JsonResponse({"error": "Invalid request method"}, status=400)
 
 # Forklift Panel
 def forklift_panel(request):
@@ -884,12 +902,37 @@ def unload(request):
     }
     """
     if request.method == 'POST':
-        # Assuming the request data is in JSON format
-        data = request.json()
+        # Extract form data from the request
+        license_number = request.GET.get('license_number')
+        unloading_location = request.GET.get('unloading_location')
+        unit = request.GET.get('unit')
+        quantity = request.GET.get('quantity')
+        quality = request.GET.get('quality')
+        forklift_driver = request.GET.get('forklift_driver')
+
+        # Initialize an empty list to collect error messages
+        errors = []
+
+        # Check if all required fields are provided
+        if not license_number:
+            errors.append({'status': 'error', 'message': 'lic_number is required.'})
+        if not unloading_location:
+            errors.append({'status': 'error', 'message': 'width is required.'})
+        if not unit:
+            errors.append({'status': 'error', 'message': 'gsm is required.'})
+        if not quantity:
+            errors.append({'status': 'error', 'message': 'length is required.'})
+        if not quality:
+            errors.append({'status': 'error', 'message': 'breaks is required.'})
+        if not forklift_driver:
+            errors.append({'status': 'error', 'message': 'grade is required.'})
+        # If there are any errors, return them in the response
+        if errors:
+            return JsonResponse({'status': 'error', 'errors': errors})
 
         try:
             # Retrieve the shipment instance
-            shipment = Shipments.objects.get(license_number=data['license_number'])
+            shipment = Shipments.objects.get(license_number=license_number)
 
             # Update shipment fields
             shipment.status = 'LoadedUnloaded'
@@ -897,7 +940,7 @@ def unload(request):
             shipment.save()
 
             # Calculate the quantity to be unloaded
-            quantity_to_unload = data['quantity']
+            quantity_to_unload = quantity
 
             # Assuming Anbar_Akhal is used for unloading location
             # Update AnbarGeneric (Anbar_Akhal in this case)
@@ -910,7 +953,7 @@ def unload(request):
                 anbar_item.save()
 
             # Return a success response
-            return JsonResponse({'status': 'success', 'message': f'{quantity_to_unload} units have been added to {data["license_number"]}.'})
+            return JsonResponse({'status': 'success', 'message': f'{quantity_to_unload} units have been added to {license_number}.'})
 
         except Shipments.DoesNotExist:
             return JsonResponse({'status': 'error', 'message': 'Shipments not found.'}, status=404)
@@ -1218,7 +1261,7 @@ def add_new_anbar(request):
             return JsonResponse({'status': 'fail', 'message': 'An unexpected error occurred.'})
 
     else:
-        return JsonResponse({'status': 'fail', 'message': 'Invalid request method.'})
+        return render(request, 'add_new_anbar.html')
 
 
 @csrf_exempt
@@ -1278,7 +1321,7 @@ def add_material_type(request):
 
     else:
         # Handle non-POST requests
-        return JsonResponse({'status': 'fail', 'message': 'Invalid request method.'})
+        return render(request, 'add_material_type.html')
 
 
 @csrf_exempt
@@ -1340,7 +1383,7 @@ def add_unit(request):
             return JsonResponse({'status': 'error', 'message': f'Error adding Unit: {str(e)}'})
     else:
         # Handle non-POST requests
-        return JsonResponse({'status': 'fail', 'message': 'Invalid request method.'})
+        return render(request, 'add_unit.html')
 
 
 @csrf_exempt
