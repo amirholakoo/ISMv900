@@ -2,85 +2,10 @@
 import {initFlowbite} from "flowbite";
 import modal from "@/components/Modal.vue";
 import Alert from "@/components/Alert.vue";
-
-export default {
-  name: "loaded",
-  components: {Alert, modal},
-  data(){
-    return {
-      drowpdownList: {
-        lic_number: {name: 'شماره پلاک',title: 'شماره پلاک', data: '', value: ''},
-        loading_location: {name: 'محل بار شده',title: 'محل بار شده', data: '', value: ''},
-        width: {name: 'عرض',title: 'عرض', data: '', value: ''},
-      },
-      forms: {
-        forklift_driver: {name: 'اسم راننده فرک لیفت', value: ''},
-      },
-      success: false,
-      error: false,
-      errors: [],
-    }
-  },
-  mounted() {
-    initFlowbite();
-    this.axios.get('/myapp/api/getLicenseNumbers').then((response) => {
-      console.log(response.data)
-      this.drowpdownList.lic_number.data = response.data['license_numbers']
-    })
-    this.axios.get('/myapp/api/getAnbarTableNames').then((response) => {
-      console.log(response.data)
-      this.drowpdownList.loading_location.data = response.data['data']
-    })
-    this.axios.get('/myapp/api/getUnitNames').then((response) => {
-      console.log(response.data)
-      this.drowpdownList.width.data = response.data['unit_names']
-    })
-  },
-  methods:{
-    clicked(k, name){
-      console.log(k, name)
-      if (k == 'lic_number'){
-        this.drowpdownList.lic_number.name = name
-        this.drowpdownList.lic_number.value = name
-      }
-      if (k == 'loading_location'){
-        this.drowpdownList.loading_location.name = name
-        this.drowpdownList.loading_location.value = name
-      }
-      if (k == 'width'){
-        this.drowpdownList.width.name = name
-        this.drowpdownList.width.value = name
-      }
-    },
-    async addSupplier() {
-      const params = {
-        "license_number": this.drowpdownList.lic_number.value,
-        "loading_location": this.drowpdownList.loading_location.value,
-        "width": this.drowpdownList.width.value,
-        "quantity": this.forms.Quantity.value,
-        "quality": this.forms.Quality.value,
-        "forklift_driver": this.forms.forklift_driver.value
-      };
-      const response = await this.axios.post('/myapp/api/loaded', {}, {params: params})
-      console.log(response.data); // Access response data
-      if (response.data['status'] == 'success'){
-        this.success = true
-      }else {
-        this.error = true
-        this.errors = response.data['errors']
-      }
-    },
-  }
-}
-</script>
-<script>
-import {initFlowbite} from "flowbite";
-import modal from "@/components/Modal.vue";
-import Alert from "@/components/Alert.vue";
 import Card from "@/components/Card.vue";
 
 export default {
-  name: "unloaded",
+  name: "loaded",
   components: {Card, Alert, modal},
   data(){
     return {
