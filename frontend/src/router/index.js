@@ -6,6 +6,15 @@ import addCustomer from "@/components/addCustomer.vue";
 import addRawMaterial from "@/components/addRawMaterial.vue";
 import addNewReel from "@/components/addNewReel.vue";
 import forkliftPanel from "@/components/forkliftPanel.vue";
+import createShipment from "@/components/createShipment.vue";
+import sales from "@/components/weightStation/sales.vue";
+import purchase from "@/components/weightStation/purchase.vue";
+import weight1 from "@/components/weightStation/weight1.vue";
+import weight2 from "@/components/weightStation/weight2.vue";
+import addNewAnbar from "@/components/admin/addNewAnbar.vue";
+import addNewUnit from "@/components/admin/addNewUnit.vue";
+import addNewMatrialType from "@/components/admin/addNewMatrialType.vue";
+
 const routes = [
   {
     path: '/',
@@ -49,6 +58,46 @@ const routes = [
     path: '/myapp/forkliftPanel/',
     name: 'forkliftPanel',
     component: forkliftPanel
+  },
+  {
+    path: '/myapp/addShipment/',
+    name: 'addShipment',
+    component: createShipment
+  },
+  {
+    path: '/myapp/createSalesOrder/',
+    name: 'createSalesOrder',
+    component: sales
+  },
+  {
+    path: '/myapp/createPurchaseOrder/',
+    name: 'createPurchaseOrder',
+    component: purchase
+  },
+  {
+    path: '/myapp/updateWeight1/',
+    name: 'updateWeight1',
+    component: weight1
+  },
+  {
+    path: '/myapp/updateWeight2/',
+    name: 'updateWeight2',
+    component: weight2
+  },
+  {
+    path: '/myapp/addNewAnbar/',
+    name: 'addNewAnbar',
+    component: addNewAnbar
+  },
+  {
+    path: '/myapp/addUnit/',
+    name: 'addNewUnit',
+    component: addNewUnit
+  },
+  {
+    path: '/myapp/addMaterialType/',
+    name: 'addNewMatrialType',
+    component: addNewMatrialType
   },
 ]
 
