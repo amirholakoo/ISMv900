@@ -662,7 +662,7 @@ class Unit(models.Model):
 
     supplier_name = models.CharField(max_length=255, null=True, blank=True)
     material_type = models.CharField(max_length=255)
-    unit_name = models.CharField(max_length=255, unique=True)
+    unit_name = models.CharField(max_length=255, null=True, blank=True)
     count = models.FloatField(blank=True, null=True)
     username = models.CharField(max_length=255, null=False, blank=True)
     date = models.DateTimeField(default=timezone.now, blank=True)

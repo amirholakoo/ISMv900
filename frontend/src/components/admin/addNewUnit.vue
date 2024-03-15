@@ -10,11 +10,11 @@ export default {
   data(){
     return {
       forms: {
-        supplier_name: {type: 'dropdown', name: 'اسم تامین کننده',title: 'شماره پلاک', data: '', value: ''},
-        matrial_type: {type:'dropdown', name: 'نوع متریال جدید', value: ''},
-        unit_name: {type:'input', name: 'نام واحد', value: ''},
-        count: {type:'input', name: 'مفدار', value: ''},
-        username: {type:'input', name: 'نام کاربری', value: ''},
+        supplier_name: {type: 'dropdown', name: 'اسم تامین کننده',title: 'اسم تامین کننده', data: '', value: ''},
+        material_type: {type:'dropdown', name: 'نوع متریال جدید',title: 'نوع متریال جدید', data:'', value: ''},
+        unit_name: {type:'input', name:'نام واحد', title:'نام واحد', value: ''},
+        count: {type:'input', name: 'مفدار',title: 'مفدار', value: ''},
+        username: {type:'input', name: 'نام کاربری',title: 'نام کاربری', value: ''},
       },
       success: false,
       error: false,
@@ -23,45 +23,40 @@ export default {
   },
   mounted() {
     initFlowbite();
-    this.axios.get('/myapp/api/getLicenseNumbers').then((response) => {
+    this.axios.get('/myapp/api/getSupplierNames').then((response) => {
       console.log(response.data)
-      this.drowpdownList.lic_number.data = response.data['license_numbers']
-    })
-    this.axios.get('/myapp/api/getAnbarTableNames').then((response) => {
-      console.log(response.data)
-      this.drowpdownList.unloading_location.data = response.data['data']
-    })
-    this.axios.get('/myapp/api/getUnitNames').then((response) => {
-      console.log(response.data)
-      this.drowpdownList.unit.data = response.data['unit_names']
+      this.forms.supplier_name.data = response.data['supplier_names']
     })
   },
   methods:{
     clicked(k, name){
       console.log(k, name)
-      if (k == 'lic_number'){
-        this.drowpdownList.lic_number.name = name
-        this.drowpdownList.lic_number.value = name
+      if (k == 'supplier_name'){
+        this.forms.supplier_name.name = name
+        this.forms.supplier_name.value = name
+        const params = {
+          'supplier_name': this.forms.supplier_name.value
+        }
+        this.axios.get('/myapp/api/getMaterialTypes', {params:params}).then((response) => {
+          console.log(response.data)
+          this.forms.material_type.data = response.data['material_names']
+        })
       }
-      if (k == 'unloading_location'){
-        this.drowpdownList.unloading_location.name = name
-        this.drowpdownList.unloading_location.value = name
-      }
-      if (k == 'unit'){
-        this.drowpdownList.unit.name = name
-        this.drowpdownList.unit.value = name
+      if (k == 'material_type'){
+        this.forms.material_type.name = name
+        this.forms.material_type.value = name
       }
     },
     async addSupplier() {
       const params = {
-        "license_number": this.drowpdownList.lic_number.value,
-        "unloading_location": this.drowpdownList.unloading_location.value,
-        "unit": this.drowpdownList.unit.value,
-        "quantity": this.forms.Quantity.value,
-        "quality": this.forms.Quality.value,
-        "forklift_driver": this.forms.forklift_driver.value
+        'supplier_name': this.forms.supplier_name.value,
+        'material_type': this.forms.material_type.value,
+        'unit_name': this.forms.unit_name.value,
+        'count': this.forms.count.value,
+        'username': this.forms.username.value,
       };
-      const response = await this.axios.post('/myapp/api/unload', {}, {params: params})
+      console.log(params)
+      const response = await this.axios.post('/myapp/addUnit/', {}, {params: params})
       console.log(response.data); // Access response data
       if (response.data['status'] == 'success'){
         this.success = true
@@ -107,7 +102,7 @@ export default {
           </button>
           <!-- Dropdown menu -->
           <div :id="form_name+'dropdown'" class="z-50 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
-            <ul class="overflow-y-auto h-48 py-2 text-sm text-gray-700 dark:text-gray-200" :aria-labelledby="form_name + 'Button'">
+            <ul class="overflow-y-auto h-auto max-h-48 py-2 text-sm text-gray-700 dark:text-gray-200" :aria-labelledby="form_name + 'Button'">
               <li v-for="data in val.data">
                 <a @click='clicked(form_name ,data)' type="button" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
                   {{ data }}
@@ -122,7 +117,7 @@ export default {
         <template v-slot:text>
           <div class="flex flex-col gap-2 font-bold">
             <template v-for="(val, key) in forms">
-                <p>{{val.name}}: {{val.value}}</p>
+                <p>{{val.title}}: {{val.value}}</p>
             </template>
           </div>
         </template>

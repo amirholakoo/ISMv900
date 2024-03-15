@@ -1874,7 +1874,7 @@ def add_unit(request):
         unit_name = request.GET.get('unit_name')
         count = request.GET.get('count')
         username = request.GET.get('username')
-
+        print(material_type)
         errors = []
 
         # Check if all required fields are provided
@@ -1892,24 +1892,27 @@ def add_unit(request):
         # If there are any errors, return them in the response
         if errors:
             return JsonResponse({'status': 'error', 'errors': errors})
+        else:
+            # Create a new Unit instance
+            new_unit = Unit(
+                supplier_name=supplier_name,
+                material_type=material_type,
+                unit_name=unit_name,
+                count=count,
+                username=username,
+                date=timezone.now(),
+                logs=f'created on now by {username}'
+            )
 
-        # Create a new Unit instance
-        new_unit = Unit(
-            supplier_name=supplier_name,
-            material_type=material_type,
-            unit_name=unit_name,
-            count=count,
-            username=username
-        )
-
-        # Save the new Customer object to the database
-        try:
-            new_unit.save()
-            # Return success response
-            return JsonResponse({'status': 'success', 'message': 'Unit has been added.'})
-        except Exception as e:
-            # Handle any exceptions that occur during the save operation
-            return JsonResponse({'status': 'error', 'message': f'Error adding Unit: {str(e)}'})
+            # Save the new Customer object to the database
+            try:
+                new_unit.save()
+                # Return success response
+                return JsonResponse({'status': 'success', 'message': 'Unit has been added.'})
+            except Exception as e:
+                print(e)
+                # Handle any exceptions that occur during the save operation
+                return JsonResponse({'status': 'error', 'message': f'Error adding Unit: {str(e)}'})
     else:
         # Handle non-POST requests
         return render(request, 'add_unit.html')
