@@ -327,30 +327,27 @@ def add_rawMaterial(request):
 
         # Check if all required fields are provided
         if not supplier_name:
-            errors.append({'status': 'error', 'message': 'supplier name is required.'})
+            errors.append({'status': 'error', 'message': 'اسم تامین کننده ا انتخاب کنید'})
         if not material_type:
-            errors.append({'status': 'error', 'message': 'material type is required.'})
+            errors.append({'status': 'error', 'message': 'نوع ماده را انتخاب کنید'})
         if not material_name:
-            errors.append({'status': 'error', 'message': 'material name is required.'})
+            errors.append({'status': 'error', 'message': 'اسم ماده را وارد کنید'})
         if not comments:
-            errors.append({'status': 'error', 'message': 'Comments are required.'})
-        # Load existing material names from DB
-        existing_names = [customer.customer_name for customer in RawMaterial.objects.all().values_list('material_name')]
-        # Check for duplicate name
-        if material_name in existing_names:
-            error_message = f"Error: Material Name with name '{material_name}' already exist"
-            errors.append({'status': 'error', 'message': error_message})
-
+            errors.append({'status': 'error', 'message': 'کانت را پر کنید'})
+        if not username:
+            errors.append({'status': 'error', 'message': 'نام کاربری را وارد کنید'})
         # If there are any errors, return them in the response
         if errors:
             return JsonResponse({'status': 'error', 'errors': errors})
 
         # Create a new Customer object
         new_RawMaterial = RawMaterial(
-            supplier=supplier_name,
+            supplier_name=supplier_name,
             material_type=material_type,
             material_name=material_name,
-            comments=comments
+            comments=comments,
+            username=username,
+            logs=f'usename ({username}) added new raw material'
         )
 
         # Save the new Customer object to the database
@@ -359,6 +356,7 @@ def add_rawMaterial(request):
             return JsonResponse({'status': 'success',
                                  'message': f'New Material: {material_name} has been added to database successfully!'})
         except Exception as e:
+            print(e)
             # Handle any exceptions that occur during the save operation
             return JsonResponse({'status': 'error', 'message': f'Error adding Customer: {str(e)}'})
     else:
