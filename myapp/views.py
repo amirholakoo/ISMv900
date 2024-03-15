@@ -1,11 +1,13 @@
 import json
-
+import logging
 from django.shortcuts import render, redirect
 from .models import *
 from django.http import JsonResponse
 from django.core.exceptions import ValidationError
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
+from django.db import connection
+from django.apps import apps
 import uuid
 
 from datetime import datetime
@@ -255,10 +257,13 @@ def get_materialTypes(request):
     """
     if request.method == 'GET':
         try:
+            supplier_name = request.GET.get('supplier_name')
             # Query the MaterialType model for all instances
-            material_types = MaterialType.objects.all()
+            material_types = MaterialType.objects.filter(supplier_name=supplier_name)
             # Extract and return the names in a JSON response
             material_names = [material_type.material_type for material_type in material_types]
+            print(material_names)
+            print(supplier_name)
             return JsonResponse({'status': 'success', 'material_names': material_names})
         except Exception as e:
             # Handle any exceptions that occur during the query operation
@@ -544,8 +549,11 @@ def get_license_numbers(request):
             # Extract the license numbers from the queryset
             license_numbers = [truck.license_number for truck in trucks]
 
+            free_truck = Truck.objects.filter(status='Free')
+            free_truck = [truck.license_number for truck in free_truck]
+
             # Return the license numbers as a JSON response
-            return JsonResponse({'license_numbers': license_numbers}, status=200)
+            return JsonResponse({'license_numbers': license_numbers, 'free_truck': free_truck}, status=200)
 
         except Exception as e:
             # Return a general error response
@@ -557,9 +565,38 @@ def get_license_numbers(request):
 def get_material_names(request):
     """
     Handles GET requests to retrieve all material names from the RawMaterial model.
+    """
+    if request.method == 'GET':
+        try:
+            supplier_name = request.GET.get('supplier_name')
+            print(request.GET)
+            if not supplier_name:
+                return JsonResponse({'error': 'Supplier name is required'}, status=400)
+
+            # Query the RawMaterial model for all records
+            materials = RawMaterial.objects.filter(supplier_name=supplier_name)
+
+            # Extract the material names from the queryset
+            material_names = [material.material_name for material in materials]
+
+            # Return the material names in a JSON response
+            return JsonResponse({'material_names': material_names}, status=200)
+
+        except Exception as e:
+            # Log the error for debugging
+            logging.error(f"Error in get_material_names: {e}")
+            # Return a general error response
+            return JsonResponse({'error': 'Internal Server Error'}, status=500)
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=405)
+
+
+def get_customer_names(request):
+    """
+    Handles GET requests to retrieve all customer names from the RawMaterial model.
 
     This function queries the RawMaterial model for all records and returns the
-    material names in a JSON response. If an error occurs during the process,
+    customer names in a JSON response. If an error occurs during the process,
     it returns an appropriate HTTP status code and error message.
 
     Parameters:
@@ -572,13 +609,13 @@ def get_material_names(request):
     if request.method == 'GET':
         try:
             # Query the RawMaterial model for all records
-            materials = RawMaterial.objects.all()
+            Customers = Customer.objects.all()
 
             # Extract the material names from the queryset
-            material_names = [material.material_name for material in materials]
+            customer_names = [Customer.customer_name for Customer in Customers]
 
             # Return the material names in a JSON response
-            return JsonResponse({'material_names': material_names}, status=200)
+            return JsonResponse({'customer_names': customer_names}, status=200)
 
         except Exception as e:
             # Return a general error response
@@ -597,62 +634,213 @@ def add_shipment(request):
         material_name = request.GET.get('material_name')
         shipment_type = request.GET.get('shipment_type')
         customer_name = request.GET.get('customer_name')
+        username = request.GET.get('username')
 
         # Check required fields
         errors = []
         if not license_number:
-            errors.append('License number is required.')
+            errors.append('پلاک را انتخاب کنید')
         if not supplier_name:
-            errors.append('supplier name is required.')
+            errors.append('سام تامین کننده را انتخاب کنید')
         if not material_type:
-            errors.append('material type is required.')
+            errors.append('نوع ماده را انتخاب کنید')
         if not material_name:
-            errors.append('material name is required.')
+            errors.append('اسم ماده را انتخاب کنید')
         if not shipment_type:
-            errors.append('shipment type is required.')
+            errors.append('نوع بار نامه را انخاب کنید')
         if not customer_name:
-            errors.append('customer name is required.')
+            errors.append('اسم مشتری را انخاب کنید')
+        if not username:
+            errors.append('نام کاربری را وارد کنید')
 
         if errors:
             return JsonResponse({'status': 'error', 'errors': errors})
+
         else:
-            # Process data and create shipment
-            truck = Truck.objects.filter(license_number=license_number, status='Free').first()
-            if not truck:
-                return JsonResponse({'status': 'error', 'message': 'No free truck with that license number.'})
-            else:
-                truck.save()
+            # Create new shipment
+            shipment = Shipments(
+                truck_id=Truck.objects.get(license_number=license_number),
+                license_number=license_number,
+                supplier_name=supplier_name,
+                material_type=material_type,
+                material_name=material_name,
+                shipment_type=shipment_type,
+                customer_name=customer_name,
+                status='Registered',
+                location='Entrance',
+                username=username,
+            )
+            # change Truck status to Busy
+            try:
+                # Use update to change the status atomically
+                Truck.objects.filter(license_number=license_number).update(status='Busy')
+            except Truck.DoesNotExist:
+                return JsonResponse({'status': 'error', 'message': 'هیچ کامیونی با این پلاک وجود ندارد.'}, status=404)
 
-            shipment = Shipments()
-            shipment.entry_time = timezone.now()
-            shipment.license_number = license_number
-            shipment.shipment_type = shipment_type
+            # Save the new Shipment object to the database
+            try:
+                shipment.save()
+                return JsonResponse({'status': 'success', 'message': 'بار نامه با موفقیت اضافه شد.'})
 
-            # Handle incoming/outgoing shipment logic
-            if shipment_type == 'Incoming':
-                shipment.supplier = Supplier.objects.get(supplier_name=supplier_name)
-                shipment.material_type = MaterialType.objects.get(material_type=material_type)
-                shipment.material_name = MaterialType.objects.get(material_name=material_name)
-                # Update material quantity if applicable
-                # ...
-
-            elif shipment_type == 'Outgoing':
-                shipment.customer = Customer.objects.get(customer_name=customer_name)
-                # Update customer inventory if applicable
-                # ...
-
-            shipment.save()
-
-            # truck.status = 'Busy'
-            # truck.location = 'Entrance'
-            # truck.save()
-
-            return JsonResponse({'status': 'success', 'message': 'Shipments created successfully!'})
+            except Exception as e:
+                # Handle any exceptions that occur during the save operation
+                return JsonResponse({'status': 'error', 'message': f'Error adding supplier: {str(e)}'})
     else:
         return render(request, 'add_shipment.html')
 
 
 # Weight Station/Create Orders
+
+def weight_station_panel(request):
+    if request.method == 'GET':
+        return render(request, 'weight_station_panel.html')
+
+
+@csrf_exempt
+def get_shipment_license_numbers_by_status(request, status):
+    """
+    Handles GET requests to retrieve license numbers of shipments based on status .
+    """
+    if request.method == 'GET':
+        try:
+            # Query the Shipments model for records with status 'Registered'
+            registered_shipments = Shipments.objects.filter(status=status)
+
+            # Extract the license numbers from the queryset
+            license_numbers = [shipment.license_number for shipment in registered_shipments]
+
+            # Return the license numbers in a JSON response
+            return JsonResponse({'license_numbers': license_numbers}, status=200)
+
+        except Exception as e:
+            # Return a general error response
+            return JsonResponse({'error': str(e)}, status=500)
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=405)
+
+from django.db.models import Q
+
+@csrf_exempt
+def get_shipment_license_numbers_outgoing_by_status(request, status):
+    """
+    Handles GET requests to retrieve license numbers of shipments based on status .
+    """
+    if request.method == 'GET':
+        try:
+            # Query the Shipments model for records with status 'Registered'
+            registered_shipments = Shipments.objects.filter(location=status, shipment_type='Outgoing')
+
+
+            # Extract the license numbers from the queryset
+            license_numbers = [shipment.license_number for shipment in registered_shipments]
+
+            # Return the license numbers in a JSON response
+            return JsonResponse({'license_numbers': license_numbers}, status=200)
+
+        except Exception as e:
+            # Return a general error response
+            return JsonResponse({'error': str(e)}, status=500)
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=405)
+
+
+@csrf_exempt
+def get_shipment_license_numbers_by_location(request, location):
+    """
+    Handles GET requests to retrieve license numbers of shipments based on location .
+    """
+    if request.method == 'GET':
+        try:
+            # Query the Shipments model for records with status 'Registered'
+            registered_shipments = Shipments.objects.filter(location=location)
+
+            # Extract the license numbers from the queryset
+            license_numbers = [shipment.license_number for shipment in registered_shipments]
+
+            # Return the license numbers in a JSON response
+            return JsonResponse({'license_numbers': license_numbers}, status=200)
+
+        except Exception as e:
+            # Return a general error response
+            return JsonResponse({'error': str(e)}, status=500)
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=405)
+
+
+@csrf_exempt
+def get_shipment_details_by_license_number(request):
+    """
+    Handles GET requests to retrieve shipment details (supplier_name, material_type, material_name, weight1, weight2, net_weight, unload_location, unit, quantity, quality) based on a provided license number.
+    """
+    if request.method == 'POST':
+        try:
+            # Extract data from request.GET
+            license_number = request.GET.get('license_number')
+            if license_number:
+                # Filter Shipments based on the license_number
+                shipment = Shipments.objects.filter(license_number=license_number).first()
+                if shipment:
+                    # Prepare the data to be returned
+                    shipment_details = {
+                        'supplier_name': shipment.supplier_name,
+                        'material_type': shipment.material_type,
+                        'material_name': shipment.material_name,
+                        'weight1': shipment.weight1,
+                        'weight2': shipment.weight2,
+                        'net_weight': shipment.net_weight,
+                        'unload_location': shipment.unload_location,
+                        'unit': shipment.unit,
+                        'quantity': shipment.quantity,
+                        'quality': shipment.quality,
+                    }
+                    # Return the shipment details in a JSON response
+                    return JsonResponse(shipment_details, status=200)
+                else:
+                    return JsonResponse({'error': 'No shipment found with the provided license number.'}, status=404)
+            else:
+                return JsonResponse({'error': 'License number is required.'}, status=400)
+        except Exception as e:
+            # Return a general error response
+            return JsonResponse({'error': str(e)}, status=500)
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=405)
+
+
+@csrf_exempt
+def get_shipment_details2_by_license_number(request):
+    """
+    Handles GET requests to retrieve shipment details (supplier_name, material_type, material_name, weight1, weight2, net_weight, unload_location, unit, quantity, quality) based on a provided license number.
+    """
+    if request.method == 'POST':
+        try:
+            # Extract data from request.GET
+            license_number = request.GET.get('license_number')
+            if license_number:
+                # Filter Shipments based on the license_number
+                shipment = Shipments.objects.filter(license_number=license_number).first()
+
+                if shipment:
+                    # Prepare the data to be returned
+                    shipment_details = {
+                    'customer_name': shipment.customer_name,
+                    'list_of_reels': shipment.list_of_reels,
+                    'weight1': shipment.weight1,
+                    'weight2': shipment.weight2,
+                    'net_weight': shipment.net_weight,
+                    'unloaded_location': shipment.unload_location,
+                    'consuption_profile_name': shipment.profile_name,
+                    }
+                    # Return the shipment details in a JSON response
+                    return JsonResponse(shipment_details, status=200)
+                else:
+                    return JsonResponse({'error': 'No shipment found with the provided license number.'}, status=404)
+            else:
+                return JsonResponse({'error': 'License number is required.'}, status=400)
+        except Exception as e:
+            # Return a general error response
+            return JsonResponse({'error': str(e)}, status=500)
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=405)
 
 
 @csrf_exempt
@@ -680,38 +868,75 @@ def update_weight1(request):
     """
     if request.method == 'POST':
         # Assuming shipment_id and weight1 are sent in the POST data
-        shipment_id = request.GET.get('shipment_id')
+        license_number = request.GET.get('license_number')
         weight1 = request.GET.get('weight1')
         username = request.GET.get('username')
 
-        try:
-            # Convert weight1 to a decimal and validate the range
-            weight1 = float(weight1)
-            if weight1 < 9 or weight1 > 38000:
-                return JsonResponse({'success': False, 'message': 'Weight must be between 9 and 38000 KG.'})
+        # Check required fields
+        errors = []
+        if not license_number:
+            errors.append('پلاک را انتخاب کنید')
+        if not weight1:
+            errors.append('وزن اولیه را وارد کنید')
+        if not username:
+            errors.append('نام کاربری را وارد کنید')
+        # Convert weight1 to a decimal and validate the range
+        weight1 = float(weight1)
+        if weight1 < 9 or weight1 > 38000:
+            errors.append('وزن وارد شده باید بین 9 تا 38000 کیلوگرم باشد.')
 
-            # Retrieve the shipment instance
-            shipment = Shipments.objects.get(shipment_id=shipment_id)
+        if errors:
+            return JsonResponse({'status': 'error', 'errors': errors})
+        else:
+            try:
+                Shipments.objects.filter(license_number=license_number).update(
+                    weight1=weight1,
+                    username=username,
+                    weight1_time=timezone.now(),
+                    comments=f"{username} updated Weight1",
+                    status='LoadingUnloading',
+                    location='Weight1',
+                )
+                return JsonResponse({'status': 'success', 'message': 'وزن اولیه بار نامه با موفقیت آپدیت شد.'})
 
-            # Update the fields
-            shipment.weight1 = weight1
-            shipment.weight1_time = timezone.now()
-            shipment.comments = f"{username} Weight1"
-
-            # Save the changes
-            shipment.save()
-
-            # Return a success response
-            return JsonResponse({'success': True, 'message': f'You entered WEIGHT 1 KG for Shipments for SUPPLIER/CUSTOMER with LICENSE NUMBER: {shipment.license_number} has been added.'})
-
-        except Shipments.DoesNotExist:
-            return JsonResponse({'success': False, 'message': 'Shipments not found.'})
-        except ValueError:
-            return JsonResponse({'success': False, 'message': 'Invalid weight format.'})
-        except Exception as e:
-            return JsonResponse({'success': False, 'message': str(e)})
-
+            except Exception as e:
+                # Handle any exceptions that occur during the save operation
+                return JsonResponse({'status': 'error', 'message': f'Error updating shipment weight1: {str(e)}'})
     return render(request, 'update_weight1.html')
+
+
+def show_weight1(request):
+    """
+    Handles GET requests to retrieve the weight1 of a shipment based on a provided license number.
+
+    This view function extracts the license number from the request's query parameters,
+    filters the Shipments model to find a shipment with the matching license number,
+    and returns the weight1 of the found shipment in a JSON response.
+
+    If no shipment is found with the provided license number, a JSON response with an error message
+    and a 404 status code is returned. If the license number is not provided, a JSON response with
+    an error message and a 400 status code is returned.
+
+    Parameters:
+    - request (HttpRequest): The HTTP request object.
+
+    Returns:
+    - JsonResponse: A JSON response containing the weight1 of the shipment if found, or an error message.
+    """
+    if request.method == 'GET':
+        # Extract data from request.GET
+        license_number = request.GET.get('license_number')
+        print(license_number)
+        if license_number:
+            # Filter Shipments based on the license_number
+            shipment = Shipments.objects.filter(license_number=license_number).first()
+            if shipment:
+                # Return the weight1 of the shipment
+                return JsonResponse({'weight1': shipment.weight1})
+            else:
+                return JsonResponse({'error': 'هیج بار نامه ای با شماره پلاک مورد نظر یافت نشد.'}, status=404)
+        else:
+            return JsonResponse({'error': 'شماره پلاک مورد نیازاست'}, status=400)
 
 
 def update_weight2(request):
@@ -724,39 +949,51 @@ def update_weight2(request):
     """
     if request.method == 'POST':
         # Extract data from the request
-        license_number = request.POST.get('license_number')
-        weight2 = request.POST.get('weight2')
-        net_weight = request.POST.get('net_weight')
-
-        # Validate input
-        if not license_number or not weight2 or not net_weight:
-            return JsonResponse({'status': 'error', 'message': 'All fields are required.'})
-
+        license_number = request.GET.get('license_number')
+        weight1 = request.GET.get('weight1')
+        weight2 = request.GET.get('weight2')
+        net_weight = request.GET.get('net_weight')
+        username = request.GET.get('username')
+        # Check required fields
+        errors = []
+        if not license_number:
+            errors.append('پلاک را انتخاب کنید')
+        if not weight1:
+            errors.append('وزن اولیه را وارد کنید')
+        if not weight2:
+            errors.append('وزن ثانویه را وارد کنید')
+        if not username:
+            errors.append('نام کاربری را وارد کنید')
         try:
+            weight1 = float(weight1)
             weight2 = float(weight2)
             net_weight = float(net_weight)
         except ValueError:
-            return JsonResponse({'status': 'error', 'message': 'Weight2 and Net Weight must be numbers.'})
-
+            errors.append('وزن ثانویه و وزن خالص باید عدد باشند')
         if not (9 <= weight2 <= 38000) or not (9 <= net_weight <= 38000):
-            return JsonResponse({'status': 'error', 'message': 'Weight2 and Net Weight must be between 9 KG and 38000 KG.'})
+            errors.append('وزن ثاویه و وزن حالص  وارد شده باید بین 9 تا 38000 کیلوگرم باشند.')
+        # Check if the absolute difference between weight1 and weight2 equals net_weight
+        if abs(weight1 - weight2) != net_weight:
+            return JsonResponse({'status': 'error', 'message': 'تفاوت مطلق بین وزن اولیه و وزن ثانویه باید با وزن خالص برابر باشد.'})
+        if errors:
+            return JsonResponse({'status': 'error', 'errors': errors})
+        else:
+            try:
+                # Update the Shipments instance
+                Shipments.objects.filter(license_number=license_number).update(
+                    weight1=weight1,
+                    weight2=weight2,
+                    net_weight=net_weight,
+                    username=username,
+                    weight2_time=timezone.now(),
+                    comments=f"{username} updated Weight2",
+                    status='LoadingUnloading',
+                    location='Office',
+                )
 
-        # Update the Shipments instance
-        try:
-            shipment = Shipments.objects.get(license_number=license_number)
-            shipment.weight2 = weight2
-            shipment.weight2_time = timezone.now()
-            shipment.net_weight = net_weight
-            shipment.save()
-
-            # Check if the absolute difference between weight1 and weight2 equals net_weight
-            if abs(shipment.weight1 - weight2) != net_weight:
-                return JsonResponse({'status': 'error', 'message': 'The absolute difference between Weight1 and Weight2 must equal the Net Weight.'})
-
-            return JsonResponse({'status': 'success', 'message': f'Weight2 and Net Weight for Shipments with License Number {license_number} has been updated successfully.'})
-        except Shipments.DoesNotExist:
-            return JsonResponse({'status': 'error', 'message': f'Shipments with License Number {license_number} does not exist.'})
-
+                return JsonResponse({'status': 'success', 'message': f'Weight2 and Net Weight for Shipments with License Number {license_number} has been updated successfully.'})
+            except Shipments.DoesNotExist:
+                return JsonResponse({'status': 'error', 'message': f'Shipments with License Number {license_number} does not exist.'})
     else:
         return render(request, 'update_weight2.html')
 
@@ -768,35 +1005,130 @@ def create_purchase_order(request):
     """
     if request.method == 'POST':
         try:
-            # Assuming the request data is in JSON format
-            data = request.json()
+            # Extract data from request.GET
+            license_number = request.GET.get('license_number')
+            supplier_name = request.GET.get('supplier_name')
+            material_type = request.GET.get('material_type')
+            material_name = request.GET.get('material_name')
+            weight1 = request.GET.get('weight1')
+            weight2 = request.GET.get('weight2')
+            net_weight = request.GET.get('net_weight')
+            unloaded_location = request.GET.get('unloaded_location')
+            unit = request.GET.get('unit')
+            quantity = request.GET.get('quantity')
+            quality = request.GET.get('quality')
+            penalty = request.GET.get('penalty')
+            price_pre_kg = request.GET.get('price_pre_kg')
+            vat = request.GET.get('vat')
+            total_price = request.GET.get('total_price')
+            extra_cost = request.GET.get('extra_cost')
+            invoice_status = request.GET.get('invoice_status')
+            supplier_invoice = request.GET.get('supplier_invoice')
+            payment_status = request.GET.get('payment_status')
+            document_info = request.GET.get('document_info')
+            commnet = request.GET.get('commnet')
+            username = request.GET.get('username')
 
-            # Load shipment data
-            shipment = Shipments.objects.get(license_number=data['license_number'], status='Office')
+            # Check required fields
+            errors = []
+            if not license_number:
+                errors.append({'status':'error', 'message': 'پلاک را انتخاب کنید'})
+            if not supplier_name:
+                errors.append({'status': 'error', 'message': 'اسم تامین کننده مورد نیاز است'})
+            if not material_type:
+                errors.append({'status':'error', 'message': 'نوغ ماده مورد نیاز است'})
+            if not material_name:
+                errors.append({'status':'error', 'message': 'اسم ماده مورد نیاز است'})
+            if not weight1:
+                errors.append({'status':'error', 'message': 'وزن اولیه مورد نیاز است'})
+            if not weight2:
+                errors.append({'status':'error', 'message': 'وزن ثانویه مورد نیاز است'})
+            if not net_weight:
+                errors.append({'status':'error', 'message': 'وزن خالص مورد نیاز است'})
+            if not unloaded_location:
+                errors.append({'status':'error', 'message': 'محل تخلیه شده مورد نیاز است'})
+            if not unit:
+                errors.append({'status': 'error', 'message': 'واخد مورد نیاز است'})
+            if not quantity:
+                errors.append({'status': 'error', 'message': 'کمیت (مقدار) مورد نیاز است'})
+            if not quality:
+                errors.append({'status': 'error', 'message': 'کیفیت مورد نیاز است'})
+            if not penalty:
+                errors.append({'status': 'error', 'message': 'مقدار جریمه را وارد کنید'})
+            if not price_pre_kg:
+                errors.append({'status':'error', 'message': 'مقدار قیمت هر کیلوگرم را وارد کنید'})
+            if not vat:
+                errors.append({'status':'error', 'message': 'مقدار مالیات بر ارزش افزوده را انتحاب کنید'})
+            if not total_price:
+                errors.append({'status':'error', 'message': 'مقدار قمیت کل را وارد کنید'})
+            if not extra_cost:
+                errors.append({'status':'error', 'message': ' مقدار هزینه اضافی را وارد کنید'})
+            if not invoice_status:
+                errors.append({'status':'error', 'message': 'وضعیت فاکتور را انتخاب کنید'})
+            if not supplier_invoice:
+                errors.append({'status': 'error', 'message': 'فرم فاکتور تامین کننده را پر کنید'})
+            if not payment_status:
+                errors.append({'status': 'error', 'message': 'وضعیت پرداخت را انتخاب کنید'})
+            if not document_info:
+                errors.append({'status':'error', 'message': 'اظلاعات سند را وارد کنید'})
+            if not commnet:
+                errors.append({'status':'error', 'message': 'فرم کامنت را پر کنید'})
+            if not username:
+                errors.append({'status':'error', 'message': 'فرم نام کاربری را پر کنید'})
+            if errors:
+                return JsonResponse({'status': 'error', 'errors': errors})
+            else:
+                Shipments.objects.filter(license_number=license_number).update(
+                    exit_time=timezone.now(),
+                    status='Delivered',
+                    location='Delivered',
+                    username=username,
+                    comments=commnet,
+                )
 
-            # Update shipment status and location
-            shipment.status = 'Delivered'
-            shipment.location = 'Delivered'
-            shipment.exit_time = timezone.now()
-            shipment.save()
-
-            # Insert new purchase order data
-            # Assuming PurchaseOrder is another model not shown here
-            # purchase_order = PurchaseOrder(**data)
-            # purchase_order.save()
-
-            # Update truck status and location
-            # Assuming Truck is another model not shown here
-            # truck = Truck.objects.get(id=shipment.truck_id)
-            # truck.status = 'Free'
-            # truck.location = 'Entrance'
-            # truck.save()
-
+                # Update truck status and location
+                Truck.objects.filter(license_number=license_number).update(
+                    status='Free',
+                    location='Entrance'
+                )
+                purchase = Purchases(
+                    date=timezone.now(),
+                    receive_date=timezone.now(),  # Assuming you want to set the current date/time
+                    supplier_id=Supplier.objects.get(supplier_name=supplier_name),
+                    truck_id=Truck.objects.get(license_number=license_number),
+                    material_id=MaterialType.objects.get(material_type=material_type),
+                    shipment_id=Shipments.objects.get(license_number=license_number),
+                    material_type=material_type,
+                    material_name=material_name,
+                    unit=unit,
+                    quantity=quantity,
+                    quality=quality,
+                    penalty=penalty,
+                    weight1=weight1,
+                    weight2=weight2,
+                    net_weight=net_weight,
+                    price_per_kg=price_pre_kg,
+                    vat=vat,
+                    total_price=total_price,
+                    extra_cost=extra_cost,
+                    invoice_status=invoice_status,
+                    invoice_number=supplier_invoice,
+                    status=payment_status,
+                    document_info=document_info,
+                    comments=commnet,
+                    username=username,
+                    logs=f'dded by: ({username})',
+                )
+                # Save the new purchase object to the database
+                try:
+                    purchase.save()
+                    return JsonResponse({'status': 'success', 'message': 'purchase added successfully.'})
+                except Exception as e:
+                    # Handle any exceptions that occur during the save operation
+                    return JsonResponse({'status': 'error', 'message': f'Error adding purchase: {str(e)}'})
             # Return success response
             return JsonResponse({'success': True, 'message': 'Purchase Order created successfully.'})
 
-        except Shipments.DoesNotExist:
-            return JsonResponse({'success': False, 'message': 'Shipments not found or not in Office status.'})
         except Exception as e:
             return JsonResponse({'success': False, 'message': str(e)})
 
@@ -811,42 +1143,128 @@ def create_sales_order(request):
     """
     if request.method == 'POST':
         # Assuming the request data is in JSON format
-        data = request.json()
+        license_number = request.GET.get('lic_number')
+        customer_name = request.GET.get('customer_name')
+        list_of_reels = request.GET.get('list_of_reels')
+        weight1 = request.GET.get('weight1')
+        weight2 = request.GET.get('weight2')
+        net_weight = request.GET.get('net_weight')
+        loading_location = request.GET.get('loading_location')
+        consuption_profile_name = request.GET.get('consuption_profile_name')
+        price_pre_kg = request.GET.get('price_pre_kg')
+        vat = request.GET.get('vat')
+        total_price = request.GET.get('total_price')
+        extra_cost = request.GET.get('extra_cost')
+        invoice_status = request.GET.get('invoice_status')
+        invoice_number = request.GET.get('invoice_number')
+        payment_status = request.GET.get('payment_status')
+        document_info = request.GET.get('document_info')
+        commnet = request.GET.get('commnet')
+        username = request.GET.get('username')
 
-        try:
-            # Retrieve the shipment instance
-            shipment = Shipments.objects.get(shipment_id=data['shipment_id'])
+        errors = []
+        if not license_number:
+            errors.append({'status':'error', 'message': 'پلاک را انتخاب کنید'})
+        if not customer_name:
+            errors.append({'status':'error', 'message': 'اسم مشتری مورد نیاز است'})
+        if not list_of_reels:
+            errors.append({'status':'error', 'message': ''})
+        if not weight1:
+            errors.append({'status':'error', 'message': 'وزن اولیه مورد نیاز است'})
+        if not weight2:
+            errors.append({'status':'error', 'message': 'وزن ثانویه مورد نیاز است'})
+        if not net_weight:
+            errors.append({'status':'error', 'message': 'وزن خالص مورد نیاز است'})
+        if not loading_location:
+            errors.append({'status':'error', 'message': 'محل تخلیه شده مورد نیاز است'})
+        if not consuption_profile_name:
+            errors.append({'status':'error', 'message': 'پروفایل مصرفی مورد نیاز است'})
+        if not price_pre_kg:
+            errors.append({'status':'error', 'message': 'مقدار قیمت هر کیلوگرم را وارد کنید'})
+        if not vat:
+            errors.append({'status':'error', 'message': 'مقدار مالیات بر ارزش افزوده را انتحاب کنید'})
+        if not total_price:
+            errors.append({'status':'error', 'message': 'مقدار قمیت کل را وارد کنید'})
+        if not extra_cost:
+            errors.append({'status':'error', 'message': ' مقدار هزینه اضافی را وارد کنید'})
+        if not invoice_status:
+            errors.append({'status':'error', 'message': 'وضعیت فاکتور را انتخاب کنید'})
+        if not invoice_number:
+            errors.append({'status':'error', 'message': 'شماره فاکتور را وارد کنید'})
+        if not payment_status:
+            errors.append({'status':'error', 'message': 'وضعیت پرداخت را انتخاب کنید'})
+        if not document_info:
+            errors.append({'status':'error', 'message': 'اظلاعات سند را وارد کنید'})
+        if not commnet:
+            errors.append({'status':'error', 'message': 'فرم کامنت را پر کنید'})
+        if not username:
+            errors.append({'status':'error', 'message': 'فرم نام کاربری را پر کنید'})
+        if errors:
+            return JsonResponse({'status': 'error', 'errors': errors})
+        else:
+            try:
+                customer = Customer.objects.get(customer_name=customer_name)
+                truck = Truck.objects.get(license_number=license_number)
+                shipment = Shipments.objects.get(license_number=license_number)
 
-            # Update shipment fields
-            shipment.status = 'Delivered'
-            shipment.location = 'Delivered'
-            shipment.exit_time = timezone.now()
+                # Create a new instance of the Sales model
+                sale = Sales(
+                    customer=customer,
+                    truck=truck,
+                    license_number=license_number,
+                    list_of_reels=list_of_reels,
+                    profile_name=consuption_profile_name,
+                    weight1=weight1,
+                    weight2=weight2,
+                    net_weight=net_weight,
+                    price_per_kg=price_pre_kg,
+                    vat=vat,
+                    total_price=total_price,
+                    extra_cost=extra_cost,
+                    invoice_status=invoice_status,
+                    invoice_number=invoice_number,
+                    status=payment_status,
+                    document_info=document_info,
+                    comments=commnet,
+                    username=username,
+                    shipment=shipment,
+                    date=timezone.now(),  # Assuming you want to set the current date and time
+                )
+                # Save the instance
+                sale.save()
 
-            # Calculate total price
-            total_price = shipment.net_weight * shipment.price_per_kg * (shipment.vat / 100)
+                # Retrieve the shipment instance
+                Shipments.objects.filter(license_number=license_number).update(
+                    exit_time=timezone.now(),
+                    status='Delivered',
+                    location=customer_name,
+                    username=username,
+                    comments=commnet,
+                )
+                # Update truck status and location
+                Truck.objects.filter(license_number=license_number).update(
+                    status='Free',
+                    location=customer_name
+                )
+                # Dynamically get the model based on the anbar_name
+                AnbarModel = apps.get_model('myapp', loading_location)
+                anbar_instance = AnbarModel.objects.create(
+                    status='Delivered',
+                    location=customer_name,
+                    last_date=timezone.now(),
+                )
+                # Return a success response
+                return JsonResponse({'status': 'success', 'message': 'Sales Order created successfully.'})
 
-            # Update other fields as necessary
-            # This is a simplified example, you might need to adjust based on your actual requirements
-
-            # Save the updated shipment
-            shipment.save()
-
-            # Perform other updates as per the algorithm
-            # This might involve updating other models like Products, Anbar_, Trucks, etc.
-            # This is a simplified example, you might need to adjust based on your actual requirements
-
-            # Return a success response
-            return JsonResponse({'status': 'success', 'message': 'Sales Order created successfully.'})
-
-        except Shipments.DoesNotExist:
-            return JsonResponse({'status': 'error', 'message': 'Shipments not found.'}, status=404)
-        except Exception as e:
-            return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+            except Shipments.DoesNotExist:
+                return JsonResponse({'status': 'error', 'message': 'Shipments not found.'}, status=404)
+            except Exception as e:
+                print(e)
+                return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
     else:
         return render(request, 'create_sales_order.html')
 
 
-from django.db import connection
 def get_anbar_table_names(request):
     if request.method == 'GET':
         # Get all table names from the database
@@ -868,6 +1286,7 @@ def get_unit_names(request):
 def forklift_panel(request):
     if request.method == 'GET':
         return render(request, 'forklift_panel.html')
+
 
 @csrf_exempt
 def unload(request):
@@ -915,53 +1334,112 @@ def unload(request):
 
         # Check if all required fields are provided
         if not license_number:
-            errors.append({'status': 'error', 'message': 'lic_number is required.'})
+            errors.append({'status': 'error', 'message': 'پلاک را انتخاب کنید'})
         if not unloading_location:
-            errors.append({'status': 'error', 'message': 'width is required.'})
+            errors.append({'status': 'error', 'message': 'محل تخلیه را انتخاب کنید'})
         if not unit:
-            errors.append({'status': 'error', 'message': 'gsm is required.'})
+            errors.append({'status': 'error', 'message': 'واحد را انتخاب کنید'})
         if not quantity:
-            errors.append({'status': 'error', 'message': 'length is required.'})
+            errors.append({'status': 'error', 'message': 'کمیت(مقدار) را وارد کنید'})
         if not quality:
-            errors.append({'status': 'error', 'message': 'breaks is required.'})
+            errors.append({'status': 'error', 'message': 'کیفیت را وارد کنید'})
         if not forklift_driver:
-            errors.append({'status': 'error', 'message': 'grade is required.'})
+            errors.append({'status': 'error', 'message': 'اسم راننده فورک لیفت را وارد کنید'})
         # If there are any errors, return them in the response
         if errors:
             return JsonResponse({'status': 'error', 'errors': errors})
-
-        try:
-            # Retrieve the shipment instance
-            shipment = Shipments.objects.get(license_number=license_number)
-
-            # Update shipment fields
-            shipment.status = 'LoadedUnloaded'
-            shipment.location = 'Weight2'
-            shipment.save()
-
-            # Calculate the quantity to be unloaded
-            quantity_to_unload = quantity
-
-            # Assuming Anbar_Akhal is used for unloading location
-            # Update AnbarGeneric (Anbar_Akhal in this case)
-            for _ in range(quantity_to_unload):
-                anbar_item = Anbar_Akhal(
-                    status='In-stock',
-                    receive_date=timezone.now(),
-                    # Add other necessary fields as per your model
+        else:
+            try:
+                Shipments.objects.filter(license_number=license_number).update(
+                    unload_location=unloading_location,
+                    unit=unit,
+                    quantity=quantity,
+                    quality=quality,
+                    location='Weight2',
+                    status='LoadedUnloaded',
                 )
-                anbar_item.save()
+                # Dynamically get the model based on the anbar_name
+                AnbarModel = apps.get_model('myapp', unloading_location)
+                # Calculate the quantity to be unloaded
+                quantity_to_unload = int(quantity)
+                # Update AnbarGeneric (Anbar_Akhal in this case)
+                for _ in range(quantity_to_unload):
+                    # Insert data into the specific Anbar table
+                    anbar_instance = AnbarModel.objects.create(
+                        status='In-stock',
+                        location='Weight2',
+                        receive_date=timezone.now(),
+                    )
 
-            # Return a success response
-            return JsonResponse({'status': 'success', 'message': f'{quantity_to_unload} units have been added to {license_number}.'})
+                # Return a success response
+                return JsonResponse({'status': 'success',
+                                     'message': f' {quantity_to_unload}واحد به {license_number} اضافه شد.'})
 
-        except Shipments.DoesNotExist:
-            return JsonResponse({'status': 'error', 'message': 'Shipments not found.'}, status=404)
-        except Exception as e:
-            return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+            except Shipments.DoesNotExist:
+                return JsonResponse({'status': 'error', 'message': 'Shipments not found.'}, status=404)
+            except Exception as e:
+                return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+
     else:
         return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=400)
 
+
+def get_widths_from_anbar_location(anbar_location, status):
+    # Dynamically import the model class
+    model_class = apps.get_model('myapp', anbar_location)
+
+    # Query the model to get widths where the status is "In-stock"
+    widths = model_class.objects.filter(status=status).values_list('width', flat=True).distinct()
+
+    return list(widths)
+
+
+def get_widths_view(request):
+    """
+    A Django view function that handles GET requests to fetch widths from a specific anbar location
+    where the status is "In-stock". The anbar location is specified as a query parameter.
+
+    Expected Query Parameters:
+    - anbar_location: The name of the anbar location (e.g., 'Anbar_Akhal').
+
+    Returns:
+    - A JSON response containing a list of distinct widths from the specified anbar location
+      where the status is "In-stock".
+    """
+    try:
+        # Extract the anbar_location from the query parameters
+        anbar_location = request.GET.get('anbar_location')
+        if not anbar_location:
+            return JsonResponse({'error': 'Anbar location is required'}, status=400)
+
+        # Fetch widths from the specified anbar location where the status is "In-stock"
+        widths = get_widths_from_anbar_location(anbar_location, 'In-stock')
+        # Return the widths as a JSON response
+        return JsonResponse({'widths': widths}, status=200)
+    except Exception as e:
+        # Handle any exceptions that occur during the process
+        return JsonResponse({'error': str(e)}, status=500)
+
+def get_reel_numbers_by_width_and_status(request):
+    try:
+        # Extract the anbar_location from the query parameters
+        anbar_location = request.GET.get('anbar_location')
+        width = request.GET.get('width')
+        if not anbar_location:
+            return JsonResponse({'error': 'Anbar location is required'}, status=400)
+
+        # Dynamically import the model class
+        model_class = apps.get_model('myapp', anbar_location)
+
+        # Query the model to get reel numbers where the width matches the specified width,
+        # the status is "In-stock", and sort the results by receive_date (old to new)
+        reel_numbers = model_class.objects.filter(width=width, status='In-stock').order_by('receive_date').values_list('reel_number', flat=True)
+
+        # Return the widths as a JSON response
+        return JsonResponse({'reel_numbers': list(reel_numbers)}, status=200)
+    except Exception as e:
+        # Handle any exceptions that occur during the process
+        return JsonResponse({'error': str(e)}, status=500)
 
 @csrf_exempt
 def loaded(request):
@@ -999,29 +1477,49 @@ def loaded(request):
     """
     if request.method == 'POST':
         # Assuming the request data is in JSON format
-        data = request.json()
+        license_number = request.GET.get('lic_number')
+        loading_location = request.GET.get('loading_location')
+        width = request.GET.get('width')
+        reel_numbers = json.loads(request.GET.get('reel_numbers'))
+        forklift_driver = request.GET.get('forklift_driver')
+        # Initialize an empty list to collect error messages
+        errors = []
+        if not license_number:
+            errors.append({'status': 'error', 'message': 'پلاک را انتخاب کنید'})
+        if not loading_location:
+            errors.append({'status':'error', 'message': 'محل بارگیری را انتخاب کنید'})
+        if not width:
+            errors.append({'status':'error', 'message': 'عزض را انتخاب کنید'})
+        if not reel_numbers:
+            errors.append({'status':'error', 'message': 'شماره رول مورد نیاز است'})
+        if not forklift_driver:
+            errors.append({'status': 'error', 'message': 'اسم راننده فورک لیفت را وارد کنید'})
+        # If there are any errors, return them in the response
+        if errors:
+            return JsonResponse({'status': 'error', 'errors': errors})
+        else:
+            try:
+                Shipments.objects.filter(license_number=license_number).update(
+                    list_of_reels=','.join(reel_numbers),
+                    location='Weight2',
+                    status='LoadedUnloaded',
+                    comments=f'{forklift_driver} loaded',
+                    logs='',
+                )
 
+                # Dynamically import the model class
+                AnbarModel = apps.get_model('myapp', loading_location)
+                for reel_number in reel_numbers:
+                    AnbarModel.objects.filter(reel_number=reel_number, width=width,).update(status='Sold')
+                    Products.objects.filter(reel_number=reel_number, width=width,).update(status='Sold')
+
+                # Return a success response
+                return JsonResponse({'status': 'success',
+                                     'message': f'Width and List of Reels has been added to {license_number}.'})
+            except Shipments.DoesNotExist:
+                return JsonResponse({'status': 'error', 'message': 'Shipments not found.'}, status=404)
         try:
-            # Retrieve the shipment instance
-            shipment = Shipments.objects.get(license_number=data['license_number'])
-
-            # Update shipment fields
-            shipment.status = 'LoadedUnloaded'
-            shipment.location = 'Weight2'
-            shipment.list_of_reels = ','.join(data['reel_numbers'])
-            shipment.save()
-
-            # Update AnbarGeneric (Anbar_Akhal in this example)
-            for reel_number in data['reel_numbers']:
-                anbar_item = Anbar_Akhal.objects.get(reel_number=reel_number)
-                anbar_item.status = 'Sold'
-                anbar_item.save()
-
-            # Return a success response
-            return JsonResponse({'status': 'success', 'message': f'Width and List of Reels has been added to {data["license_number"]}.'})
-
-        except Shipments.DoesNotExist:
-            return JsonResponse({'status': 'error', 'message': 'Shipments not found.'}, status=404)
+            pass
         except Exception as e:
             return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
     else:
@@ -1063,6 +1561,7 @@ def used(request):
         "forklift_driver": "Driver John"
     }
     """
+
     if request.method == 'POST':
         # Assuming the request data is in JSON format
         data = request.json()
@@ -1563,3 +2062,45 @@ def apiHandler(request):
     else:
         # Handle non-POST requests
         return JsonResponse({'error': 'Method not allowed'}, status=405)
+
+
+
+from django.db import models
+from django.apps import apps
+from django.db.models.base import ModelBase
+
+def create_anbar_table(table_name):
+    # Define a new model class that inherits from AnbarGeneric
+    attrs = {
+        '__module__': 'your_app_name.models', # Replace 'your_app_name' with your actual app name
+        'Meta': type('Meta', (), {
+            'db_table': table_name,
+        }),
+    }
+    # Create a new model class
+    new_model = ModelBase(table_name, (AnbarGeneric,), attrs)
+    # Register the new model with Django's app registry
+    apps.get_app_config('your_app_name').models.add(new_model)
+    # Create the table in the database
+    with connection.schema_editor() as schema_editor:
+        schema_editor.create_model(new_model)
+    return new_model
+
+
+from django.http import JsonResponse
+from django.db import connection
+
+def create_anbar_table_view(request):
+    if request.method == 'POST':
+        table_name = request.POST.get('table_name')
+        if table_name:
+            try:
+                # Attempt to create the new table
+                new_model = create_anbar_table(table_name)
+                return JsonResponse({'status': 'success', 'message': f'Table {table_name} created successfully.'})
+            except Exception as e:
+                return JsonResponse({'status': 'error', 'message': str(e)})
+        else:
+            return JsonResponse({'status': 'error', 'message': 'Table name is required.'})
+    else:
+        return JsonResponse({'status': 'error', 'message': 'Invalid request method.'})
