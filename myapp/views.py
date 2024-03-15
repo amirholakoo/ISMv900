@@ -1809,20 +1809,20 @@ def add_material_type(request):
     if request.method == 'POST':
         try:
             # Extract data from the request
-            supplier_name = request.POST.get('supplier_name')
-            material_type = request.POST.get('material_type')
-            username = request.POST.get('username')
+            supplier_name = request.GET.get('supplier_name')
+            material_type = request.GET.get('material_type')
+            username = request.GET.get('username')
 
             # Initialize an empty list to collect error messages
             errors = []
 
             # Check if all required fields are provided
             if not supplier_name:
-                errors.append({'status': 'error', 'message': 'supplier name is required.'})
+                errors.append({'status': 'error', 'message': 'اسم تامین کننده را انتخاب کنید.'})
             if not material_type:
-                errors.append({'status': 'error', 'message': 'material type is required.'})
+                errors.append({'status': 'error', 'message': 'نوع ماده را وارد کنید'})
             if not username:
-                errors.append({'status': 'error', 'message': 'username is required.'})
+                errors.append({'status': 'error', 'message': 'نام کاربری را وارد کنید.'})
 
             # If there are any errors, return them in the response
             if errors:
@@ -1832,7 +1832,7 @@ def add_material_type(request):
             new_material_type = MaterialType(
                 supplier_name=supplier_name,
                 material_type=material_type,
-                username=username
+                username=username,
             )
             # Save the new Customer object to the database
             try:
@@ -1840,6 +1840,7 @@ def add_material_type(request):
                 # Return success response
                 return JsonResponse({'status': 'success', 'message': 'Material type has been added.'})
             except Exception as e:
+                print(e)
                 # Handle any exceptions that occur during the save operation
                 return JsonResponse({'status': 'error', 'message': f'Error adding Material type: {str(e)}'})
 
