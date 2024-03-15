@@ -30,7 +30,7 @@ export default {
         this.success = true
       }else {
         this.error = true
-        this.errors = response.data['errors']
+        this.errors = this.errors.push(response.data['message'])
       }
     },
   }
