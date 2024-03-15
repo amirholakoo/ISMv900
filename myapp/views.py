@@ -1726,6 +1726,7 @@ def retuned(request):
 
 
 # Admin panel
+from django.contrib import admin
 
 @csrf_exempt
 def add_new_anbar(request):
@@ -1736,29 +1737,57 @@ def add_new_anbar(request):
     Returns a JSON response indicating success or failure, along with relevant messages.
     """
     if request.method == 'POST':
+        # Extract data from the request
+        location = request.GET.get('location')
+        username = request.GET.get('username')
+        errors = []
+        if not location:
+            errors.append({'status': 'error', 'message': 'اسم مکان انبار را وارد کنید'})
+        if not username:
+            errors.append({'status': 'error', 'message': 'نام کابری را وارد کنید.'})
+
         try:
-            # Extract data from the request
-            location_name = request.GET.get('location_name')
-            username = request.GET.get('username')
+            # Define a new model class that inherits from AnbarGeneric
+            attrs = {
+                '__module__': 'myapp.models',  # Replace 'your_app_name' with your actual app name
+                'Meta': type('Meta', (), {
+                    'db_table': location,
+                }),
+            }
+            # Create a new model class
+            new_model = ModelBase(location, (AnbarGeneric,), attrs)
+            # Register the new model with Django's app registry
+            # apps.get_app_config('myapp').models.add(new_model)
+            app_config = apps.get_app_config('myapp')
+            app_config.models[location] = new_model
 
-            # Check if the location already exists
-            if AnbarGeneric.objects.filter(location=location_name).exists():
-                return JsonResponse({'status': 'fail', 'message': 'Anbar location already exists.'})
+            # Create the table in the database
+            with connection.schema_editor() as schema_editor:
+                schema_editor.create_model(new_model)
 
-            # Create a new anbar entry
-            anbar = AnbarGeneric(location=location_name, comments=f'Username Created on {username} (CVS)')
-            anbar.save()
+            @admin.register(new_model)
+            class AnbarAdmin(admin.ModelAdmin):
+                # Specify the fields to display in the list view
+                list_display = ('material_name', 'reel_number', 'status', 'location', 'last_date')
+                # Specify the fields to use in the search box
+                search_fields = ('material_name', 'reel_number')
+                # Specify the fields to use in the filter sidebar
+                list_filter = ('status', 'location')
+                # Specify the fields to display in the detail view
+                fields = (
+                'material_name', 'reel_number', 'status', 'location', 'last_date', 'width', 'gsm', 'length', 'grade',
+                'breaks', 'comments', 'qr_code', 'profile_name', 'username', 'logs')
 
             # Return success response
-            return JsonResponse({'status': 'success', 'message': f'Anbar {location_name} has been added.'})
+            return JsonResponse({'status': 'success', 'message': f'Anbar {location} has been added.'})
 
         except ValidationError as e:
             # Handle validation errors
             return JsonResponse({'status': 'fail', 'message': str(e)})
         except Exception as e:
             # Handle unexpected errors
-            return JsonResponse({'status': 'fail', 'message': 'An unexpected error occurred.'})
-
+            print(e)
+            return JsonResponse({'status': 'fail', 'message': f'An unexpected error occurred.{e}'})
     else:
         return render(request, 'add_new_anbar.html')
 

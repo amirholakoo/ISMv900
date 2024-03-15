@@ -19,31 +19,12 @@ export default {
     }
   },
   methods:{
-    clicked(k, name){
-      console.log(k, name)
-      if (k == 'lic_number'){
-        this.drowpdownList.lic_number.name = name
-        this.drowpdownList.lic_number.value = name
-      }
-      if (k == 'unloading_location'){
-        this.drowpdownList.unloading_location.name = name
-        this.drowpdownList.unloading_location.value = name
-      }
-      if (k == 'unit'){
-        this.drowpdownList.unit.name = name
-        this.drowpdownList.unit.value = name
-      }
-    },
     async addSupplier() {
       const params = {
-        "license_number": this.drowpdownList.lic_number.value,
-        "unloading_location": this.drowpdownList.unloading_location.value,
-        "unit": this.drowpdownList.unit.value,
-        "quantity": this.forms.Quantity.value,
-        "quality": this.forms.Quality.value,
-        "forklift_driver": this.forms.forklift_driver.value
+        'location': this.forms.location.value,
+        'username': this.forms.username.value
       };
-      const response = await this.axios.post('/myapp/api/unload', {}, {params: params})
+      const response = await this.axios.post('/myapp/addNewAnbar/', {}, {params: params})
       console.log(response.data); // Access response data
       if (response.data['status'] == 'success'){
         this.success = true
