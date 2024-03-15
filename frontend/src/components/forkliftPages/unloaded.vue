@@ -24,40 +24,40 @@ export default {
   },
   mounted() {
     initFlowbite();
-    this.axios.get('/myapp/api/getLicenseNumbers').then((response) => {
+    this.axios.get('/myapp/api/getShipmentLicenseNumbersByStatus/LoadingUnloading').then((response) => {
       console.log(response.data)
-      this.drowpdownList.lic_number.data = response.data['license_numbers']
+      this.forms.lic_number.data = response.data['license_numbers']
     })
     this.axios.get('/myapp/api/getAnbarTableNames').then((response) => {
       console.log(response.data)
-      this.drowpdownList.unloading_location.data = response.data['data']
+      this.forms.unloading_location.data = response.data['data']
     })
     this.axios.get('/myapp/api/getUnitNames').then((response) => {
       console.log(response.data)
-      this.drowpdownList.unit.data = response.data['unit_names']
+      this.forms.unit.data = response.data['unit_names']
     })
   },
   methods:{
     clicked(k, name){
       console.log(k, name)
       if (k == 'lic_number'){
-        this.drowpdownList.lic_number.name = name
-        this.drowpdownList.lic_number.value = name
+        this.forms.lic_number.name = name
+        this.forms.lic_number.value = name
       }
       if (k == 'unloading_location'){
-        this.drowpdownList.unloading_location.name = name
-        this.drowpdownList.unloading_location.value = name
+        this.forms.unloading_location.name = name
+        this.forms.unloading_location.value = name
       }
       if (k == 'unit'){
-        this.drowpdownList.unit.name = name
-        this.drowpdownList.unit.value = name
+        this.forms.unit.name = name
+        this.forms.unit.value = name
       }
     },
     async addSupplier() {
       const params = {
-        "license_number": this.drowpdownList.lic_number.value,
-        "unloading_location": this.drowpdownList.unloading_location.value,
-        "unit": this.drowpdownList.unit.value,
+        "license_number": this.forms.lic_number.value,
+        "unloading_location": this.forms.unloading_location.value,
+        "unit": this.forms.unit.value,
         "quantity": this.forms.Quantity.value,
         "quality": this.forms.Quality.value,
         "forklift_driver": this.forms.forklift_driver.value
@@ -106,7 +106,7 @@ export default {
           </button>
           <!-- Dropdown menu -->
           <div :id="form_name+'dropdown'" class="z-50 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
-            <ul class="overflow-y-auto h-48 py-2 text-sm text-gray-700 dark:text-gray-200" :aria-labelledby="form_name + 'Button'">
+            <ul class="overflow-y-auto h-auto max-h-48 py-2 text-sm text-gray-700 dark:text-gray-200" :aria-labelledby="form_name + 'Button'">
               <li v-for="data in val.data">
                 <a @click='clicked(form_name ,data)' type="button" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
                   {{ data }}

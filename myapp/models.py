@@ -23,7 +23,7 @@ class Truck(models.Model):
     driver_doc = models.CharField(max_length=255, blank=True)
     phone = models.CharField(max_length=20, blank=True)
     status = models.CharField(max_length=10, choices=[('Free', 'Free'), ('Busy', 'Busy')], default='Free')
-    location = models.CharField(max_length=255, blank=True)
+    location = models.CharField(max_length=255, blank=True, choices=[('Entrance', 'Entrance'), ('Weight1', 'Weight1'), ('Weight2', 'Weight2'), ('Offiffice', 'Offiffice'), ('Delivered', 'Delivered')], default='Entrance')
     username = models.CharField(max_length=255, null=False, blank=True)
     logs = models.TextField(blank=True)
 
@@ -47,8 +47,8 @@ class Shipments(models.Model):
     # Fields
     shipment_type = models.CharField(max_length=255, choices=[('Incoming', 'Incoming'), ('Outgoing', 'Outgoing')], null=True)
     status = models.CharField(max_length=255, choices=[('Registered', 'Registered'), ('LoadingUnloading', 'LoadingUnloading'), ('LoadedUnloaded', 'LoadedUnloaded'), ('Office', 'Office'), ('Delivered', 'Delivered'), ('Canceled', 'Canceled')], null=True)
-    location = models.CharField(max_length=255, choices=[('Entrance', 'Entrance'), ('Weight1', 'Weight1'), ('Weight2', 'Weight2'), ('Offiffice', 'Offiffice'), ('Delivered', 'Delivered')], null=True)
-    truck_id = models.IntegerField(null=True)
+    location = models.CharField(max_length=255, choices=[('Entrance', 'Entrance'), ('Weight1', 'Weight1'), ('Weight2', 'Weight2'), ('Office', 'Office'), ('Delivered', 'Delivered')], null=True)
+    truck_id = models.ForeignKey(Truck, on_delete=models.SET_NULL, blank=True, null=True)
     license_number = models.CharField(max_length=255, null=True)
     receive_date = models.DateTimeField(blank=True, null=True)
     entry_time = models.DateTimeField(blank=True, null=True)
@@ -200,8 +200,7 @@ class RawMaterial(models.Model):
     Represents a raw material used in production.
 
     Attributes:
-        id (int): Auto-incrementing primary key for the raw material.
-        supplier (ForeignKey): Foreign key to the Supplier model representing the raw material's source.
+        supplier_name
         material_type (str): Type of the raw material (e.g., cotton, wool, plastic).
         material_name (str): Name of the specific raw material (e.g., Pima cotton, Merino wool).
         description (str, optional): Optional description of the raw material and its properties.
@@ -209,8 +208,7 @@ class RawMaterial(models.Model):
         comments (str, optional): Additional comments or notes about the raw material.
     """
 
-
-    supplier = models.ForeignKey(Supplier, on_delete=models.SET_NULL, null=True, related_name='raw_materials')
+    supplier_name = models.CharField(max_length=255, null=True, blank=True)
     material_type = models.CharField(max_length=255)
     material_name = models.CharField(max_length=255)
     description = models.CharField(max_length=255, blank=True)
@@ -426,7 +424,7 @@ class AnbarGeneric(models.Model):
     status = models.CharField(max_length=50, choices=STATUS_CHOICES, null=True, blank=True)
 
     # Location of the material
-    location = models.CharField(max_length=255, null=True, blank=True, default='Entrance')
+    location = models.CharField(max_length=255, null=True, blank=True)
 
     # Last date the material was updated
     last_date = models.DateTimeField(null=True, blank=True)

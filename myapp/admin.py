@@ -5,7 +5,7 @@ from .models import *
 @admin.register(Truck)
 class TruckAdmin(admin.ModelAdmin):
 
-    list_display = ('license_number', 'driver_name', 'phone', 'status', 'location', 'username', 'logs')
+    list_display = ('id', 'license_number', 'driver_name', 'phone', 'status', 'location', 'username', 'logs')
 
     search_fields = ('license_number', 'driver_name')
 
@@ -55,9 +55,9 @@ class CustomerAdmin(admin.ModelAdmin):
 @admin.register(RawMaterial)
 class RawMaterialAdmin(admin.ModelAdmin):
 
-    list_display = ('material_name', 'supplier', 'material_type', 'status', 'description', 'comments', 'username', 'logs')
+    list_display = ('material_name', 'supplier_name', 'material_type', 'status', 'description', 'comments', 'username', 'logs')
 
-    search_fields = ('material_name', 'material_type')
+    search_fields = ('supplier_name', 'material_name', 'material_type')
 
     list_filter = ('status', 'material_type')
 
