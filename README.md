@@ -2,8 +2,7 @@
 Inventory and Sales Management in Python using Django and JavaScrips using Vue.JS
 
 ## setup project: 
-we use python 3.9 and django 4.2.10
-
+we use python 3.9 and django 4.2
 ### Step 1: Create a Virtual Environment
 
 To create a virtual environment, open your terminal or command prompt and navigate to the directory where you want to create the virtual environment. Then, run the following command:
@@ -110,5 +109,4 @@ python manage.py runserver
 ```
 
 Then, open your web browser and navigate to `http://127.0.0.1:8000/admin/`. Log in with the superuser credentials you just created.
-
 
