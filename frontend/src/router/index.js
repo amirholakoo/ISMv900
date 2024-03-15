@@ -11,6 +11,7 @@ import sales from "@/components/weightStation/sales.vue";
 import purchase from "@/components/weightStation/purchase.vue";
 import weight1 from "@/components/weightStation/weight1.vue";
 import weight2 from "@/components/weightStation/weight2.vue";
+import weightStationPanel from "@/components/weightStation/weightStationPanel.vue";
 import addNewAnbar from "@/components/admin/addNewAnbar.vue";
 import addNewUnit from "@/components/admin/addNewUnit.vue";
 import addNewMatrialType from "@/components/admin/addNewMatrialType.vue";
@@ -83,6 +84,11 @@ const routes = [
     path: '/myapp/updateWeight2/',
     name: 'updateWeight2',
     component: weight2
+  },
+  {
+    path: '/myapp/weightStationPanel/',
+    name: 'weightStationPanel',
+    component: weightStationPanel
   },
   {
     path: '/myapp/addNewAnbar/',
