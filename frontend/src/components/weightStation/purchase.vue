@@ -11,24 +11,24 @@ export default {
     return {
       forms: {
         lic_number: {type: 'dropdown', name: 'شماره پلاک',title: 'شماره پلاک', data: '', value: ''},
-        supplier_name: {type:'input', name: 'اسم مشتری', value: ''},
-        material_type: {type:'input', name: 'لیست رول ها', value: ''},
-        material_name: {type:'input', name: 'لیست رول ها', value: ''},
-        weight1: {type:'input', name: 'وزن 1', value: ''},
-        weight2: {type:'input', name: 'وزن 2', value: ''},
-        net_weight: {type:'input', name: 'وزن خالص', value: ''},
-        unloaded_location: {type:'input', name: 'محل انبار', value: ''},
-        unit: {type:'input', name: 'اسم پوفایل مصرفی', value: ''},
-        quantity: {type:'input', name: 'قیمت هر کیلوگرم', value: ''},
-        quality: {type: 'dropdown', name: 'مالیات بر ارزش افزوده',title: 'مالیات بر ارزش افزوده', data: '', value: ''},
-        penalty: {type:'input', name: 'قمیت کل', value: ''},
-        price_pre_kg: {type:'input', name: 'هزینه اضافی', value: ''},
-        vat: {type: 'dropdown', name: 'وضعیت فاکتور',title: 'وضعیت فاکتور', data: '', value: ''},
-        total_price: {type:'input', name: 'قمیت کل', value: ''},
+        supplier_name: {type:'input', name: 'اسم تامین کننده', value: '', disable:true},
+        material_type: {type:'input', name: 'نوع ماده', value: '', disable:true},
+        material_name: {type:'input', name: 'اسم ماده', value: '', disable:true},
+        weight1: {type:'input', name: 'وزن 1', value: '', disable:true},
+        weight2: {type:'input', name: 'وزن 2', value: '', disable:true},
+        net_weight: {type:'input', name: 'وزن خالص', value: '', disable:true},
+        unloaded_location: {type:'input', name: 'محل تخلیه شده', value: '', disable:true},
+        unit: {type:'input', name: 'واحد', value: '', disable:true},
+        quantity: {type:'input', name: 'کمیت (مقدار)', tile: 'کمیت (مقدار)', value: '', disable:true},
+        quality: {type: 'input', name: 'کیفیت',title: 'مالیات بر ارزش افزوده', value: '', disable:true},
+        penalty: {type:'input', name: 'جریمه', title: 'جریمه', value: ''},
+        price_pre_kg: {type:'input', name: 'قیمت هر کیلوگرم', value: ''},
+        vat: {type: 'dropdown', name: 'مالیات بر ارزش افزوده',title: 'مالیات بر ارزش افزوده', data: ['0%', '1%', '2%', '3%', '4%', '5%', '6%', '7%', '8%', '9%', '10%'], value: '0'},
+        total_price: {type:'input', name: 'قمیت کل', value: '', disable:true},
         extra_cost: {type:'input', name: 'هزینه اضافی', value: ''},
-        invoice_status: {type: 'dropdown', name: 'وضعیت فاکتور',title: 'وضعیت فاکتور', data: '', value: ''},
-        supplier_invoice: {type:'input', name: 'شماره فاکتور', value: ''},
-        payment_status:{type:'dropdown', name: 'وضعیت پرداخت',title: 'وضعیت پرداخت', data: '', value: ''},
+        invoice_status: {type: 'dropdown', name: 'وضعیت فاکتور',title: 'وضعیت فاکتور', data: ['Received', 'NA'], value: ''},
+        supplier_invoice: {type:'input', name: 'شماره فاکتور تامین کننده', value: ''},
+        payment_status:{type:'dropdown', name: 'وضعیت پرداخت',title: 'وضعیت پرداخت', data: ['Terms', 'Paid'], value: ''},
         document_info: {type:'input', name: 'اظلاعات سند', value: ''},
         commnet: {type:'input', name: 'کامنت', value: ''},
         username: {type:'input', name: 'نام کاربری', value: ''},
@@ -38,47 +38,86 @@ export default {
       errors: [],
     }
   },
+  computed:{
+    total_price(){
+      let vat = this.forms.vat.value;
+      vat = parseInt(vat.replace('%', ''))
+      return (this.forms.net_weight.value * this.forms.price_pre_kg.value * (vat/100))
+    }
+  },
   mounted() {
     initFlowbite();
-    this.axios.get('/myapp/api/getLicenseNumbers').then((response) => {
+    this.axios.get('/myapp/api/getShipmentLicenseNumbersByLocation/Office').then((response) => {
       console.log(response.data)
-      this.drowpdownList.lic_number.data = response.data['license_numbers']
-    })
-    this.axios.get('/myapp/api/getAnbarTableNames').then((response) => {
-      console.log(response.data)
-      this.drowpdownList.unloading_location.data = response.data['data']
-    })
-    this.axios.get('/myapp/api/getUnitNames').then((response) => {
-      console.log(response.data)
-      this.drowpdownList.unit.data = response.data['unit_names']
+      this.forms.lic_number.data = response.data['license_numbers']
     })
   },
   methods:{
     clicked(k, name){
       console.log(k, name)
       if (k == 'lic_number'){
-        this.drowpdownList.lic_number.name = name
-        this.drowpdownList.lic_number.value = name
+        this.forms.lic_number.name = name
+        this.forms.lic_number.value = name
+        const params = {
+          "license_number": this.forms.lic_number.value,
+        }
+        this.axios.post('/myapp/api/getShipmentDetailsByLicenseNumber', {},{params:params}).then((response) => {
+          console.log(response.data)
+          this.forms.supplier_name.value = response.data['supplier_name']
+          this.forms.material_type.value = response.data['material_type']
+          this.forms.material_name.value = response.data['material_name']
+          this.forms.weight1.value = response.data['weight1']
+          this.forms.weight2.value = response.data['weight2']
+          this.forms.net_weight.value = response.data['net_weight']
+          this.forms.unloaded_location.value = response.data['unload_location']
+          this.forms.unit.value = response.data['unit']
+          this.forms.quantity.value = response.data['quantity']
+          this.forms.quality.value = response.data['quality']
+        })
       }
-      if (k == 'unloading_location'){
-        this.drowpdownList.unloading_location.name = name
-        this.drowpdownList.unloading_location.value = name
+      if (k == 'vat'){
+        this.forms.vat.name = name
+        this.forms.vat.value = name
+        console.log(this.total_price)
+        this.forms.total_price.value = this.total_price
       }
-      if (k == 'unit'){
-        this.drowpdownList.unit.name = name
-        this.drowpdownList.unit.value = name
+      if (k == 'invoice_status'){
+        this.forms.invoice_status.name = name
+        this.forms.invoice_status.value = name
+      }
+      if (k == 'payment_status'){
+        this.forms.payment_status.name = name
+        this.forms.payment_status.value = name
       }
     },
     async addSupplier() {
+      let vat = this.forms.vat.value;
       const params = {
-        "license_number": this.drowpdownList.lic_number.value,
-        "unloading_location": this.drowpdownList.unloading_location.value,
-        "unit": this.drowpdownList.unit.value,
-        "quantity": this.forms.Quantity.value,
-        "quality": this.forms.Quality.value,
-        "forklift_driver": this.forms.forklift_driver.value
+        'license_number': this.forms.lic_number.value,
+        'supplier_name': this.forms.supplier_name.value,
+        'material_type': this.forms.material_type.value,
+        'material_name': this.forms.material_name.value,
+        'weight1': this.forms.weight1.value,
+        'weight2': this.forms.weight2.value,
+        'net_weight': this.forms.net_weight.value,
+        'unloaded_location': this.forms.unloaded_location.value,
+        'unit': this.forms.unit.value,
+        'quantity': this.forms.quantity.value,
+        'quality': this.forms.quality.value,
+        'penalty': this.forms.penalty.value,
+        'price_pre_kg': this.forms.price_pre_kg.value,
+        'vat': parseInt(vat.replace('%', '')) ,
+        'total_price': this.forms.total_price.value,
+        'extra_cost': this.forms.extra_cost.value,
+        'invoice_status': this.forms.invoice_status.value,
+        'supplier_invoice': this.forms.supplier_invoice.value,
+        'payment_status': this.forms.payment_status.value,
+        'document_info': this.forms.document_info.value,
+        'commnet': this.forms.commnet.value,
+        'username': this.forms.username.value,
       };
-      const response = await this.axios.post('/myapp/api/unload', {}, {params: params})
+      console.log(params)
+      const response = await this.axios.post('/myapp/createPurchaseOrder/', {}, {params: params})
       console.log(response.data); // Access response data
       if (response.data['status'] == 'success'){
         this.success = true
@@ -109,7 +148,7 @@ export default {
       <template v-for="(val, form_name) in forms">
         <template v-if="val.type=='input'">
           <div class="relative">
-            <input v-model="val.value" type="text" :id="form_name" class="block px-2.5 pb-2.5 pt-4 w-full text-sm text-gray-900 bg-transparent rounded-lg border-1 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" placeholder="" />
+            <input v-model="val.value" type="text" :id="form_name" class="block px-2.5 pb-2.5 pt-4 w-full text-sm text-gray-900 bg-transparent rounded-lg border-1 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" placeholder="" :disabled="val.disable"/>
             <label :for="form_name" class="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white dark:bg-gray-900 px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1">
               {{val.name}}
             </label>
@@ -124,7 +163,7 @@ export default {
           </button>
           <!-- Dropdown menu -->
           <div :id="form_name+'dropdown'" class="z-50 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
-            <ul class="overflow-y-auto h-48 py-2 text-sm text-gray-700 dark:text-gray-200" :aria-labelledby="form_name + 'Button'">
+            <ul class="overflow-y-auto h-auto max-h-48 py-2 text-sm text-gray-700 dark:text-gray-200" :aria-labelledby="form_name + 'Button'">
               <li v-for="data in val.data">
                 <a @click='clicked(form_name ,data)' type="button" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
                   {{ data }}

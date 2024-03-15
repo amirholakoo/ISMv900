@@ -150,7 +150,7 @@ export default {
             <h>{{ license_code3.val }}</h>
             <h>{{ license_code2.val }}</h>
             <h>{{ license_code1.val }}</h>
-            <h>ir</h>
+            <h>ایران</h>
             <h>{{ license_code4.val }}</h>
           </div>
           <p>اسم راننده: {{ driver_name }}</p>
@@ -174,7 +174,7 @@ export default {
   </Alert>
   <Alert v-if="success" type="Success">
     <template v-slot:SuccessContent>
-      کامیون مورد نظر به نام راننده {{ driver_name }} ناموفقیت به دیتابیس اضافه شد
+      کامیون مورد نظر به نام راننده {{ driver_name }} باموفقیت به دیتابیس اضافه شد
     </template>
   </Alert>
 </Card>

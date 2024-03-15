@@ -14,9 +14,9 @@ export default {
         supplier_name: {type: 'dropdown', name: 'اسم تامین کننده',title: 'اسم تامین کننده', data: '', value: ''},
         matrial_type: {type: 'dropdown', name: 'نوع ماده',title: 'نوع ماده', data: '', value: ''},
         matrial_name: {type: 'dropdown', name: 'اسم ماده',title: 'اسم ماده', data: '', value: ''},
-        shipmet_type: {type: 'dropdown', name: 'نوع بار نامه',title: 'نوع بار نامه', data: '', value: ''},
+        shipmet_type: {type: 'dropdown', name: 'نوع بار نامه',title: 'نوع بار نامه', data: ['Incoming', 'Outgoing'], value: 'Incoming'},
         customer_name: {type: 'dropdown', name: 'اسم مشتری',title: 'اسم مشتری', data: '', value: ''},
-        username: {type: 'input', name: 'نام کاربری', value: ''},
+        username: {type: 'input', name: 'نام کاربری',title:'نام کاربری', value: ''},
       },
       success: false,
       error: false,
@@ -27,43 +27,68 @@ export default {
     initFlowbite();
     this.axios.get('/myapp/api/getLicenseNumbers').then((response) => {
       console.log(response.data)
-      this.drowpdownList.lic_number.data = response.data['license_numbers']
+      this.forms.lic_number.data = response.data['free_truck']
     })
-    this.axios.get('/myapp/api/getAnbarTableNames').then((response) => {
+    this.axios.get('/myapp/api/getSupplierNames').then((response) => {
       console.log(response.data)
-      this.drowpdownList.unloading_location.data = response.data['data']
+      this.forms.supplier_name.data = response.data['supplier_names']
     })
-    this.axios.get('/myapp/api/getUnitNames').then((response) => {
+
+    this.axios.get('/myapp/api/getCustomerNames').then((response) => {
       console.log(response.data)
-      this.drowpdownList.unit.data = response.data['unit_names']
+      this.forms.customer_name.data = response.data['customer_names']
     })
   },
   methods:{
     clicked(k, name){
       console.log(k, name)
       if (k == 'lic_number'){
-        this.drowpdownList.lic_number.name = name
-        this.drowpdownList.lic_number.value = name
+        this.forms.lic_number.name = name
+        this.forms.lic_number.value = name
       }
-      if (k == 'unloading_location'){
-        this.drowpdownList.unloading_location.name = name
-        this.drowpdownList.unloading_location.value = name
+      if (k == 'supplier_name'){
+        this.forms.supplier_name.name = name
+        this.forms.supplier_name.value = name
+        let params = {
+          'supplier_name': name,
+        }
+        this.axios.get('/myapp/api/getMaterialTypes',{params: params}).then((response) => {
+          console.log(response.data)
+          this.forms.matrial_type.data = response.data['material_names']
+        })
+        this.axios.get('/myapp/api/getMaterialNames', { params: params }).then((response) => {
+          console.log(response.data)
+          this.forms.matrial_name.data = response.data['material_names']
+        })
       }
-      if (k == 'unit'){
-        this.drowpdownList.unit.name = name
-        this.drowpdownList.unit.value = name
+      if (k == 'matrial_type'){
+        this.forms.matrial_type.name = name
+        this.forms.matrial_type.value = name
+      }
+      if (k == 'matrial_name'){
+        this.forms.matrial_name.name = name
+        this.forms.matrial_name.value = name
+      }
+      if (k == 'shipmet_type'){
+        this.forms.shipmet_type.name = name
+        this.forms.shipmet_type.value = name
+      }
+      if (k == 'customer_name'){
+        this.forms.customer_name.name = name
+        this.forms.customer_name.value = name
       }
     },
-    async addSupplier() {
+    async addShipment() {
       const params = {
-        "license_number": this.drowpdownList.lic_number.value,
-        "unloading_location": this.drowpdownList.unloading_location.value,
-        "unit": this.drowpdownList.unit.value,
-        "quantity": this.forms.Quantity.value,
-        "quality": this.forms.Quality.value,
-        "forklift_driver": this.forms.forklift_driver.value
+        "license_number": this.forms.lic_number.value,
+        "supplier_name": this.forms.supplier_name.value,
+        "material_type": this.forms.matrial_type.value,
+        "material_name": this.forms.matrial_name.value,
+        "shipment_type": this.forms.shipmet_type.value,
+        "customer_name": this.forms.customer_name.value,
+        "username": this.forms.username.value,
       };
-      const response = await this.axios.post('/myapp/api/unload', {}, {params: params})
+      const response = await this.axios.post('/myapp/addShipment/', {}, {params: params})
       console.log(response.data); // Access response data
       if (response.data['status'] == 'success'){
         this.success = true
@@ -109,7 +134,7 @@ export default {
           </button>
           <!-- Dropdown menu -->
           <div :id="form_name+'dropdown'" class="z-50 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
-            <ul class="overflow-y-auto h-48 py-2 text-sm text-gray-700 dark:text-gray-200" :aria-labelledby="form_name + 'Button'">
+            <ul class="overflow-y-auto h-auto max-h-48 py-2 text-sm text-gray-700 dark:text-gray-200" :aria-labelledby="form_name + 'Button'">
               <li v-for="data in val.data">
                 <a @click='clicked(form_name ,data)' type="button" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
                   {{ data }}
@@ -124,13 +149,13 @@ export default {
         <template v-slot:text>
           <div class="flex flex-col gap-2 font-bold">
             <template v-for="(val, key) in forms">
-                <p>{{val.name}}: {{val.value}}</p>
+                <p>{{val.title}}: {{val.value}}</p>
             </template>
           </div>
         </template>
         <template v-slot:btns>
           <div>
-            <button data-modal-hide="popup-modal" aria-label="Close" @click="addSupplier" type="button" class="inline-flex justify-center w-full px-2 py-1.5 text-xs font-medium text-center text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-500 dark:hover:bg-blue-600 dark:focus:ring-blue-800">درسته</button>
+            <button data-modal-hide="popup-modal" aria-label="Close" @click="addShipment" type="button" class="inline-flex justify-center w-full px-2 py-1.5 text-xs font-medium text-center text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-500 dark:hover:bg-blue-600 dark:focus:ring-blue-800">درسته</button>
           </div>
         </template>
       </modal>

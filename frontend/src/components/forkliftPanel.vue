@@ -26,19 +26,19 @@ export default {
       btnPanel: true,
       btns: [
           {
-            name: 'تخلیه',
+            name: 'تخلیه شده',
             isActive: false
           },
           {
-            name: 'بار شده',
+            name: 'بارگیری شده',
             isActive: false
           },
           {
-            name: 'مصرف کردن',
+            name: 'مصرف شده',
             isActive: false
           },
           {
-            name: 'حرکت کرد',
+            name: 'جا به جا شده',
             isActive: false
           },
           {
@@ -85,7 +85,7 @@ export default {
   <template v-else>
     <template v-for="panel in btns">
       <template v-if="panel.isActive==true">
-        <Card :title="panel.name" v-if="panel.name=='تخلیه'">
+        <Card :title="panel.name" v-if="panel.name=='تخلیه شده'">
           <div class="flex flex-col gap-2 justify-center items-center">
             <unloaded></unloaded>
             <button @click="backToPanel" type="button" class="inline-flex justify-center w-48 px-2 py-1.5 text-sm font-medium text-center text-white bg-rose-600 rounded-lg hover:bg-rose-700 focus:ring-4 focus:outline-none focus:ring-rose-300 dark:bg-rose-500 dark:hover:bg-rose-600 dark:focus:ring-rose-800">
@@ -93,7 +93,7 @@ export default {
             </button>
           </div>
         </Card>
-        <Card :title="panel.name" v-if="panel.name=='بار شده'">
+        <Card :title="panel.name" v-if="panel.name=='بارگیری شده'">
           <div class="flex flex-col gap-2 justify-center items-center">
             <loaded></loaded>
             <button @click="backToPanel" type="button" class="inline-flex justify-center w-48 px-2 py-1.5 text-sm font-medium text-center text-white bg-rose-600 rounded-lg hover:bg-rose-700 focus:ring-4 focus:outline-none focus:ring-rose-300 dark:bg-rose-500 dark:hover:bg-rose-600 dark:focus:ring-rose-800">
@@ -101,7 +101,7 @@ export default {
             </button>
           </div>
         </Card>
-        <Card :title="panel.name" v-if="panel.name=='مصرف کردن'">
+        <Card :title="panel.name" v-if="panel.name=='مصرف شده'">
           <div class="flex flex-col gap-2 justify-center items-center">
             <used></used>
             <button @click="backToPanel" type="button" class="inline-flex justify-center w-48 px-2 py-1.5 text-sm font-medium text-center text-white bg-rose-600 rounded-lg hover:bg-rose-700 focus:ring-4 focus:outline-none focus:ring-rose-300 dark:bg-rose-500 dark:hover:bg-rose-600 dark:focus:ring-rose-800">
@@ -109,7 +109,7 @@ export default {
             </button>
           </div>
         </Card>
-        <Card :title="panel.name" v-if="panel.name=='حرکت کرد'">
+        <Card :title="panel.name" v-if="panel.name=='جا به جا شده'">
           <div class="flex flex-col gap-2 justify-center items-center">
             <moved></moved>
             <button @click="backToPanel" type="button" class="inline-flex justify-center w-48 px-2 py-1.5 text-sm font-medium text-center text-white bg-rose-600 rounded-lg hover:bg-rose-700 focus:ring-4 focus:outline-none focus:ring-rose-300 dark:bg-rose-500 dark:hover:bg-rose-600 dark:focus:ring-rose-800">
