@@ -8,6 +8,10 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
 from django.db import connection
 from django.apps import apps
+from django.db import models
+from django.apps import apps
+from django.db.models.base import ModelBase
+
 import uuid
 
 from datetime import datetime
@@ -2074,27 +2078,4 @@ def cancel_shipment(request):
         # Handle non-POST requests
         return JsonResponse({'status': 'fail', 'message': 'Invalid request method.'})
 
-
-@csrf_exempt
-def apiHandler(request):
-    if request.method == 'POST':
-        print(dict(request.GET.items()))
-        # print(request.json())
-        # Extract data from the request
-        data = request.GET
-        print(data)
-        # Define required fields
-        required_fields = ['supplier_name', 'material_type', 'unit_name', 'quantity', 'anbar_location', 'reason', 'forklift_driver']
-
-        # Validate required fields
-        errors = [{'status': 'error', 'message': f'{field} is required.'} for field in required_fields if not data.get(field)]
-
-        # If there are any errors, return them in the response
-        if errors:
-            return JsonResponse({'status': 'error', 'errors': errors})
-
-        return JsonResponse({'status':'ok', 'data': data, 'error': errors})
-    else:
-        # Handle non-POST requests
-        return JsonResponse({'error': 'Method not allowed'}, status=405)
 
