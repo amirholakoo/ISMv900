@@ -4,7 +4,6 @@ from .views import *
 urlpatterns = [
     # Following paths are related to APIs:
 
-    path("api/apiHandler", apiHandler),
     path("api/checkLicenseNumber", check_license_number),
     path("api/addTruck", add_truck),
     path("api/getMaterialTypes", get_materialTypes),
