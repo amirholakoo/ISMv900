@@ -80,6 +80,7 @@ export default {
         'reel_numbers': JSON.stringify(Array.from(this.forms.reel_numbers.value)),
         'forklift_driver': this.forms.forklift_driver.value,
       };
+      console.log(params)
       const response = await this.axios.post('/myapp/api/loaded', {}, {params: params})
       console.log(response.data); // Access response data
       if (response.data['status'] == 'success'){

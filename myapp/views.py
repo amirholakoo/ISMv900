@@ -716,7 +716,6 @@ def get_shipment_license_numbers_by_status(request, status):
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=405)
 
-from django.db.models import Q
 
 @csrf_exempt
 def get_shipment_license_numbers_outgoing_by_status(request, status):
@@ -1418,6 +1417,7 @@ def get_widths_view(request):
         # Handle any exceptions that occur during the process
         return JsonResponse({'error': str(e)}, status=500)
 
+
 def get_reel_numbers_by_width_and_status(request):
     try:
         # Extract the anbar_location from the query parameters
@@ -1915,6 +1915,10 @@ def add_unit(request):
         # Handle non-POST requests
         return render(request, 'add_unit.html')
 
+def get_unit_based_on_material_type(request):
+    if request.method == 'GET':
+        pass
+
 
 @csrf_exempt
 def add_consumption_profile(request):
@@ -1980,7 +1984,7 @@ def add_consumption_profile(request):
                 return JsonResponse({'status': 'error', 'message': f'Error adding consumption: {str(e)}'})
     else:
         # Handle non-POST requests
-        return JsonResponse({'status': 'fail', 'message': 'Invalid request method.'})
+        return render(request, 'add_consumption_profile.html')
 
 
 @csrf_exempt

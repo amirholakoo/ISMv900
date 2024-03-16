@@ -15,6 +15,7 @@ import weightStationPanel from "@/components/weightStation/weightStationPanel.vu
 import addNewAnbar from "@/components/admin/addNewAnbar.vue";
 import addNewUnit from "@/components/admin/addNewUnit.vue";
 import addNewMatrialType from "@/components/admin/addNewMatrialType.vue";
+import consumptionProfile from "@/components/admin/consumptionProfile.vue";
 
 const routes = [
   {
@@ -104,6 +105,11 @@ const routes = [
     path: '/myapp/addMaterialType/',
     name: 'addNewMatrialType',
     component: addNewMatrialType
+  },
+  {
+    path: '/myapp/addConsumptionProfile/',
+    name: 'addConsumptionProfile',
+    component: consumptionProfile
   },
 ]
 

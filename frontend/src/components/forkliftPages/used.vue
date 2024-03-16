@@ -26,43 +26,34 @@ export default {
     initFlowbite();
     this.axios.get('/myapp/api/getLicenseNumbers').then((response) => {
       console.log(response.data)
-      this.drowpdownList.lic_number.data = response.data['license_numbers']
-    })
-    this.axios.get('/myapp/api/getAnbarTableNames').then((response) => {
-      console.log(response.data)
-      this.drowpdownList.unloading_location.data = response.data['data']
-    })
-    this.axios.get('/myapp/api/getUnitNames').then((response) => {
-      console.log(response.data)
-      this.drowpdownList.unit.data = response.data['unit_names']
+      this.forms.lic_number.data = response.data['license_numbers']
     })
   },
   methods:{
     clicked(k, name){
       console.log(k, name)
-      if (k == 'lic_number'){
-        this.drowpdownList.lic_number.name = name
-        this.drowpdownList.lic_number.value = name
-      }
       if (k == 'unloading_location'){
-        this.drowpdownList.unloading_location.name = name
-        this.drowpdownList.unloading_location.value = name
+        this.forms.unloading_location.name = name
+        this.forms.unloading_location.value = name
       }
-      if (k == 'unit'){
-        this.drowpdownList.unit.name = name
-        this.drowpdownList.unit.value = name
+      if (k == 'supplier_name'){
+        this.forms.supplier_name.name = name
+        this.forms.supplier_name.value = name
+      }
+      if (k == 'material_name'){
+        this.forms.material_name.name = name
+        this.forms.material_name.value = name
       }
     },
     async addSupplier() {
       const params = {
-        "license_number": this.drowpdownList.lic_number.value,
-        "unloading_location": this.drowpdownList.unloading_location.value,
-        "unit": this.drowpdownList.unit.value,
+        "unloading_location": this.forms.unloading_location.value,
+        "material_name": this.forms.material_name.value,
+        "unit": this.forms.unit.value,
         "quantity": this.forms.Quantity.value,
-        "quality": this.forms.Quality.value,
         "forklift_driver": this.forms.forklift_driver.value
       };
-      const response = await this.axios.post('/myapp/api/unload', {}, {params: params})
+      const response = await this.axios.post('/myapp/api/used', {}, {params: params})
       console.log(response.data); // Access response data
       if (response.data['status'] == 'success'){
         this.success = true
