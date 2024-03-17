@@ -1,6 +1,5 @@
 from django.urls import path
 from .views import *
-
 urlpatterns = [
     # Following paths are related to APIs:
 
@@ -22,18 +21,25 @@ urlpatterns = [
     path("api/getWidths", get_widths_view),
     path("api/showWeight1/", show_weight1),
     path("api/getUnitNames", get_unit_names),
+    path("api/getUnitNamesBasedOnSupplier", get_unit_names_based_on_supplier),
     path("api/unload", unload),
     path("api/loaded", loaded),
     path("api/used", used),
     path("api/moved", moved),
     path("api/cancelShipment", cancel_shipment),
+    path("api/getSupplierNamesBasedAndbar", get_supplierNames_based_andbar),
+    path("api/getUnitBasedSupplierName", get_unit_based_supplier_name),
 
     # Following paths are related to Pages:
 
-    path("addTruck/", add_truck),
-    path("addSupplier/", add_supplier),
     path("addCustomer/", add_customer),
+    path("addSupplier/", add_supplier),
+    path("addMaterialType/", add_material_type),
+    path("addUnit/", add_unit),
     path("addRawMaterial/", add_rawMaterial),
+    path("addTruck/", add_truck),
+    path("addNewAnbar/", add_new_anbar),
+    path("addConsumptionProfile/", add_consumption_profile),
     path("addNewReel/", add_new_reel),
     path("addShipment/", add_shipment),
     path("weightStationPanel/", weight_station_panel),
@@ -42,8 +48,6 @@ urlpatterns = [
     path("createPurchaseOrder/", create_purchase_order),
     path("createSalesOrder/", create_sales_order),
     path("forkliftPanel/", forklift_panel),
-    path("addNewAnbar/", add_new_anbar),
-    path("addMaterialType/", add_material_type),
-    path("addUnit/", add_unit),
-    path("addConsumptionProfile/", add_consumption_profile),
+
 ]
+

@@ -24,9 +24,9 @@ export default {
   },
   mounted() {
     initFlowbite();
-    this.axios.get('/myapp/api/getLicenseNumbers').then((response) => {
+    this.axios.get('/myapp/api/getAnbarTableNames').then((response) => {
       console.log(response.data)
-      this.forms.lic_number.data = response.data['license_numbers']
+      this.forms.unloading_location.data = response.data['data']
     })
   },
   methods:{
@@ -35,10 +35,25 @@ export default {
       if (k == 'unloading_location'){
         this.forms.unloading_location.name = name
         this.forms.unloading_location.value = name
+        const params = {
+          'anbar_location': this.forms.unloading_location.value,
+        }
+        this.axios.get('/myapp/api/getSupplierNamesBasedAndbar', {params:params}).then((response) => {
+          console.log(response.data)
+          this.forms.supplier_name.data = response.data['supplier_names']
+          this.forms.material_name.data = response.data['material_names']
+        })
       }
       if (k == 'supplier_name'){
         this.forms.supplier_name.name = name
         this.forms.supplier_name.value = name
+        const params = {
+          'supplier_name': this.forms.unloading_location.value,
+        }
+        this.axios.get('/myapp/api/getUnitBasedSupplierName', {params:params}).then((response) => {
+          console.log(response.data)
+          this.forms.unit.data = response.data['unit_names']
+        })
       }
       if (k == 'material_name'){
         this.forms.material_name.name = name
@@ -97,7 +112,7 @@ export default {
           </button>
           <!-- Dropdown menu -->
           <div :id="form_name+'dropdown'" class="z-50 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
-            <ul class="overflow-y-auto h-48 py-2 text-sm text-gray-700 dark:text-gray-200" :aria-labelledby="form_name + 'Button'">
+            <ul class="overflow-y-auto max-h-48 h-auto py-2 text-sm text-gray-700 dark:text-gray-200" :aria-labelledby="form_name + 'Button'">
               <li v-for="data in val.data">
                 <a @click='clicked(form_name ,data)' type="button" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
                   {{ data }}

@@ -1,5 +1,5 @@
 from django.utils import timezone
-from datetime import datetime
+from jdatetime import datetime
 from django.db import models
 # Create your models here.
 
@@ -51,7 +51,7 @@ class Shipments(models.Model):
     truck_id = models.ForeignKey(Truck, on_delete=models.SET_NULL, blank=True, null=True)
     license_number = models.CharField(max_length=255, null=True)
     receive_date = models.DateTimeField(blank=True, null=True)
-    entry_time = models.DateTimeField(blank=True, null=True)
+    entry_time = models.DateTimeField(blank=True, null=True, default=datetime.now)
     customer_name = models.CharField(max_length=255, null=True)
     supplier_name = models.CharField(max_length=255, null=True)
     weight1 = models.DecimalField(max_digits=10, decimal_places=2, null=True)
@@ -449,7 +449,7 @@ class AnbarGeneric(models.Model):
 
     # QR code associated with the material
     qr_code = models.TextField(null=True, blank=True)
-
+    unit = models.CharField(max_length=255, null=True, blank=True)
     # Profile name for the material
     profile_name = models.CharField(max_length=255, null=True, blank=True)
     username = models.CharField(max_length=255, null=False, blank=True)
@@ -597,6 +597,8 @@ class Consumption(models.Model):
 
     # Additional comments about the consumption
     comments = models.TextField(null=True, blank=True)
+    cancelling_reason = models.TextField(null=True, blank=True)
+    location = models.CharField(max_length=255, null=True, blank=True)
 
     # Status of the consumption
     status = models.CharField(max_length=50, null=True, blank=True)
@@ -665,7 +667,8 @@ class Unit(models.Model):
     unit_name = models.CharField(max_length=255, null=True, blank=True)
     count = models.FloatField(blank=True, null=True)
     username = models.CharField(max_length=255, null=False, blank=True)
-    date = models.DateTimeField(default=timezone.now, blank=True)
+    date = models.DateTimeField(default=datetime.now, blank=True)
+    status = models.CharField(max_length=255, blank=True)
     logs = models.TextField(blank=True)
 
     # Meta
