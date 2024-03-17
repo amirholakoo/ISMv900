@@ -16,11 +16,11 @@ export default {
   data(){
     return{
       forms: {
-        customer_name: {type: 'input', name: 'خریدار',title: 'خریدار', data: '', value: '', error: true},
+        customer_name: {type: 'input', name: 'اسم مشتری',title: ' اسم مشتری', data: '', value: ''},
         address: {type: 'input', name: 'آدرس',title: 'آدرس', data: '', value: ''},
         phone: {type: 'input', name: 'شماره همراه',title: 'شماره همراه', data: '', value: ''},
-        comment: {type: 'input', name: 'توضیح',title: 'توضیح', data: '', value: ''},
-        username: {type: 'input', name: 'نام کاربری',title: 'نام کاربری', data: '', value: ''},
+        comment: {type: 'input', name: 'توضیحات',title: 'توضیحات', data: '', value: ''},
+        username: {type: 'input', name: 'نام کاربر',title: 'نام کاربری', data: '', value: ''},
       },
       success: false,
       error: false,
@@ -49,8 +49,10 @@ export default {
       this.errors = []
       for (const key in this.forms) {
         if (this.forms[key].value == ''){
-          this.forms[key].error = true
+          if (key!='comment'){
+            this.forms[key].error = true
           this.errors.push({'message': `${this.forms[key].name} مورد نیاز است`})
+          }
         }else {
            this.forms[key].error = false
         }
@@ -106,6 +108,24 @@ export default {
             </label>
           </div>
         </template>
+        <template v-if="val.type=='dropdown'">
+          <button :id="form_name + 'Button'" :data-dropdown-toggle="form_name+'dropdown'" class="justify-between w-44 text-white bg-green-500 hover:bg-green-600 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="button">
+            {{val.name}}
+            <svg class="w-2.5 h-2.5 ms-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>
+            </svg>
+          </button>
+          <!-- Dropdown menu -->
+          <div :id="form_name+'dropdown'" class="z-50 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
+            <ul class="overflow-y-auto h-auto max-h-48 py-2 text-sm text-gray-700 dark:text-gray-200" :aria-labelledby="form_name + 'Button'">
+              <li v-for="data in val.data">
+                <a @click='clicked(form_name ,data)' type="button" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
+                  {{ data }}
+                </a>
+              </li>
+            </ul>
+        </div>
+        </template>
       </template>
       <modal type="confirm">
         <template v-slot:button>اضافه کردن</template>
@@ -122,7 +142,7 @@ export default {
         </template>
         <template v-slot:btns>
           <div>
-            <button data-modal-hide="popup-modal" aria-label="Close" @click="addSupplier" type="button" class="inline-flex justify-center w-full px-2 py-1.5 text-xs font-medium text-center text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-500 dark:hover:bg-blue-600 dark:focus:ring-blue-800">درسته</button>
+            <button data-modal-hide="popup-modal" aria-label="Close" @click="addSupplier" type="button" class="inline-flex justify-center w-full px-2 py-1.5 text-xs font-medium text-center text-white        bg-green-500 hover:bg-green-600 focus:ring-4 focus:outline-none focus:ring-green-300  rounded-lg dark:bg-blue-500 dark:hover:bg-blue-600 dark:focus:ring-blue-800">درسته</button>
           </div>
         </template>
       </modal>
