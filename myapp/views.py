@@ -169,7 +169,7 @@ def add_supplier(request):
             comments=comments,
             username=username,
             status='Active',
-            logs =f'Username {username} Created NOW at time ({str(datetime.now())}),'
+            logs =f'{username} Created NOW at time ({str(datetime.now())}),'
         )
 
         # Save the new Supplier object to the database
@@ -237,7 +237,7 @@ def add_customer(request):
             comments=comments,
             username=username,
             status='Active',
-            logs=f'Username {username} Created NOW at time ({str(datetime.now())}),'
+            logs=f'{username} Created NOW at time ({str(datetime.now())}),'
         )
 
         # Save the new Customer object to the database
@@ -357,7 +357,7 @@ def add_rawMaterial(request):
             material_name=material_name,
             comments=comments,
             username=username,
-            logs=f'Username {username} Created NOW at time ({str(datetime.now())}),'
+            logs=f'{username} Created NOW at time ({str(datetime.now())}),'
         )
 
         # Save the new Customer object to the database
@@ -711,7 +711,7 @@ def add_shipment(request):
                     location='Entrance',
                     username=username,
                     entry_time=str(datetime.now()),
-                    logs=f'username ({username}) Now created NOW ({str(datetime.now())}),'
+                    logs=f'{username} Now created NOW at time ({str(datetime.now())}),'
                 )
             else:
                 shipment = Shipments(
@@ -723,7 +723,7 @@ def add_shipment(request):
                     location='Entrance',
                     username=username,
                     entry_time=str(datetime.now()),
-                    logs=f'username ({username}) Now created NOW ({str(datetime.now())}),'
+                    logs=f'{username} Now created NOW ({str(datetime.now())}),'
                 )
 
             # change Truck status to Busy
@@ -951,7 +951,7 @@ def update_weight1(request):
                     comments=f"{username} updated Weight1",
                     status='LoadingUnloading',
                     location='Weight1',
-                    logs=f'Username ({username}) Weight1 NOW ({str(datetime.now())}),'
+                    logs=f'{username} Weight1 NOW ({str(datetime.now())}),'
                 )
                 return JsonResponse({'status': 'success', 'message': 'وزن اولیه بار نامه با موفقیت آپدیت شد.'})
 
@@ -1045,7 +1045,7 @@ def update_weight2(request):
                     comments=f"{username} updated Weight2",
                     status='LoadingUnloading',
                     location='Office',
-                    logs=f'Username ({username}) Weight2 NOW ({str(datetime.now())}),'
+                    logs=f'{username} Weight2 NOW ({str(datetime.now())}),'
                 )
 
                 return JsonResponse({'status': 'success', 'message': f'Weight2 and Net Weight for Shipments with License Number {license_number} has been updated successfully.'})
@@ -1175,7 +1175,7 @@ def create_purchase_order(request):
                     document_info=document_info,
                     comments=commnet,
                     username=username,
-                    logs=f'Username ({username}) Created PO NOW ({str(datetime.now())}),',
+                    logs=f'{username} Created PO NOW ({str(datetime.now())}),',
                 )
                 # Save the new purchase object to the database
                 try:
@@ -1677,7 +1677,7 @@ def used(request):
                     material_name=material_name,
                     unit=unit,
                     status='Used',
-                    logs=f'Forklift Driver ({forklift_driver}) Used NOW at ({str(datetime.now())}),'
+                    logs=f'{forklift_driver} Used NOW at ({str(datetime.now())}),'
                     # commNOW (CVS)ents=data['forklift_driver']
                 )
                 consumption.save()
@@ -1940,7 +1940,7 @@ def add_material_type(request):
                 material_type=material_type,
                 username=username,
                 status='Active',
-                logs=f'Username {username} Created NOW at time ({datetime.now()}),'
+                logs=f'{username} Created NOW at time ({datetime.now()}),'
             )
             # Save the new Customer object to the database
             try:
@@ -2096,7 +2096,7 @@ def add_consumption_profile(request):
                     profile_name=profile_name,
                     username=username,
                     status="Active",
-                    logs=f'Username {username} Created NOW at time ({datetime.now()}),'
+                    logs=f'{username} Created NOW at time ({datetime.now()}),'
                 )
                 new_consumption.save()
 
