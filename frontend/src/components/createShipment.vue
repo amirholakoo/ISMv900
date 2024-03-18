@@ -1,5 +1,5 @@
 <script>
-import {initFlowbite} from "flowbite";
+import {initFlowbite, initDropdowns} from "flowbite";
 import modal from "@/components/Modal.vue";
 import Alert from "@/components/Alert.vue";
 import Card from "@/components/Card.vue";
@@ -39,6 +39,7 @@ export default {
   },
   mounted() {
     initFlowbite();
+    initDropdowns();
     this.axios.get('/myapp/api/getLicenseNumbers').then((response) => {
       console.log(response.data)
       this.forms.lic_number.data = response.data['free_truck']
