@@ -49,7 +49,7 @@ export default {
         }
         this.axios.get('/myapp/api/getMaterialTypes', {params:params}).then((response) => {
           console.log(response.data)
-          this.forms.material_type.data = response.data['material_names']
+          this.forms.material_type.data = response.data['material_types']
         })
       }
       if (k == 'material_type'){

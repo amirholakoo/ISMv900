@@ -227,7 +227,7 @@ class RawMaterial(models.Model):
 
         Format: "{material_name} (ID: {material_id})"
         """
-        return f"{self.material_name} (ID: {self.id})  (ID: {self.supplier}) (ID: {self.status})"
+        return f"{self.material_name} (ID: {self.id})  (supplier name: {self.supplier_name}) (status: {self.status})"
 
 
 class Purchases(models.Model):
@@ -631,7 +631,7 @@ class MaterialType(models.Model):
     # Ensure material_type is always provided to avoid empty entries
     material_type = models.CharField(max_length=255)
     username = models.CharField(max_length=255, null=False, blank=True)
-
+    status = models.CharField(max_length=50, null=True, blank=True)
     date = models.DateTimeField(default=timezone.now, blank=True)
     logs = models.TextField(blank=True)
 

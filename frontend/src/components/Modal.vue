@@ -84,6 +84,9 @@ export default {
                 </button>
             </header>
             <main class="flex justify-center text-sm font-normal">
+              <slot name="table"></slot>
+            </main>
+            <main class="flex justify-start text-sm font-normal px-2">
               <slot name="text"></slot>
             </main>
             <footer>

@@ -29,6 +29,7 @@ urlpatterns = [
     path("api/cancelShipment", cancel_shipment),
     path("api/getSupplierNamesBasedAndbar", get_supplierNames_based_andbar),
     path("api/getUnitBasedSupplierName", get_unit_based_supplier_name),
+    path("api/getReelNumber", get_reel_number),
 
     # Following paths are related to Pages:
 

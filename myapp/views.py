@@ -14,7 +14,6 @@ from django.db.models.base import ModelBase
 from jdatetime import datetime
 import uuid
 
-from datetime import datetime
 # Create your views here.
 
 # Incoming process:
@@ -99,7 +98,7 @@ def add_truck(request):
             driver_doc=driver_doc,
             phone=phone,
             username=username,
-            logs=f'Username {username} Created NOW at time ({datetime.now()}),'
+            logs=f'{username} Created NOW at time ({str(datetime.now())}),'
         )
 
         errors = []
@@ -160,7 +159,7 @@ def add_supplier(request):
         # If there are any errors, return them in the response
         if errors:
             return JsonResponse({'status': 'error', 'errors': errors})
-
+        print(datetime.now())
         # Create a new Supplier object
         new_supplier = Supplier(
             supplier_name=supplier_name,
@@ -169,7 +168,7 @@ def add_supplier(request):
             comments=comments,
             username=username,
             status='Active',
-            logs = f'Username {username} Created NOW at time ({datetime.now()}),'
+            logs =f'Username {username} Created NOW at time ({str(datetime.now())}),'
         )
 
         # Save the new Supplier object to the database
@@ -237,7 +236,7 @@ def add_customer(request):
             comments=comments,
             username=username,
             status='Active',
-            logs=f'Username {username} Created NOW at time ({datetime.now()}),'
+            logs=f'Username {username} Created NOW at time ({str(datetime.now())}),'
         )
 
         # Save the new Customer object to the database
@@ -271,10 +270,8 @@ def get_materialTypes(request):
             # Query the MaterialType model for all instances
             material_types = MaterialType.objects.filter(supplier_name=supplier_name)
             # Extract and return the names in a JSON response
-            material_names = [material_type.material_type for material_type in material_types]
-            print(material_names)
-            print(supplier_name)
-            return JsonResponse({'status': 'success', 'material_names': material_names})
+            material_type = [material_type.material_type for material_type in material_types]
+            return JsonResponse({'status': 'success', 'material_types': material_type})
         except Exception as e:
             # Handle any exceptions that occur during the query operation
             return JsonResponse({'status': 'error', 'message': f'Error retrieving material names: {str(e)}'})
@@ -298,7 +295,7 @@ def get_supplierNames(request):
     if request.method == 'GET':
         try:
             # Query the Supplier model for all instances
-            suppliers = Supplier.objects.all()
+            suppliers = Supplier.objects.filter(status="Active")
             # Extract and return the names in a JSON response
             supplier_names = [supplier.supplier_name for supplier in suppliers]
             return JsonResponse({'status': 'success', 'supplier_names': supplier_names})
@@ -359,7 +356,7 @@ def add_rawMaterial(request):
             material_name=material_name,
             comments=comments,
             username=username,
-            logs=f'Username {username} Created NOW at time ({datetime.now()}),'
+            logs=f'Username {username} Created NOW at time ({str(datetime.now())}),'
         )
 
         # Save the new Customer object to the database
@@ -411,6 +408,38 @@ def get_consumption_profile_names(request):
         except Exception as e:
             # Return a   500 error for any exceptions
             return JsonResponse({'error': str(e)}, status=500)
+
+def get_reel_number(request):
+    if request.method == 'GET':
+        # Load the last reel number from the Products DB
+        try:
+            last_reel_number = Products.objects.latest('reel_number').reel_number
+            width = Products.objects.latest('width').width
+            GSM = Products.objects.latest('gsm').gsm
+            length = Products.objects.latest('length').length
+            breaks = Products.objects.latest('breaks').breaks
+            grade = Products.objects.latest('grade').grade
+            profile_name = Products.objects.latest('profile_name').profile_name
+
+        except Products.DoesNotExist:
+            last_reel_number = 0
+            width = 0
+            GSM = 0
+            length = 0
+            breaks = 0
+            grade = 0
+            profile_name = 0
+        next_reel_number = last_reel_number + 1
+        data = {
+            'next_reel_number': next_reel_number,
+            'width': width,
+            'GSM': GSM,
+            'length': length,
+            'breaks': breaks,
+            'grade': grade,
+            'profile_name': profile_name,
+        }
+        return JsonResponse(data=data, status=200)
 
 
 @csrf_exempt
@@ -490,34 +519,34 @@ def add_new_reel(request):
             # If there are any errors, return them in the response
             if errors:
                 return JsonResponse({'status': 'error', 'errors': errors})
+            # from django.db.models import Q
+            # consumptions  = Consumption.objects.filter(Q(supplier_name=supplier_name) & Q(material_name=material_name)
+            # Create a new Products record
+            new_product = Products(
+                reel_number=reel_number,
+                width=width,
+                gsm=gsm,
+                length=length,
+                breaks=breaks,
+                grade=grade,
+                profile_name=consumption_profile_name,
+                receive_date=datetime.now(),
+                logs=f'Created NOW at time ({str(datetime.now())}),',
+            )
+            new_product.save()
 
-            # Load the last reel number from the Products DB
-            last_reel_number = Products.objects.latest('reel_number').reel_number
-            next_reel_number = f"{last_reel_number[:-1]}{int(last_reel_number[-1]) +   1}"
-            #
-            # # Create a new Products record
-            # new_product = Products(
-            #     reel_number=next_reel_number,
-            #     width=width,
-            #     gsm=gsm,
-            #     length=length,
-            #     breaks=breaks,
-            #     grade=grade,
-            #     profile_name=consumption_profile_name,
-            # )
-            # new_product.save()
-            #
-            # # Create a new Anbar_Salon_Tolid record
-            # new_anbar_record = Anbar_Salon_Tolid(
-            #     reel_number=next_reel_number,
-            #     width=width,
-            #     gsm=gsm,
-            #     length=length,
-            #     breaks=breaks,
-            #     grade=grade,
-            #     profile_name=consumption_profile_name,
-            # )
-            # new_anbar_record.save()
+            # Create a new Anbar_Salon_Tolid record
+            new_anbar_record = Anbar_Salon_Tolid(
+                location='Anbar_Salon_Tolid',
+                reel_number=reel_number,
+                width=width,
+                gsm=gsm,
+                length=length,
+                breaks=breaks,
+                grade=grade,
+                profile_name=consumption_profile_name,
+            )
+            new_anbar_record.save()
 
             # Update the Consumption DB based on the selected consumption profile
             # Note: Add your own logic to update the Consumption model here
@@ -648,39 +677,54 @@ def add_shipment(request):
 
         # Check required fields
         errors = []
-        if not license_number:
-            errors.append('پلاک را انتخاب کنید')
-        if not supplier_name:
-            errors.append('سام تامین کننده را انتخاب کنید')
-        if not material_type:
-            errors.append('نوع ماده را انتخاب کنید')
-        if not material_name:
-            errors.append('اسم ماده را انتخاب کنید')
-        if not shipment_type:
-            errors.append('نوع بار نامه را انخاب کنید')
-        if not customer_name:
-            errors.append('اسم مشتری را انخاب کنید')
-        if not username:
-            errors.append('نام کاربری را وارد کنید')
+        # if not license_number:
+        #     errors.append('پلاک را انتخاب کنید')
+        # if not supplier_name:
+        #     errors.append('سام تامین کننده را انتخاب کنید')
+        # if not material_type:
+        #     errors.append('نوع ماده را انتخاب کنید')
+        # if not material_name:
+        #     errors.append('اسم ماده را انتخاب کنید')
+        # if not shipment_type:
+        #     errors.append('نوع بار نامه را انخاب کنید')
+        # if not customer_name:
+        #     errors.append('اسم مشتری را انخاب کنید')
+        # if not username:
+        #     errors.append('نام کاربری را وارد کنید')
 
         if errors:
             return JsonResponse({'status': 'error', 'errors': errors})
 
         else:
+            print(shipment_type)
             # Create new shipment
-            shipment = Shipments(
-                truck_id=Truck.objects.get(license_number=license_number),
-                license_number=license_number,
-                supplier_name=supplier_name,
-                material_type=material_type,
-                material_name=material_name,
-                shipment_type=shipment_type,
-                customer_name=customer_name,
-                status='Registered',
-                location='Entrance',
-                username=username,
-                logs=f'username ({username}) Now created at ({timezone.now()}),'
-            )
+            if shipment_type == "Incoming":
+                shipment = Shipments(
+                    truck_id=Truck.objects.get(license_number=license_number),
+                    license_number=license_number,
+                    supplier_name=supplier_name,
+                    material_type=material_type,
+                    material_name=material_name,
+                    shipment_type=shipment_type,
+                    status='Registered',
+                    location='Entrance',
+                    username=username,
+                    entry_time=str(datetime.now()),
+                    logs=f'username ({username}) Now created NOW ({str(datetime.now())}),'
+                )
+            else:
+                shipment = Shipments(
+                    truck_id=Truck.objects.get(license_number=license_number),
+                    license_number=license_number,
+                    shipment_type=shipment_type,
+                    customer_name=customer_name,
+                    status='Registered',
+                    location='Entrance',
+                    username=username,
+                    entry_time=str(datetime.now()),
+                    logs=f'username ({username}) Now created NOW ({str(datetime.now())}),'
+                )
+
             # change Truck status to Busy
             try:
                 # Use update to change the status atomically
@@ -902,11 +946,11 @@ def update_weight1(request):
                 Shipments.objects.filter(license_number=license_number).update(
                     weight1=weight1,
                     username=username,
-                    weight1_time=timezone.now(),
+                    weight1_time=str(datetime.now()),
                     comments=f"{username} updated Weight1",
                     status='LoadingUnloading',
                     location='Weight1',
-                    logs=f'Username ({username}) Weight1 NOW,'
+                    logs=f'Username ({username}) Weight1 NOW ({str(datetime.now())}),'
                 )
                 return JsonResponse({'status': 'success', 'message': 'وزن اولیه بار نامه با موفقیت آپدیت شد.'})
 
@@ -968,24 +1012,24 @@ def update_weight2(request):
         # Check required fields
         errors = []
         if not license_number:
-            errors.append('پلاک را انتخاب کنید')
+            errors.append({'status': 'error', 'message': 'پلاک را انتخاب کنید'})
         if not weight1:
-            errors.append('وزن اولیه را وارد کنید')
+            errors.append({'status': 'error', 'message': 'وزن اولیه را وارد کنید'})
         if not weight2:
-            errors.append('وزن ثانویه را وارد کنید')
+            errors.append({'status': 'error', 'message': 'وزن ثانویه را وارد کنید'})
         if not username:
-            errors.append('نام کاربری را وارد کنید')
+            errors.append({'status': 'error', 'message': 'نام کاربری را وارد کنید'})
         try:
             weight1 = float(weight1)
             weight2 = float(weight2)
             net_weight = float(net_weight)
         except ValueError:
-            errors.append('وزن ثانویه و وزن خالص باید عدد باشند')
+            errors.append({'status': 'error', 'message': 'وزن ثانویه و وزن خالص باید عدد باشند'})
         if not (9 <= weight2 <= 38000) or not (9 <= net_weight <= 38000):
-            errors.append('وزن ثاویه و وزن حالص  وارد شده باید بین 9 تا 38000 کیلوگرم باشند.')
+            errors.append({'status': 'error', 'message': 'وزن ثاویه و وزن حالص  وارد شده باید بین 9 تا 38000 کیلوگرم باشند.'})
         # Check if the absolute difference between weight1 and weight2 equals net_weight
         if abs(weight1 - weight2) != net_weight:
-            return JsonResponse({'status': 'error', 'message': 'تفاوت مطلق بین وزن اولیه و وزن ثانویه باید با وزن خالص برابر باشد.'})
+            errors.append({'status': 'error', 'message': 'تفاوت  بین وزن اولیه و وزن ثانویه باید با وزن خالص برابر باشد.'})
         if errors:
             return JsonResponse({'status': 'error', 'errors': errors})
         else:
@@ -996,10 +1040,11 @@ def update_weight2(request):
                     weight2=weight2,
                     net_weight=net_weight,
                     username=username,
-                    weight2_time=timezone.now(),
+                    weight2_time=str(datetime.now()),
                     comments=f"{username} updated Weight2",
                     status='LoadingUnloading',
                     location='Office',
+                    logs=f'Username ({username}) Weight2 NOW ({str(datetime.now())}),'
                 )
 
                 return JsonResponse({'status': 'success', 'message': f'Weight2 and Net Weight for Shipments with License Number {license_number} has been updated successfully.'})
@@ -1082,8 +1127,6 @@ def create_purchase_order(request):
                 errors.append({'status': 'error', 'message': 'وضعیت پرداخت را انتخاب کنید'})
             if not document_info:
                 errors.append({'status':'error', 'message': 'اظلاعات سند را وارد کنید'})
-            if not commnet:
-                errors.append({'status':'error', 'message': 'فرم کامنت را پر کنید'})
             if not username:
                 errors.append({'status':'error', 'message': 'فرم نام کاربری را پر کنید'})
             if errors:
@@ -1102,13 +1145,16 @@ def create_purchase_order(request):
                     status='Free',
                     location='Entrance'
                 )
+                mt = MaterialType.objects.get(material_type=material_type)
+                print('-------------------')
+                print(mt)
                 purchase = Purchases(
-                    date=timezone.now(),
-                    receive_date=timezone.now(),  # Assuming you want to set the current date/time
-                    supplier_id=Supplier.objects.get(supplier_name=supplier_name),
-                    truck_id=Truck.objects.get(license_number=license_number),
-                    material_id=MaterialType.objects.get(material_type=material_type),
-                    shipment_id=Shipments.objects.get(license_number=license_number),
+                    date=str(datetime.now()),
+                    receive_date=str(datetime.now()),  # Assuming you want to set the current date/time
+                    # supplier_id=Supplier.objects.get(supplier_name=supplier_name),
+                    # truck_id=Truck.objects.get(license_number=license_number),
+                    # material_id=MaterialType.objects.get(material_type=material_type),
+                    # shipment_id=Shipments.objects.get(license_number=license_number),
                     material_type=material_type,
                     material_name=material_name,
                     unit=unit,
@@ -1128,7 +1174,7 @@ def create_purchase_order(request):
                     document_info=document_info,
                     comments=commnet,
                     username=username,
-                    logs=f'Username ({username}) Created PO NOW',
+                    logs=f'Username ({username}) Created PO NOW ({str(datetime.now())}),',
                 )
                 # Save the new purchase object to the database
                 try:
@@ -1138,10 +1184,11 @@ def create_purchase_order(request):
                     # Handle any exceptions that occur during the save operation
                     return JsonResponse({'status': 'error', 'message': f'Error adding purchase: {str(e)}'})
             # Return success response
-            return JsonResponse({'success': True, 'message': 'Purchase Order created successfully.'})
+            return JsonResponse({'status': 'success', 'message': 'Purchase Order created successfully.'})
 
         except Exception as e:
-            return JsonResponse({'success': False, 'message': str(e)})
+            print(e)
+            return JsonResponse({'status': 'error', 'message': str(e)})
 
     else:
         return render(request, 'create_purchase_order.html')
@@ -1239,14 +1286,14 @@ def create_sales_order(request):
                     comments=commnet,
                     username=username,
                     shipment=shipment,
-                    date=timezone.now(),  # Assuming you want to set the current date and time
+                    date=datetime.now(),  # Assuming you want to set the current date and time
                 )
                 # Save the instance
                 sale.save()
 
                 # Retrieve the shipment instance
                 Shipments.objects.filter(license_number=license_number).update(
-                    exit_time=timezone.now(),
+                    exit_time=datetime.now(),
                     status='Delivered',
                     location=customer_name,
                     username=username,
@@ -1262,7 +1309,7 @@ def create_sales_order(request):
                 anbar_instance = AnbarModel.objects.create(
                     status='Delivered',
                     location=customer_name,
-                    last_date=timezone.now(),
+                    last_date=datetime.now(),
                 )
                 # Return a success response
                 return JsonResponse({'status': 'success', 'message': 'Sales Order created successfully.'})
@@ -1550,12 +1597,12 @@ def get_supplierNames_based_andbar(request):
             anbar_model = apps.get_model('myapp', anbar_location)
             supplier_name = anbar_model.objects.values_list('supplier_name', flat=True)
             material_name = anbar_model.objects.values_list('material_name', flat=True)
-            print(supplier_name)
+            unit = anbar_model.objects.values_list('unit', flat=True)
             supplier_names = list(supplier_name)
             material_names = list(material_name)
-            print(supplier_names)
+            units = list(unit)
             # Return the widths as a JSON response
-            return JsonResponse({'supplier_names': supplier_names, 'material_names': material_names}, status=200)
+            return JsonResponse({'supplier_names': supplier_names, 'material_names': material_names, 'units':units}, status=200)
         except Exception as e:
             # Handle any exceptions that occur during the process
             return JsonResponse({'error': str(e)}, status=500)
@@ -1613,36 +1660,43 @@ def used(request):
 
     if request.method == 'POST':
         # Assuming the request data is in JSON format
-        data = request.json()
 
+        unloading_location = request.GET.get('unloading_location')
+        supplier_name = request.GET.get('supplier_name')
+        material_name = request.GET.get('material_name')
+        unit = request.GET.get('unit')
+        quantity = request.GET.get('quantity')
+        forklift_driver = request.GET.get('forklift_driver')
         try:
             # Create Consumption records
-            for _ in range(data['quantity']):
+            for _ in range(quantity):
                 consumption = Consumption(
-                    receive_date=timezone.now(),
-                    supplier_name=data['supplier_name'],
-                    material_name=data['material_name'],
-                    unit=data['unit'],
+                    receive_date=datetime.now(),
+                    supplier_name=supplier_name,
+                    material_name=material_name,
+                    unit=unit,
                     status='Used',
-                    comments=data['forklift_driver']
+                    logs=f'Forklift Driver ({forklift_driver}) Used NOW at ({str(datetime.now())}),'
+                    # commNOW (CVS)ents=data['forklift_driver']
                 )
                 consumption.save()
 
             # Update AnbarGeneric (Anbar_Akhal in this example)
             anbar_items = Anbar_Akhal.objects.filter(
-                location=data['unloading_location'],
-                supplier_name=data['supplier_name'],
-                material_name=data['material_name']
+                location=unloading_location,
+                supplier_name=supplier_name,
+                material_name=material_name
             )
             for item in anbar_items:
                 item.status = 'Used'
                 item.location = 'Consumption DB'
-                item.last_date = timezone.now()
+                item.last_date = datetime.now()
                 item.comments = 'forklift driver'
                 item.save()
 
             # Return a success response
-            return JsonResponse({'status': 'success', 'message': f'{data["quantity"]} units of {data["material_name"]} have been marked as used.'})
+            #  'message': f'{data["quantity"]} units of {data["material_name"]} have been marked as used.'
+            return JsonResponse({'status': 'success',})
 
         except Exception as e:
             return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
@@ -1957,9 +2011,9 @@ def add_unit(request):
                 unit_name=unit_name,
                 count=count,
                 username=username,
-                date=datetime.now(),
+                date=str(datetime.now()),
                 status='Active',
-                logs=f'Username {username} Created NOW at time ({datetime.now()}),'
+                logs=f'{username} Created NOW at time ({str(datetime.now())}),'
             )
 
             # Save the new Customer object to the database
@@ -1968,6 +2022,7 @@ def add_unit(request):
                 # Return success response
                 return JsonResponse({'status': 'success', 'message': 'Unit has been added.'})
             except Exception as e:
+                print(e)
                 # Handle any exceptions that occur during the save operation
                 errors.append({'status': 'error', 'message': f'Error adding Unit: {str(e)}'})
                 return JsonResponse({'status': 'error', 'errors': errors})

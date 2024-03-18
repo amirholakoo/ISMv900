@@ -203,7 +203,7 @@ class MaterialTypeAdmin(admin.ModelAdmin):
 @admin.register(Unit)
 class UnitAdmin(admin.ModelAdmin):
     # Specify the fields to display in the list view
-    list_display = ('supplier_name', 'material_type', 'unit_name', 'count', 'username', 'date')
+    list_display = ('supplier_name', 'material_type', 'unit_name', 'count', 'username', 'date', 'logs')
     # Specify the fields to use in the search box
     search_fields = ('supplier_name', 'material_type', 'unit_name', 'username')
     # Specify the fields to use in the filter sidebar

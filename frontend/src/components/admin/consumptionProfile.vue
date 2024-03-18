@@ -221,7 +221,7 @@ export default {
       </template>
       <modal type="confirm">
       <template v-slot:button>اضافه کردن</template>
-      <template v-slot:text>
+      <template v-slot:table>
         <div class="flex flex-col gap-2 font-bold max-w-xs">
           <div class="max-w-xs overflow-x-auto shadow-md sm:rounded-lg">
                     <table class="max-w-xs text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">

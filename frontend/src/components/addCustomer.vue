@@ -51,7 +51,7 @@ export default {
         if (this.forms[key].value == ''){
           if (key!='comment'){
             this.forms[key].error = true
-          this.errors.push({'message': `${this.forms[key].name} مورد نیاز است`})
+            this.errors.push({'message': `${this.forms[key].name} مورد نیاز است`})
           }
         }else {
            this.forms[key].error = false

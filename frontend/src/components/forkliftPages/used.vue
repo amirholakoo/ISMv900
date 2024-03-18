@@ -42,18 +42,12 @@ export default {
           console.log(response.data)
           this.forms.supplier_name.data = response.data['supplier_names']
           this.forms.material_name.data = response.data['material_names']
+          this.forms.unit.data = response.data['units']
         })
       }
       if (k == 'supplier_name'){
         this.forms.supplier_name.name = name
         this.forms.supplier_name.value = name
-        const params = {
-          'supplier_name': this.forms.unloading_location.value,
-        }
-        this.axios.get('/myapp/api/getUnitBasedSupplierName', {params:params}).then((response) => {
-          console.log(response.data)
-          this.forms.unit.data = response.data['unit_names']
-        })
       }
       if (k == 'material_name'){
         this.forms.material_name.name = name
@@ -63,6 +57,7 @@ export default {
     async addSupplier() {
       const params = {
         "unloading_location": this.forms.unloading_location.value,
+        "supplier_name": this.forms.supplier_name.value,
         "material_name": this.forms.material_name.value,
         "unit": this.forms.unit.value,
         "quantity": this.forms.Quantity.value,
