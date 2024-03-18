@@ -83,97 +83,97 @@ class SaleAdmin(admin.ModelAdmin):
 @admin.register(Anbar_Sangin)
 class AnbarSanginAdmin(admin.ModelAdmin):
     # Specify the fields to display in the list view
-    list_display = ('supplier_name', 'material_name', 'reel_number', 'status', 'location', 'last_date')
+    list_display = ('supplier_name', 'material_name', 'reel_number','unit', 'status', 'location', 'last_date', 'receive_date',)
     # Specify the fields to use in the search box
     search_fields = ('material_name', 'reel_number')
     # Specify the fields to use in the filter sidebar
     list_filter = ('status', 'location')
     # Specify the fields to display in the detail view
-    fields = ('supplier_name','material_name', 'reel_number', 'status', 'location', 'last_date', 'width', 'gsm', 'length', 'grade', 'breaks', 'comments', 'qr_code', 'profile_name', 'username', 'logs')
+    fields = ('receive_date','supplier_name','material_name', 'reel_number','unit', 'status', 'location', 'last_date', 'width', 'gsm', 'length', 'grade', 'breaks', 'comments', 'qr_code', 'profile_name', 'username', 'logs')
 
 
 @admin.register(Anbar_Salon_Tolid)
 class AnbarSalonTolidAdmin(admin.ModelAdmin):
     # Specify the fields to display in the list view
-    list_display = ('supplier_name', 'material_name', 'reel_number', 'status', 'location', 'last_date')
+    list_display = ('supplier_name', 'material_name', 'reel_number','unit', 'status', 'location', 'last_date', 'receive_date')
     # Specify the fields to use in the search box
     search_fields = ('material_name', 'reel_number')
     # Specify the fields to use in the filter sidebar
     list_filter = ('status', 'location')
     # Specify the fields to display in the detail view
-    fields = ('supplier_name', 'material_name', 'reel_number', 'status', 'location', 'last_date', 'width', 'gsm', 'length', 'grade', 'breaks', 'comments', 'qr_code', 'profile_name', 'username', 'logs')
+    fields = ('supplier_name', 'material_name', 'reel_number','unit', 'status', 'location', 'last_date','receive_date', 'width', 'gsm', 'length', 'grade', 'breaks', 'comments', 'qr_code', 'profile_name', 'username', 'logs')
 
 
 @admin.register(Anbar_Parvandeh)
 class AnbarParvandehAdmin(admin.ModelAdmin):
     # Specify the fields to display in the list view
-    list_display = ('supplier_name', 'material_name', 'reel_number', 'status', 'location', 'last_date')
+    list_display = ('supplier_name', 'material_name', 'reel_number','unit', 'status', 'location', 'last_date', 'receive_date')
     # Specify the fields to use in the search box
     search_fields = ('material_name', 'reel_number')
     # Specify the fields to use in the filter sidebar
     list_filter = ('status', 'location')
     # Specify the fields to display in the detail view
-    fields = ('supplier_name', 'material_name', 'reel_number', 'status', 'location', 'last_date', 'width', 'gsm', 'length', 'grade', 'breaks', 'comments', 'qr_code', 'profile_name', 'username', 'logs')
+    fields = ('supplier_name', 'material_name', 'reel_number','unit', 'status', 'location', 'last_date','receive_date', 'width', 'gsm', 'length', 'grade', 'breaks', 'comments', 'qr_code', 'profile_name', 'username', 'logs')
 
 
 @admin.register(Anbar_Koochak)
 class AnbarKoochakAdmin(admin.ModelAdmin):
     # Specify the fields to display in the list view
-    list_display = ('supplier_name', 'material_name', 'reel_number', 'status', 'location', 'last_date')
+    list_display = ('supplier_name', 'material_name', 'reel_number','unit', 'status', 'location', 'last_date', 'receive_date')
     # Specify the fields to use in the search box
     search_fields = ('material_name', 'reel_number')
     # Specify the fields to use in the filter sidebar
     list_filter = ('status', 'location')
     # Specify the fields to display in the detail view
-    fields = ('supplier_name', 'material_name', 'reel_number', 'status', 'location', 'last_date', 'width', 'gsm', 'length', 'grade', 'breaks', 'comments', 'qr_code', 'profile_name', 'username', 'logs')
+    fields = ('supplier_name', 'material_name', 'reel_number','unit', 'status', 'location', 'last_date', 'width', 'gsm', 'length', 'grade', 'breaks', 'comments', 'qr_code', 'profile_name', 'username', 'logs')
 
 
 @admin.register(Anbar_Khamir_Ghadim)
 class AnbarKhamirGhadimAdmin(admin.ModelAdmin):
     # Specify the fields to display in the list view
-    list_display = ('supplier_name', 'material_name', 'reel_number', 'status', 'location', 'last_date')
+    list_display = ('supplier_name', 'material_name', 'reel_number', 'unit','status', 'location', 'last_date','receive_date')
     # Specify the fields to use in the search box
     search_fields = ('material_name', 'reel_number')
     # Specify the fields to use in the filter sidebar
     list_filter = ('status', 'location')
     # Specify the fields to display in the detail view
-    fields = ('supplier_name', 'material_name', 'reel_number', 'status', 'location', 'last_date', 'width', 'gsm', 'length', 'grade', 'breaks', 'comments', 'qr_code', 'profile_name', 'username', 'logs')
+    fields = ('supplier_name', 'material_name', 'reel_number', 'unit','status', 'location', 'last_date','receive_date', 'width', 'gsm', 'length', 'grade', 'breaks', 'comments', 'qr_code', 'profile_name', 'username', 'logs')
 
 
 @admin.register(Anbar_Khamir_Kordan)
 class AnbarKhamirKordanAdmin(admin.ModelAdmin):
     # Specify the fields to display in the list view
-    list_display = ('supplier_name', 'material_name', 'reel_number', 'status', 'location', 'last_date')
+    list_display = ('supplier_name', 'material_name', 'reel_number', 'unit','status', 'location', 'last_date','receive_date')
     # Specify the fields to use in the search box
     search_fields = ('material_name', 'reel_number')
     # Specify the fields to use in the filter sidebar
     list_filter = ('status', 'location')
     # Specify the fields to display in the detail view
-    fields = ('supplier_name', 'material_name', 'reel_number', 'status', 'location', 'last_date', 'width', 'gsm', 'length', 'grade', 'breaks', 'comments', 'qr_code', 'profile_name', 'username', 'logs')
+    fields = ('supplier_name', 'material_name', 'reel_number', 'unit','status', 'location', 'last_date','receive_date', 'width', 'gsm', 'length', 'grade', 'breaks', 'comments', 'qr_code', 'profile_name', 'username', 'logs')
 
 
 @admin.register(Anbar_Muhvateh_Kardan)
 class AnbarMuhvatehKardanAdmin(admin.ModelAdmin):
     # Specify the fields to display in the list view
-    list_display = ('material_name', 'supplier_name', 'reel_number', 'status', 'location', 'last_date')
+    list_display = ('material_name', 'supplier_name', 'reel_number', 'unit','status', 'location', 'last_date','receive_date')
     # Specify the fields to use in the search box
     search_fields = ('material_name', 'reel_number')
     # Specify the fields to use in the filter sidebar
     list_filter = ('status', 'location')
     # Specify the fields to display in the detail view
-    fields = ('supplier_name', 'material_name', 'reel_number', 'status', 'location', 'last_date', 'width', 'gsm', 'length', 'grade', 'breaks', 'comments', 'qr_code', 'profile_name', 'username', 'logs')
+    fields = ('supplier_name', 'material_name', 'reel_number', 'unit','status', 'location', 'last_date','receive_date', 'width', 'gsm', 'length', 'grade', 'breaks', 'comments', 'qr_code', 'profile_name', 'username', 'logs')
 
 
 @admin.register(Anbar_Akhal)
 class AnbarAkhalAdmin(admin.ModelAdmin):
     # Specify the fields to display in the list view
-    list_display = ('supplier_name', 'material_name', 'reel_number', 'status', 'location', 'last_date')
+    list_display = ('supplier_name', 'material_name', 'reel_number', 'unit','status', 'location', 'last_date','receive_date')
     # Specify the fields to use in the search box
     search_fields = ('material_name', 'reel_number')
     # Specify the fields to use in the filter sidebar
     list_filter = ('status', 'location')
     # Specify the fields to display in the detail view
-    fields = ('supplier_name', 'material_name', 'reel_number', 'status', 'location', 'last_date', 'width', 'gsm', 'length', 'grade', 'breaks', 'comments', 'qr_code', 'profile_name', 'username', 'logs')
+    fields = ('supplier_name', 'material_name', 'reel_number', 'unit','status', 'location', 'last_date','receive_date', 'width', 'gsm', 'length', 'grade', 'breaks', 'comments', 'qr_code', 'profile_name', 'username', 'logs')
 
 
 @admin.register(Consumption)

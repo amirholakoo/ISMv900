@@ -169,7 +169,7 @@ def add_supplier(request):
             comments=comments,
             username=username,
             status='Active',
-            logs =f'Username {username} Created NOW at time ({str(datetime.now())}),'
+            logs =f'{username} Created NOW at time ({str(datetime.now())}),'
         )
 
         # Save the new Supplier object to the database
@@ -237,7 +237,7 @@ def add_customer(request):
             comments=comments,
             username=username,
             status='Active',
-            logs=f'Username {username} Created NOW at time ({str(datetime.now())}),'
+            logs=f'{username} Created NOW at time ({str(datetime.now())}),'
         )
 
         # Save the new Customer object to the database
@@ -357,7 +357,7 @@ def add_rawMaterial(request):
             material_name=material_name,
             comments=comments,
             username=username,
-            logs=f'Username {username} Created NOW at time ({str(datetime.now())}),'
+            logs=f'{username} Created NOW at time ({str(datetime.now())}),'
         )
 
         # Save the new Customer object to the database
@@ -531,7 +531,7 @@ def add_new_reel(request):
                 breaks=breaks,
                 grade=grade,
                 profile_name=consumption_profile_name,
-                receive_date=datetime.now(),
+                receive_date=str(datetime.now()),
                 logs=f'Created NOW at time ({str(datetime.now())}),',
             )
             new_product.save()
@@ -546,12 +546,29 @@ def add_new_reel(request):
                 breaks=breaks,
                 grade=grade,
                 profile_name=consumption_profile_name,
+                receive_date=str(datetime.now()),
             )
             new_anbar_record.save()
 
-            # Update the Consumption DB based on the selected consumption profile
-            # Note: Add your own logic to update the Consumption model here
-
+            # Update the Consumption DB based on the selected consumption profile name
+            cn = Consumption.objects.filter(profile_name=consumption_profile_name)
+            # Get all table names from the database
+            all_table_names = connection.introspection.table_names()
+            anbar_table_names = [name for name in all_table_names if name.startswith('Anbar_')]
+            # Dynamically get the model based on the anbar_name
+            for anbar_name in anbar_table_names:
+                AnbarModel = apps.get_model('myapp', anbar_name)
+                for profile in cn:
+                    profile.supplier_name
+                    profile.material_name
+                # Update Anbar
+                for _ in range(len(cn)):
+                    # Insert data into the specific Anbar table
+                    anbar_instance = AnbarModel.objects.create(
+                        status='In-stock',
+                        location='Weight2',
+                        receive_date=timezone.now(),
+                    )
             # Return a success response
             return JsonResponse({'status': 'success', 'message': 'Reel number has been added'}, status=200)
 
@@ -711,7 +728,7 @@ def add_shipment(request):
                     location='Entrance',
                     username=username,
                     entry_time=str(datetime.now()),
-                    logs=f'username ({username}) Now created NOW ({str(datetime.now())}),'
+                    logs=f'{username} Now created NOW at time ({str(datetime.now())}),'
                 )
             else:
                 shipment = Shipments(
@@ -723,7 +740,7 @@ def add_shipment(request):
                     location='Entrance',
                     username=username,
                     entry_time=str(datetime.now()),
-                    logs=f'username ({username}) Now created NOW ({str(datetime.now())}),'
+                    logs=f'{username} Now created NOW ({str(datetime.now())}),'
                 )
 
             # change Truck status to Busy
@@ -951,7 +968,7 @@ def update_weight1(request):
                     comments=f"{username} updated Weight1",
                     status='LoadingUnloading',
                     location='Weight1',
-                    logs=f'Username ({username}) Weight1 NOW ({str(datetime.now())}),'
+                    logs=f'{username} Weight1 NOW ({str(datetime.now())}),'
                 )
                 return JsonResponse({'status': 'success', 'message': 'وزن اولیه بار نامه با موفقیت آپدیت شد.'})
 
@@ -1042,10 +1059,9 @@ def update_weight2(request):
                     net_weight=net_weight,
                     username=username,
                     weight2_time=str(datetime.now()),
-                    comments=f"{username} updated Weight2",
                     status='LoadingUnloading',
                     location='Office',
-                    logs=f'Username ({username}) Weight2 NOW ({str(datetime.now())}),'
+                    logs=f'{username} Weight2 NOW ({str(datetime.now())}),'
                 )
 
                 return JsonResponse({'status': 'success', 'message': f'Weight2 and Net Weight for Shipments with License Number {license_number} has been updated successfully.'})
@@ -1175,7 +1191,7 @@ def create_purchase_order(request):
                     document_info=document_info,
                     comments=commnet,
                     username=username,
-                    logs=f'Username ({username}) Created PO NOW ({str(datetime.now())}),',
+                    logs=f'{username} Created PO NOW ({str(datetime.now())}),',
                 )
                 # Save the new purchase object to the database
                 try:
@@ -1426,6 +1442,8 @@ def unload(request):
                     location='Weight2',
                     status='LoadedUnloaded',
                 )
+                UnitDB = Unit.objects.get(unit_name=unit)
+                supplier_name=UnitDB.supplier_name
                 # Dynamically get the model based on the anbar_name
                 AnbarModel = apps.get_model('myapp', unloading_location)
                 # Calculate the quantity to be unloaded
@@ -1434,9 +1452,11 @@ def unload(request):
                 for _ in range(quantity_to_unload):
                     # Insert data into the specific Anbar table
                     anbar_instance = AnbarModel.objects.create(
+                        supplier_name=supplier_name,
                         status='In-stock',
-                        location='Weight2',
-                        receive_date=timezone.now(),
+                        location=unloading_location,
+                        receive_date=str(datetime.now()),
+                        last_date=str(datetime.now()),
                     )
 
                 # Return a success response
@@ -1669,31 +1689,34 @@ def used(request):
         quantity = request.GET.get('quantity')
         forklift_driver = request.GET.get('forklift_driver')
         try:
+            # Calculate the quantity to be unloaded
+            quantity_to_unload = int(quantity)
+            # Dynamically get the model based on the anbar_name
+            AnbarModel = apps.get_model('myapp', unloading_location)
+
             # Create Consumption records
-            for _ in range(quantity):
+            for _ in range(quantity_to_unload):
                 consumption = Consumption(
-                    receive_date=datetime.now(),
+                    receive_date=str(datetime.now()),
                     supplier_name=supplier_name,
                     material_name=material_name,
                     unit=unit,
                     status='Used',
-                    logs=f'Forklift Driver ({forklift_driver}) Used NOW at ({str(datetime.now())}),'
-                    # commNOW (CVS)ents=data['forklift_driver']
+                    logs=f'{forklift_driver} Used NOW at ({str(datetime.now())}),'
                 )
                 consumption.save()
-
-            # Update AnbarGeneric (Anbar_Akhal in this example)
-            anbar_items = Anbar_Akhal.objects.filter(
-                location=unloading_location,
-                supplier_name=supplier_name,
-                material_name=material_name
-            )
-            for item in anbar_items:
-                item.status = 'Used'
-                item.location = 'Consumption DB'
-                item.last_date = datetime.now()
-                item.comments = 'forklift driver'
-                item.save()
+                # Insert data into the specific Anbar table
+                anbar_items = AnbarModel.objects.filter(
+                    supplier_name=supplier_name,
+                    material_name=material_name,
+                    unit=unit,
+                ).update(
+                    status='Used',
+                    location='Consumption DB',
+                    logs=f'{forklift_driver} Used NOW at ({str(datetime.now())}),',
+                    receive_date = str(datetime.now()),
+                    last_date=str(datetime.now()),
+                )
 
             # Return a success response
             #  'message': f'{data["quantity"]} units of {data["material_name"]} have been marked as used.'
@@ -1940,7 +1963,7 @@ def add_material_type(request):
                 material_type=material_type,
                 username=username,
                 status='Active',
-                logs=f'Username {username} Created NOW at time ({datetime.now()}),'
+                logs=f'{username} Created NOW at time ({datetime.now()}),'
             )
             # Save the new Customer object to the database
             try:
@@ -2096,7 +2119,7 @@ def add_consumption_profile(request):
                     profile_name=profile_name,
                     username=username,
                     status="Active",
-                    logs=f'Username {username} Created NOW at time ({datetime.now()}),'
+                    logs=f'{username} Created NOW at time ({datetime.now()}),'
                 )
                 new_consumption.save()
 
