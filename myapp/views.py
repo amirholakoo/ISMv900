@@ -91,6 +91,7 @@ def add_truck(request):
         phone = request.GET.get('phone')
         username = request.GET.get('username')
         errors = []
+        print(driver_name)
         # Create new truck
         new_truck = Truck(
             license_number=license_number,

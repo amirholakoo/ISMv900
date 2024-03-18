@@ -62,11 +62,12 @@ export default {
     async addTruck() {
       const params = {
         "license_number": this.first.val + this.letter.val + this.second.val +"ایران"+ this.year.val,
-        "driver_name": this.driver_name,
-        "driver_doc": this.driver_doc,
-        "phone": this.phone,
-        "username": this.username,
+        "driver_name": this.forms.driver_name.value,
+        "driver_doc": this.forms.driver_doc.value,
+        "phone": this.forms.phone.value,
+        "username": this.forms.username.value,
       };
+
       this.errors = []
       for (const key in this.forms) {
         if (this.forms[key].value == ''){
@@ -98,14 +99,6 @@ export default {
     },
   },
   watch: {
-    "letter.val"(c, p){
-      // const farsiRange = /[\u0600-\u06FF]/;
-      // if (farsiRange.test(c)){
-      //   this.letter.error = false
-      // } else {
-      //   this.letter.error = true
-      // }
-    },
     success(c, p){
       if (c == true) {
         setTimeout(() => {
@@ -114,6 +107,14 @@ export default {
         }, 5000)
       }
     }
+    // "letter.val"(c, p){
+  //   // const farsiRange = /[\u0600-\u06FF]/;
+  //   // if (farsiRange.test(c)){
+  //   //   this.letter.error = false
+  //   // } else {
+  //   //   this.letter.error = true
+  //   // }
+  // },
   //   "first.val"(c, p, n){
   //     if ( Number.isInteger(parseInt(c))){
   //       this.first.val = parseInt(c)
