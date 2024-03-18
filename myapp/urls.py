@@ -12,6 +12,7 @@ urlpatterns = [
     path("api/getAnbarTableNames", get_anbar_table_names),
     path("api/getMaterialNames", get_material_names),
     path("api/getCustomerNames", get_customer_names),
+    path("api/getShipmentLicenseNumbers", get_shipment_license_numbers),
     path("api/getShipmentLicenseNumbersByStatus/<str:status>", get_shipment_license_numbers_by_status),
     path("api/getShipmentLicenseNumbersOutgoingByStatus/<str:status>", get_shipment_license_numbers_outgoing_by_status),
     path("api/getShipmentLicenseNumbersByLocation/<str:location>", get_shipment_license_numbers_by_location),

@@ -38,7 +38,7 @@ export default {
         GSM:{type:'input', name: 'گراماژ', title:'گراماژ', data:'', value:''},
         length:{type:'input', name: 'طول', title:'طول', data:'', value:''},
         breaks:{type:'input', name: 'پارگی', title:'پارگی', data:'', value:''},
-        grade:{type:'input', name: 'کیفیت', title:'کیفیت', data:'کیفیت', value:''},
+        grade:{type:'input', name: 'کیفیت', title:'کیفیت', data:'', value:''},
         consumption_profile_name:{type:'dropdown', name:'پروفایل مصرف', title:'پروفایل مصرف', data:'', value:''},
       },
       success: false,
@@ -49,12 +49,9 @@ export default {
     }
   },
   watch:{
-    success(c, p){
+    hide(c, p){
       if (c == true) {
-        setTimeout(() => {
-          this.success = false
-          location.reload();
-        }, 5000)
+        location.reload();
       }
     },
   },
@@ -67,7 +64,7 @@ export default {
       }
     },
     async addSupplier() {
-      const params = {
+      let params = {
         "reel_number": this.forms.reel_number.value,
         "width": this.forms.width.value,
         "gsm": this.forms.GSM.value,
@@ -76,12 +73,27 @@ export default {
         "grade": this.forms.grade.value,
         "consumption_profile_name": this.forms.consumption_profile_name.value,
       };
+      this.qrcode = await QRCode.toDataURL(JSON.stringify(params), {
+        width: 256,
+        height: 256,
+      })
+      params = {
+        "reel_number": this.forms.reel_number.value,
+        "width": this.forms.width.value,
+        "gsm": this.forms.GSM.value,
+        "length": this.forms.length.value,
+        "breaks": this.forms.breaks.value,
+        "grade": this.forms.grade.value,
+        "consumption_profile_name": this.forms.consumption_profile_name.value,
+        "qr_code": this.qrcode,
+      };
+      console.log('params is:',params)
       this.errors = []
       for (const key in this.forms) {
         if (this.forms[key].value == ''){
           if (key!='comment'){
             this.forms[key].error = true
-          this.errors.push({'message': `${this.forms[key].name} مورد نیاز است`})
+            this.errors.push({'message': `${this.forms[key].name} مورد نیاز است`})
           }
         }else {
            this.forms[key].error = false
@@ -113,6 +125,7 @@ export default {
       printWindow.document.write('</body></html>');
       printWindow.print();
       printWindow.documents.close();
+      location.reload();
     },
   },
 }
@@ -121,25 +134,15 @@ export default {
   <Card title="اضافه کردن رول جدید">
     <form class="flex flex-col items-center mt-5 gap-4">
       <div v-if="error" class="flex p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400" role="alert">
-            <svg class="flex-shrink-0 inline w-4 h-4 me-3 mt-[2px]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
-            </svg>
-            <span class="sr-only">Danger</span>
-            <div>
-              <span class="font-medium">خطا! لطفا اطلاعات را برسی کنید:</span>
-                <ul class="mt-1.5 list-disc list-inside">
-                  <li v-for="error in errors">{{ error.message }}</li>
-              </ul>
-            </div>
-          </div>
-      <div v-if="success" class="flex p-4 mb-4 text-sm text-green-800 rounded-lg bg-green-50 dark:bg-gray-800 dark:text-green-400" role="alert">
         <svg class="flex-shrink-0 inline w-4 h-4 me-3 mt-[2px]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
           <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
         </svg>
+        <span class="sr-only">Danger</span>
         <div>
-          <span class="font-medium">
-            مشتری جدید با نام {{ forms.customer_name.value }} با موفقیت به سیستم اضافه شد.
-          </span>
+          <span class="font-medium">خطا! لطفا اطلاعات را برسی کنید:</span>
+            <ul class="mt-1.5 list-disc list-inside">
+              <li v-for="error in errors">{{ error.message }}</li>
+          </ul>
         </div>
       </div>
       <template v-for="(val, form_name) in forms">
@@ -189,6 +192,29 @@ export default {
           </div>
         </template>
       </modal>
+
+      <div v-if="success" :class="{'hidden': hide}" class="backdrop-blur-sm bg-white/30 flex fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+        <div class="relative p-4 w-full max-w-md max-h-full">
+          <div  id="alert-3" class="flex flex-col gap-4 p-4 mb-4 text-green-800 rounded-lg bg-green-50 dark:bg-gray-800 dark:text-green-400" role="alert">
+              <header class="flex felx-row justify-between items-center">
+                <svg class="flex-shrink-0 w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
+              </svg>
+                <h class="ms-3 text-sm font-medium">رول  {{ forms.reel_number.value }} با موفقیت به سیستم اضافه شد.</h>
+                <button @click="hide=!hide" type="button" class="ms-auto -mx-1.5 -my-1.5 bg-green-50 text-green-500 rounded-lg focus:ring-2 focus:ring-green-400 p-1.5 hover:bg-green-200 inline-flex items-center justify-center h-8 w-8 dark:bg-gray-800 dark:text-green-400 dark:hover:bg-gray-700">
+                <span class="sr-only">Close</span>
+                <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                  <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                </svg>
+              </button>
+              </header>
+              <main class="flex flex-col justify-center items-center gap-2">
+                <img :src="qrcode" class="w-[256px] h-[256px]"/>
+                <button @click="printQRCode" type="button" class="inline-flex justify-center w-full px-2 py-1.5 text-xs font-medium text-center text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-500 dark:hover:bg-blue-600 dark:focus:ring-blue-800">چاپ QR Code</button>
+              </main>
+            </div>
+        </div>
+      </div>
     </form>
   </Card>
 </template>

@@ -267,7 +267,7 @@ class Purchases(models.Model):
     """
     # Fields
 
-    date = models.DateTimeField(default=timezone.now, blank=True)
+    date = models.DateTimeField(default=datetime.now, blank=True)
     receive_date = models.DateTimeField(blank=True, null=True)
 
     supplier_id = models.ForeignKey('Supplier', on_delete=models.SET_NULL, blank=True, null=True)

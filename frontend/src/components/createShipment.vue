@@ -39,7 +39,6 @@ export default {
   },
   mounted() {
     initFlowbite();
-    initDropdowns();
     this.axios.get('/myapp/api/getLicenseNumbers').then((response) => {
       console.log(response.data)
       this.forms.lic_number.data = response.data['free_truck']
@@ -186,7 +185,6 @@ export default {
         </div>
       </div>
       <template v-for="(val, form_name) in forms">
-        <template v-if="val.status">
           <template v-if="val.type=='input'">
             <div class="relative">
               <input v-model="val.value" type="text" :id="form_name" :class="[val.error ? 'text-red-900 border-red-500 focus:border-red-500' : 'text-gray-900 focus:border-green-500 border-gray-300']" class="block px-2.5 pb-2.5 pt-4 w-full text-sm  bg-transparent rounded-lg border-1 appearance-none focus:outline-none focus:ring-0 peer" placeholder="" />
@@ -196,7 +194,7 @@ export default {
             </div>
           </template>
           <template v-if="val.type=='dropdown'">
-          <button :id="form_name + 'Button'" :data-dropdown-toggle="form_name+'dropdown'" class="justify-between w-44 text-white bg-green-500 hover:bg-green-600 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="button">
+          <button :id="form_name + 'Button'" :data-dropdown-toggle="form_name+'dropdown'" :class="[val.status ? '': 'hidden']" class="justify-between w-44 text-white bg-green-500 hover:bg-green-600 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="button">
             {{val.name}}
             <svg class="w-2.5 h-2.5 ms-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
               <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>
@@ -213,7 +211,7 @@ export default {
             </ul>
         </div>
         </template>
-        </template>
+
       </template>
       <modal type="confirm">
         <template v-slot:button>اضافه کردن</template>

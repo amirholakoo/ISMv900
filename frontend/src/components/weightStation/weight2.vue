@@ -23,8 +23,12 @@ export default {
   },
   mounted() {
     initFlowbite();
-    this.axios.get('/myapp/api/getShipmentLicenseNumbersByStatus/LoadedUnloaded').then((response) => {
-      console.log(response.data)
+    const params = {
+      "status": 'LoadedUnloaded',
+      "location": 'Weight2'
+    }
+    this.axios.post('/myapp/api/getShipmentLicenseNumbers', {}, {params: params}).then((response) => {
+      console.log('lics:',response.data)
       this.forms.lic_number.data = response.data['license_numbers']
     })
   },

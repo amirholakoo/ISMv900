@@ -34,7 +34,7 @@ class SupplierAdmin(admin.ModelAdmin):
 @admin.register(Products)
 class ProductsAdmin(admin.ModelAdmin):
 
-    list_display = ('reel_number', 'width', 'gsm', 'length', 'grade', 'breaks', 'comments', 'qr_code', 'location', 'status', 'receive_date', 'last_date', 'profile_name', 'username', 'logs')
+    list_display = ('reel_number', 'width', 'gsm', 'length', 'grade', 'breaks', 'comments', 'location', 'status', 'receive_date', 'last_date', 'profile_name', 'username', 'logs','qr_code')
 
     search_fields = ('reel_number', 'grade')
 
@@ -95,7 +95,7 @@ class AnbarSanginAdmin(admin.ModelAdmin):
 @admin.register(Anbar_Salon_Tolid)
 class AnbarSalonTolidAdmin(admin.ModelAdmin):
     # Specify the fields to display in the list view
-    list_display = ('supplier_name', 'material_name', 'reel_number','unit', 'status', 'location', 'last_date', 'receive_date')
+    list_display = ('supplier_name', 'material_name', 'reel_number','unit', 'status', 'location', 'last_date','receive_date', 'width', 'gsm', 'length', 'grade', 'breaks', 'comments', 'qr_code', 'profile_name', 'username', 'logs')
     # Specify the fields to use in the search box
     search_fields = ('material_name', 'reel_number')
     # Specify the fields to use in the filter sidebar

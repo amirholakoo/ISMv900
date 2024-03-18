@@ -143,7 +143,7 @@ export default {
         </svg>
         <div>
           <span class="font-medium">
-            مشتری جدید با نام {{ forms.customer_name.value }} با موفقیت به سیستم اضافه شد.
+            لیست پروفایل مصرف با موفقیت به سیستم اضافه شد.
           </span>
         </div>
       </div>
