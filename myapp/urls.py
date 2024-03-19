@@ -51,6 +51,5 @@ urlpatterns = [
     path("createPurchaseOrder/", create_purchase_order),
     path("createSalesOrder/", create_sales_order),
     path("forkliftPanel/", forklift_panel),
-
 ]
 

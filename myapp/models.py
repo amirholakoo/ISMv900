@@ -23,7 +23,7 @@ class Truck(models.Model):
     driver_doc = models.CharField(max_length=255, blank=True)
     phone = models.CharField(max_length=20, blank=True)
     status = models.CharField(max_length=10, choices=[('Free', 'Free'), ('Busy', 'Busy')], default='Free')
-    location = models.CharField(max_length=255, blank=True, choices=[('Entrance', 'Entrance'), ('Weight1', 'Weight1'), ('Weight2', 'Weight2'), ('Offiffice', 'Offiffice'), ('Delivered', 'Delivered')], default='Entrance')
+    location = models.CharField(max_length=255, blank=True, choices=[('Entrance', 'Entrance'), ('Weight1', 'Weight1'), ('Weight2', 'Weight2'), ('Office', 'Office'), ('Delivered', 'Delivered')], default='Entrance')
     username = models.CharField(max_length=255, null=False, blank=True)
     logs = models.TextField(blank=True)
 
@@ -135,7 +135,7 @@ class Products(models.Model):
     grade = models.CharField(max_length=255)
 
     # Breaks of the product
-    breaks = models.CharField(max_length=255)
+    breaks = models.IntegerField(max_length=255)
 
     # Additional comments about the product
     comments = models.TextField(null=True, blank=True)
@@ -212,7 +212,7 @@ class RawMaterial(models.Model):
     material_type = models.CharField(max_length=255)
     material_name = models.CharField(max_length=255)
     description = models.CharField(max_length=255, blank=True)
-    status = models.CharField(max_length=255)
+    status = models.CharField(max_length=255, default='Active')
     comments = models.TextField(blank=True)
     username = models.CharField(max_length=255, null=False, blank=True)
     logs = models.TextField(blank=True)
@@ -442,7 +442,7 @@ class AnbarGeneric(models.Model):
     grade = models.CharField(max_length=255, null=True, blank=True)
 
     # Breaks of the material
-    breaks = models.CharField(max_length=255, null=True, blank=True)
+    breaks = models.IntegerField(null=True, blank=True)
 
     # Additional comments about the material
     comments = models.TextField(null=True, blank=True)

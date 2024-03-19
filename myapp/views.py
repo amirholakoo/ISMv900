@@ -327,7 +327,7 @@ def add_rawMaterial(request):
         supplier_name = request.GET.get('supplier_name')
         material_type = request.GET.get('material_type')
         material_name = request.GET.get('material_name')
-        comments = request.GET.get('comments')
+        description = request.GET.get('comments')
         username = request.GET.get('username')
 
         # Initialize an empty list to collect error messages
@@ -355,7 +355,7 @@ def add_rawMaterial(request):
             supplier_name=supplier_name,
             material_type=material_type,
             material_name=material_name,
-            comments=comments,
+            description=description,
             username=username,
             logs=f'{username} Created NOW at time ({str(datetime.now())}),'
         )
@@ -431,6 +431,7 @@ def get_reel_number(request):
             grade = 0
             profile_name = 0
         next_reel_number = int(last_reel_number) + 1
+        print(next_reel_number, last_reel_number)
         data = {
             'next_reel_number': next_reel_number,
             'width': width,
@@ -1120,7 +1121,7 @@ def create_purchase_order(request):
             quantity = request.GET.get('quantity')
             quality = request.GET.get('quality')
             penalty = request.GET.get('penalty')
-            price_pre_kg = request.GET.get('price_pre_kg')
+            price_per_kg = request.GET.get('price_pre_kg')
             vat = request.GET.get('vat')
             total_price = request.GET.get('total_price')
             extra_cost = request.GET.get('extra_cost')
@@ -1157,7 +1158,7 @@ def create_purchase_order(request):
                 errors.append({'status': 'error', 'message': 'کیفیت مورد نیاز است'})
             if not penalty:
                 errors.append({'status': 'error', 'message': 'مقدار جریمه را وارد کنید'})
-            if not price_pre_kg:
+            if not price_per_kg:
                 errors.append({'status':'error', 'message': 'مقدار قیمت هر کیلوگرم را وارد کنید'})
             if not vat:
                 errors.append({'status':'error', 'message': 'مقدار مالیات بر ارزش افزوده را انتحاب کنید'})
@@ -1181,7 +1182,7 @@ def create_purchase_order(request):
                 Shipments.objects.filter(license_number=license_number, status='LoadingUnloading', location='Office').update(
                     vat=vat,
                     penalty=penalty,
-                    price_pre_kg=price_pre_kg,
+                    price_per_kg=price_per_kg,
                     extra_cost=extra_cost,
                     invoice_status=invoice_status,
                     payment_status=payment_status,
@@ -1215,7 +1216,7 @@ def create_purchase_order(request):
                     weight1=weight1,
                     weight2=weight2,
                     net_weight=net_weight,
-                    price_per_kg=price_pre_kg,
+                    price_per_kg=price_per_kg,
                     vat=vat,
                     total_price=total_price,
                     extra_cost=extra_cost,
@@ -1346,7 +1347,8 @@ def create_sales_order(request):
                 Shipments.objects.filter(license_number=license_number).update(
                     exit_time=str(datetime.now()),
                     status='Delivered',
-                    location=customer_name,
+                    location='Delivered',
+                    price_per_kg=price_pre_kg,
                     username=username,
                     comments=commnet,
                 )
@@ -1362,6 +1364,11 @@ def create_sales_order(request):
                     location=customer_name,
                     last_date=str(datetime.now()),
                 )
+                # Products.objects.create(
+                #     status='Delivered',
+                #     location=customer_name,
+                #     last_date=str(datetime.now()),
+                # )
                 # Return a success response
                 return JsonResponse({'status': 'success', 'message': 'Sales Order created successfully.'})
 
@@ -1495,7 +1502,6 @@ def unload(request):
                         status='In-stock',
                         location=unloading_location,
                         receive_date=str(datetime.now()),
-                        last_date=str(datetime.now()),
                     )
 
                 # Return a success response
@@ -1856,7 +1862,6 @@ def moved(request):
     """
     if request.method == 'POST':
         # Assuming the request data is in JSON format
-        data = request.json()
         from_anbar = request.GET.get('from_anbar')
         real = request.GET.get('real')
         supplier_name = request.GET.get('supplier_name')
@@ -1913,7 +1918,7 @@ def moved(request):
                 new_item.save()
 
             # Return a success response
-            return JsonResponse({'status': 'success', 'message': f'{data["quantity"]} units of {data["material_name"]} have been moved from {data["from_anbar"]} to {data["to_anbar"]}.'})
+            return JsonResponse({'status': 'success', 'message': f'{Quantity} units of {material_name} have been moved from {from_anbar} to {to_anbar}.'})
 
         except Exception as e:
             return JsonResponse({'status': 'error', 'message': str(e)}, status=500)

@@ -22,7 +22,7 @@ export default {
         vat: {type: 'dropdown', name: 'مالیات بر ارزش افزوده',title: 'مالیات بر ارزش افزوده', data: ['0%', '1%', '2%', '3%', '4%', '5%', '6%', '7%', '8%', '9%', '10%'], value: '0'},
         total_price: {type:'input', name: 'قمیت کل', value: '', disable:true},
         extra_cost: {type:'input', name: 'هزینه اضافی', value: ''},
-        invoice_status: {type: 'dropdown', name: 'وضعیت فاکتور',title: 'وضعیت فاکتور', data: ['Received', 'NA'], value: ''},
+        invoice_status: {type: 'dropdown', name: 'وضعیت فاکتور',title: 'وضعیت فاکتور', data: ['Sent', 'NA'], value: ''},
         invoice_number: {type:'input', name: 'شماره فاکتور', value: ''},
         payment_status:{type:'dropdown', name: 'وضعیت پرداخت',title: 'وضعیت پرداخت', data: ['Terms', 'Paid'], value: ''},
         document_info: {type:'input', name: 'اظلاعات سند', value: ''},
