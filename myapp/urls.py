@@ -31,6 +31,7 @@ urlpatterns = [
     path("api/getSupplierNamesBasedAndbar", get_supplierNames_based_andbar),
     path("api/getUnitBasedSupplierName", get_unit_based_supplier_name),
     path("api/getReelNumber", get_reel_number),
+    path("api/loadDataForMoved", load_data_for_moved),
 
     # Following paths are related to Pages:
 

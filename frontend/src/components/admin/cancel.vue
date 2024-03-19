@@ -1,45 +1,31 @@
 <script>
-import {initFlowbite} from "flowbite";
-import modal from "@/components/Modal.vue";
+import { initFlowbite } from 'flowbite'
+import card from "@/components/Card.vue";
 import Alert from "@/components/Alert.vue";
-import Card from "@/components/Card.vue";
+import modal from "@/components/Modal.vue";
 
 export default {
-  name: "unloaded",
-  components: {Card, Alert, modal},
+  name: "cancel",
+  components: {
+    modal, Alert,
+    Card
+  },
+  mounted() {
+    initFlowbite();
+  },
   data(){
-    return {
+    return{
       forms: {
-        lic_number: {type: 'dropdown', name: 'شماره پلاک',title: 'شماره پلاک', data: '', value: ''},
-        unloading_location: {type: 'dropdown', name: 'محل تخلیه',title: 'محل تخلیه', data: '', value: ''},
-        unit: {type: 'dropdown', name: 'واحد',title: 'واحد', data: '', value: ''},
-        Quantity: {type:'input', name: 'کمیف(مقدار)', value: ''},
-        Quality: {type:'input', name: 'کیفیت', value: ''},
-        forklift_driver: {type:'input', name: 'اسم راننده فرک لیفت', value: ''},
+        customer_name: {type: 'input', name: 'اسم مشتری',title: ' اسم مشتری', data: '', value: ''},
+        address: {type: 'input', name: 'آدرس',title: 'آدرس', data: '', value: ''},
+        phone: {type: 'input', name: 'شماره همراه',title: 'شماره همراه', data: '', value: ''},
+        comment: {type: 'input', name: 'توضیحات',title: 'توضیحات', data: '', value: ''},
+        username: {type: 'input', name: 'نام کاربر',title: 'نام کاربری', data: '', value: ''},
       },
       success: false,
       error: false,
       errors: [],
     }
-  },
-  mounted() {
-    initFlowbite();
-    const params = {
-      "status": 'LoadingUnloading',
-      "location": 'Weight1'
-    }
-    this.axios.post('/myapp/api/getShipmentLicenseNumbers', {}, {params: params}).then((response) => {
-      console.log('lics:',response.data)
-      this.forms.lic_number.data = response.data['license_numbers']
-    })
-    this.axios.get('/myapp/api/getAnbarTableNames').then((response) => {
-      console.log(response.data)
-      this.forms.unloading_location.data = response.data['data']
-    })
-    this.axios.get('/myapp/api/getUnitNames').then((response) => {
-      console.log(response.data)
-      this.forms.unit.data = response.data['unit_names']
-    })
   },
   watch:{
     success(c, p){
@@ -51,46 +37,46 @@ export default {
       }
     },
   },
-  methods:{
-    clicked(k, name){
-      console.log(k, name)
-      if (k == 'lic_number'){
-        this.forms.lic_number.name = name
-        this.forms.lic_number.value = name
-      }
-      if (k == 'unloading_location'){
-        this.forms.unloading_location.name = name
-        this.forms.unloading_location.value = name
-      }
-      if (k == 'unit'){
-        this.forms.unit.name = name
-        this.forms.unit.value = name
-      }
-    },
+  methods: {
     async addSupplier() {
       const params = {
-        "license_number": this.forms.lic_number.value,
-        "unloading_location": this.forms.unloading_location.value,
-        "unit": this.forms.unit.value,
-        "quantity": this.forms.Quantity.value,
-        "quality": this.forms.Quality.value,
-        "forklift_driver": this.forms.forklift_driver.value
+        "customer_name": this.forms.customer_name.value,
+        "address": this.forms.address.value,
+        "phone": this.forms.phone.value,
+        "username": this.forms.username.value,
+        "comments": this.forms.comment.value,
       };
-      const response = await this.axios.post('/myapp/api/unload', {}, {params: params})
-      console.log(response.data); // Access response data
-      if (response.data['status'] == 'success'){
-        this.success = true
-      }else {
-        this.error = true
-        this.errors = response.data['errors']
+      this.errors = []
+      for (const key in this.forms) {
+        if (this.forms[key].value == ''){
+          if (key!='comment'){
+            this.forms[key].error = true
+            this.errors.push({'message': `${this.forms[key].name} مورد نیاز است`})
+          }
+        }else {
+           this.forms[key].error = false
+        }
       }
-    },
-  }
+      if (this.errors.length == 0){
+        this.error = false
+        const response = await this.axios.post('/myapp/addCustomer/', {}, {params: params})
+        console.log(response.data); // Access response data
+        if (response.data['status'] == 'success'){
+          this.success = true
+        }else {
+          this.error = true
+          this.errors = response.data['errors']
+        }
+      } else {
+        this.error = true
+      }
+    }
+  },
 }
 </script>
-
 <template>
-<form class="flex flex-col items-center mt-5 gap-4">
+  <Card title="اضافه کردن مشتری جدید">
+    <form class="flex flex-col items-center mt-5 gap-4">
       <div v-if="error" class="flex p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400" role="alert">
             <svg class="flex-shrink-0 inline w-4 h-4 me-3 mt-[2px]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
               <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
@@ -109,8 +95,7 @@ export default {
         </svg>
         <div>
           <span class="font-medium">
-            {{forms.unit.value}} {{forms.Quantity.value}}
-            با موفقیت به پلاگ {{forms.lic_number.value}} اضافه شد
+            مشتری جدید با نام {{ forms.customer_name.value }} با موفقیت به سیستم اضافه شد.
           </span>
         </div>
       </div>
@@ -151,7 +136,7 @@ export default {
                 <ul v-if="key=='reel_numbers'">
                   <li v-for="item in val.value" :key="item">{{ item }}</li>
                 </ul>
-                <p v-else>{{val.name}}: {{val.value}}</p>
+                <p v-else>{{val.title}}: {{val.value}}</p>
             </template>
           </div>
         </template>
@@ -162,4 +147,5 @@ export default {
         </template>
       </modal>
     </form>
+  </Card>
 </template>

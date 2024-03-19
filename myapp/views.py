@@ -1786,6 +1786,36 @@ def used(request):
     else:
         return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=400)
 
+def load_data_for_moved(request):
+    try:
+        # Extract the anbar_location from the query parameters
+        anbar_location = request.GET.get('anbar_location')
+        if not anbar_location:
+            return JsonResponse({'error': 'Anbar location is required'}, status=400)
+
+        # Dynamically import the model class
+        model_class = apps.get_model('myapp', anbar_location)
+
+        # Query the model to get reel numbers where the width matches the specified width,
+        # the status is "In-stock", and sort the results by receive_date (old to new)
+        anbar = model_class.objects.filter(status='In-stock')
+        print(anbar)
+        data = {
+            "supplier_name": anbar.supplier_name,
+            "material_name": anbar.material_name,
+            "unit": anbar.unit,
+
+            "width": anbar.width,
+            "reel_number": anbar.reel_number,
+        }
+
+        # Return the widths as a JSON response
+        return JsonResponse(data=data, status=200)
+    except Exception as e:
+        print(e)
+        # Handle any exceptions that occur during the process
+        return JsonResponse({'error': str(e)}, status=500)
+
 
 @csrf_exempt
 def moved(request):
@@ -1827,29 +1857,58 @@ def moved(request):
     if request.method == 'POST':
         # Assuming the request data is in JSON format
         data = request.json()
+        from_anbar = request.GET.get('from_anbar')
+        real = request.GET.get('real')
+        supplier_name = request.GET.get('supplier_name')
+        material_name = request.GET.get('material_name')
+        unit = request.GET.get('unit')
+        Quantity = request.GET.get('Quantity')
+        width = request.GET.get('width')
+        to_anbar = request.GET.get('to_anbar')
+        forklift_driver = request.GET.get('forklift_driver')
+        real_or_raw = request.GET.get('real_or_raw')
 
         try:
+            AnbarModel1 = apps.get_model('myapp', from_anbar)
+            AnbarModel2 = apps.get_model('myapp', to_anbar)
             # Update source AnbarGeneric items
-            source_items = Anbar_Akhal.objects.filter(
-                location=data['from_anbar'],
-                supplier_name=data['supplier_name'],
-                material_name=data['material_name']
-            )
-            for item in source_items:
-                item.status = 'Moved'
-                item.location = data['to_anbar']
-                item.last_date = timezone.now()
-                item.save()
+            if real_or_raw == 'Raw':
+                source_items = AnbarModel1.objects.filter(
+                    location=from_anbar,
+                    supplier_name=supplier_name,
+                    material_name=material_name,
+                    logs=f'{forklift_driver} Moved NOW at time ({str(datetime.now())})'
+                )
+                for item in source_items:
+                    item.status = 'Moved'
+                    item.location = to_anbar
+                    item.last_date = str(datetime.now())
+                    item.save()
+            if real_or_raw == 'Reel':
+                # Update source AnbarGeneric items
+                source_items2 = Products.objects.filter(
+                    location=from_anbar,
+                    supplier_name=supplier_name,
+                    material_name=material_name,
+                    logs=f'{forklift_driver} Moved NOW at time ({str(datetime.now())})'
+                )
+                for item in source_items2:
+                    item.status = 'Moved'
+                    item.location = to_anbar
+                    item.last_date = str(datetime.now())
+                    item.save()
 
             # Create new entries in the destination AnbarGeneric location
-            for _ in range(data['quantity']):
-                new_item = Anbar_Akhal(
-                    receive_date=timezone.now(),
-                    location=data['to_anbar'],
+            for _ in range(int(Quantity)):
+                new_item = AnbarModel2(
+                    receive_date=str(datetime.now()),
+                    location=to_anbar,
                     status='In-stock',
-                    supplier_name=data['supplier_name'],
-                    material_name=data['material_name'],
-                    # Add other necessary fields as per your model
+                    supplier_name=supplier_name,
+                    material_name=material_name,
+                    width=width,
+                    unit=unit,
+                    reel_number=real
                 )
                 new_item.save()
 
