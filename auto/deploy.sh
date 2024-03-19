@@ -20,12 +20,12 @@ fi
 # Clone the repository
 git clone https://github.com/amirholakoo/ISMv900.git v988
 
+# Change ownership of the venv directory
+sudo chown -R $USER:$USER ~/ISMv900
+# Or sudo chown -R admin:admin ~
+
 # Install Python and pip if they are not installed
 sudo apt-get install python3 python3-pip -y
-
-# Change ownership of the venv directory
-sudo chown -R $USER:$USER ~/ISMv900/venv
-# Or sudo chown -R admin:admin ~
 
 # Install virtualenv if not installed
 sudo pip3 install virtualenv
