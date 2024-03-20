@@ -61,9 +61,9 @@ OR
 
 ### Create static/dist
 
-myapp
-frontend
-static
+- myapp
+- frontend
+- static
 |---dist
 	
     mkdir static
