@@ -1684,10 +1684,9 @@ def get_supplierNames_based_andbar(request):
     if request.method == 'GET':
         anbar_location = request.GET.get('anbar_location')
         try:
-            anbar_model = apps.get_model('myapp', anbar_location)
-            supplier_name = anbar_model.objects.values_list('supplier_name', flat=True)
-            material_name = anbar_model.objects.values_list('material_name', flat=True)
-            unit = anbar_model.objects.values_list('unit', flat=True)
+            supplier_name = AnbarGeneric.objects.values_list('supplier_name', flat=True)
+            material_name = AnbarGeneric.objects.values_list('material_name', flat=True)
+            unit = AnbarGeneric.objects.values_list('unit', flat=True)
             supplier_names = list(supplier_name)
             material_names = list(material_name)
             units = list(unit)
@@ -1761,7 +1760,6 @@ def used(request):
             # Calculate the quantity to be unloaded
             quantity_to_unload = int(quantity)
             # Dynamically get the model based on the anbar_name
-            AnbarModel = apps.get_model('myapp', unloading_location)
 
             # Create Consumption records
             for _ in range(quantity_to_unload):
@@ -1771,25 +1769,25 @@ def used(request):
                     material_name=material_name,
                     unit=unit,
                     status='Used',
-                    logs=f'{forklift_driver} Used NOW at ({str(datetime.now())}),'
+                    logs=log_generator(forklift_driver, 'Used')
                 )
                 consumption.save()
                 # Insert data into the specific Anbar table
-                anbar_items = AnbarModel.objects.filter(
+                AnbarGeneric.objects.filter(
                     supplier_name=supplier_name,
                     material_name=material_name,
                     unit=unit,
                 ).update(
                     status='Used',
                     location='Consumption DB',
-                    logs=f'{forklift_driver} Used NOW at ({str(datetime.now())}),',
-                    receive_date = timezone.now(),
+                    logs=log_generator(forklift_driver, 'Used'),
+                    receive_date=timezone.now(),
                     last_date=timezone.now(),
                 )
 
             # Return a success response
-            #  'message': f'{data["quantity"]} units of {data["material_name"]} have been marked as used.'
-            return JsonResponse({'status': 'success',})
+
+            return JsonResponse({'status': 'success', 'message': f'{quantity} units of {material_name} have been marked as used.'})
 
         except Exception as e:
             return JsonResponse({'status': 'error', 'message': str(e)}, status=500)

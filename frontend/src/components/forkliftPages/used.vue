@@ -14,8 +14,8 @@ export default {
         supplier_name: {type: 'dropdown', name: 'اسم تامین کننده',title: 'اسم تامین کننده', data: '', value: ''},
         material_name: {type: 'dropdown', name: 'اسم ماده',title: 'اسم ماده', data: '', value: ''},
         unit: {type: 'dropdown', name: 'واحد',title: 'واحد', data: '', value: ''},
-        Quantity: {type:'input', name: 'کمیف(مقدار)', value: ''},
-        forklift_driver: {type:'input', name: 'اسم راننده فرک لیفت', value: ''},
+        Quantity: {type:'input', name: 'مقدار',title: 'مقدار', value: ''},
+        forklift_driver: {type:'input', name: 'اسم راننده فرک لیفت',title: 'اسم راننده فرک لیفت', value: ''},
       },
       success: false,
       error: false,
@@ -52,6 +52,10 @@ export default {
       if (k == 'material_name'){
         this.forms.material_name.name = name
         this.forms.material_name.value = name
+      }
+      if (k == 'unit'){
+        this.forms.unit.name = name
+        this.forms.unit.value = name
       }
     },
     async addSupplier() {
@@ -96,7 +100,7 @@ export default {
         </svg>
         <div>
           <span class="font-medium">
-            مشتری جدید با نام {{ forms.customer_name.value }} با موفقیت به سیستم اضافه شد.
+             با موفقیت به سیستم اضافه شد.
           </span>
         </div>
       </div>
@@ -137,7 +141,7 @@ export default {
                 <ul v-if="key=='reel_numbers'">
                   <li v-for="item in val.value" :key="item">{{ item }}</li>
                 </ul>
-                <p v-else>{{val.name}}: {{val.value}}</p>
+                <p v-else>{{val.title}}: {{val.value}}</p>
             </template>
           </div>
         </template>
