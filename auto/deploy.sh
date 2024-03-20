@@ -21,7 +21,7 @@ fi
 git clone https://github.com/amirholakoo/ISMv900.git v988
 
 # Change ownership of the venv directory
-sudo chown -R $USER:$USER ~/ISMv900
+sudo chown -R $USER:$USER v988
 # Or sudo chown -R admin:admin ~
 
 # Install Python and pip if they are not installed
