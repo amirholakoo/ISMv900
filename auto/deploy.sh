@@ -41,7 +41,7 @@ pip install django
 pip install jdatetime
 
 # Create static/dist directories
-mkdir -p myapp/frontend/static/dist
+mkdir -p static/dist
 
 # Apply Django migrations
 python manage.py makemigrations
