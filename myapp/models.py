@@ -386,15 +386,6 @@ class Sales(models.Model):
         return f"Sale (ID: {self.id}, Date: {self.date}, Customer: {self.customer})"
 
 
-class Anbars(models.Model):
-    location = models.CharField(max_length=255, null=True, blank=True)
-    username = models.CharField(max_length=255, null=False, blank=True)
-    logs = models.TextField(blank=True)
-
-    # Meta
-    class Meta:
-        db_table = 'Anbars'
-
 
 
 class AnbarGeneric(models.Model):
@@ -436,7 +427,7 @@ class AnbarGeneric(models.Model):
 
     # Location of the material
     location = models.CharField(max_length=255, null=True, blank=True)
-    location_id = models.ForeignKey(Anbars, on_delete=models.CASCADE,  null=True)
+
     # Last date the material was updated
     last_date = models.DateTimeField(null=True, blank=True)
 
@@ -468,7 +459,113 @@ class AnbarGeneric(models.Model):
 
     # Meta
     class Meta:
-        db_table = 'AnbarGeneric'
+        abstract = True # Make this model abstract so it's not created in the DB
+
+
+
+# Define the specific anbar models
+class Anbar_Sangin(AnbarGeneric):
+    """
+    Model representing an anbar item in Sangin.
+    Inherits from AnbarGeneric to reuse common fields and behaviors.
+    """
+    class Meta(AnbarGeneric.Meta):
+        verbose_name_plural = "Anbar Sangin"
+        db_table = 'Anbar_Sangin'
+
+    def __str__(self):
+        return f"{self.material_name} ({self.reel_number})"
+
+
+class Anbar_Salon_Tolid(AnbarGeneric):
+    """
+    Model representing an anbar item in Salon Tolid.
+    Inherits from AnbarGeneric to reuse common fields and behaviors.
+    """
+    class Meta(AnbarGeneric.Meta):
+        verbose_name_plural = "Anbar Salon Tolid"
+        db_table = 'Anbar_Salon_Tolid'
+
+    def __str__(self):
+        return f"{self.material_name} ({self.reel_number})"
+
+
+class Anbar_Parvandeh(AnbarGeneric):
+    """
+    Model representing an anbar item in Parvandeh.
+    Inherits from AnbarGeneric to reuse common fields and behaviors.
+    """
+    class Meta(AnbarGeneric.Meta):
+        verbose_name_plural = "Anbar Parvandeh"
+        db_table = 'Anbar_Parvandeh'
+
+    def __str__(self):
+        return f"{self.material_name} ({self.reel_number})"
+
+
+class Anbar_Koochak(AnbarGeneric):
+    """
+    Model representing an anbar item in Koochak.
+    Inherits from AnbarGeneric to reuse common fields and behaviors.
+    """
+    class Meta(AnbarGeneric.Meta):
+        verbose_name_plural = "Anbar Koochak"
+        db_table = 'Anbar_Koochak'
+
+    def __str__(self):
+        return f"{self.material_name} ({self.reel_number})"
+
+
+class Anbar_Khamir_Ghadim(AnbarGeneric):
+    """
+    Model representing an anbar item in Khamir Ghadim.
+    Inherits from AnbarGeneric to reuse common fields and behaviors.
+    """
+    class Meta(AnbarGeneric.Meta):
+        verbose_name_plural = "Anbar Khamir Ghadim"
+        db_table = 'Anbar_Khamir_Ghadim'
+
+    def __str__(self):
+        return f"{self.material_name} ({self.reel_number})"
+
+
+class Anbar_Khamir_Kordan(AnbarGeneric):
+    """
+    Model representing an anbar item in Khamir Kordan.
+    Inherits from AnbarGeneric to reuse common fields and behaviors.
+    """
+    class Meta(AnbarGeneric.Meta):
+        verbose_name_plural = "Anbar Khamir Kordan"
+        db_table = 'Anbar_Khamir_Kordan'
+
+    def __str__(self):
+        return f"{self.material_name} ({self.reel_number})"
+
+
+class Anbar_Muhvateh_Kardan(AnbarGeneric):
+    """
+    Model representing an anbar item in Muhvateh Kardan.
+    Inherits from AnbarGeneric to reuse common fields and behaviors.
+    """
+    class Meta(AnbarGeneric.Meta):
+        verbose_name_plural = "Anbar Muhvateh Kardan"
+        db_table = 'Anbar_Muhvateh_Kardan'
+
+    def __str__(self):
+        return f"{self.material_name} ({self.reel_number})"
+
+
+class Anbar_Akhal(AnbarGeneric):
+    """
+    Model representing an anbar item in Akhal.
+    Inherits from AnbarGeneric to reuse common fields and behaviors.
+    """
+    class Meta(AnbarGeneric.Meta):
+        verbose_name_plural = "Anbar Akhal"
+        db_table = 'Anbar_Akhal'
+
+    def __str__(self):
+        return f"{self.material_name} ({self.reel_number})"
 
 
 class Consumption(models.Model):
@@ -524,12 +621,16 @@ class Consumption(models.Model):
 
 
 class ConsumptionProfile(models.Model):
-    profile = models.ForeignKey(Consumption, on_delete=models.CASCADE, related_name='profile_items')
+    profile_name = models.ForeignKey(Consumption, on_delete=models.CASCADE, related_name='profile_items')
     supplier_name = models.CharField(max_length=255)
     material_type = models.CharField(max_length=255)
     material_name = models.CharField(max_length=255)
     unit = models.CharField(max_length=100)
     quantity = models.DecimalField(max_digits=10, decimal_places=2)
+    receive_date = models.DateTimeField(blank=True, null=True)
+    status = models.CharField(max_length=255, blank=True, default="Active")
+    username = models.CharField(max_length=255, null=False, blank=True)
+    logs = models.TextField(blank=True)
     # Meta
     class Meta:
         db_table = 'ConsumptionProfile'

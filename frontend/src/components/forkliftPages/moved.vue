@@ -15,11 +15,11 @@ export default {
         supplier_name: {status:true, type: 'dropdown', name: 'اسم تامین کننده',title: 'اسم تامین کننده', data: '', value: ''},
         material_name: {status:true, type: 'dropdown', name: 'اسم ماده',title: 'اسم ماده', data: '', value: ''},
         unit: {status:true, type: 'dropdown', name: 'واحد',title: 'واحد', data: '', value: ''},
-        Quantity: {status:true, type:'input', name: 'کمیف(مقدار)', value: ''},
+        Quantity: {status:true, type:'input', name: 'کمیف(مقدار)', title: 'کمیف(مقدار)', value: ''},
         width: {status:false, type: 'dropdown', name: 'عرض',title: 'عرض', data: '', value: ''},
         reel: {status:false, type: 'dropdown', name: 'عرض',title: 'عرض', data: '', value: ''},
         to_anbar: {status:true, type: 'dropdown', name: 'به انبار',title: 'به انبار', data: '', value: ''},
-        forklift_driver: {status:true, type:'input', name: 'اسم راننده فرک لیفت', value: ''},
+        forklift_driver: {status:true, type:'input', name: 'اسم راننده فرک لیفت',title: 'اسم راننده فرک لیفت', value: ''},
       },
       success: false,
       error: false,
@@ -51,43 +51,68 @@ export default {
       if (k == 'from_anbar'){
         this.forms.from_anbar.name = name
         this.forms.from_anbar.value = name
-        const params = {
-          "anbar_location": this.forms.from_anbar.value
+      }
+      if (k == 'real_or_raw') {
+        this.forms.real_or_raw.name = name
+        this.forms.real_or_raw.value = name
+        if (name == 'Reel') {
+          this.forms.supplier_name.status = false
+          this.forms.material_name.status = false
+          this.forms.unit.status = false
+          this.forms.Quantity.status = false
+          this.forms.width.status = true
+          this.forms.reel.status = true
+          const params = {
+            "anbar_location": this.forms.from_anbar.value,
+            "real_or_raw": 'Reel'
+          }
+          this.axios.post('/myapp/api/loadDataForMoved', {}, {params: params}).then((response) => {
+            console.log(response.data)
+            this.forms.width.data = response.data['width']
+            this.forms.reel.data = response.data['reel_number']
+          })
         }
-        this.axios.post('/myapp/api/loadDataForMoved', {}, {params:params}).then((response) => {
-          console.log(response.data)
-          this.forms.real.data = response.data['width']
-          this.forms.supplier_name.data = response.data['supplier_name']
-          this.forms.material_name.data = response.data['material_name']
-          this.forms.unit.data = response.data['unit']
-        })
-      }
-      if (k == 'real_or_raw'){
-        if (name == 'Reel')
-        this.forms.supplier_name.status = false
-        this.forms.material_name.status = false
-        this.forms.unit.status = false
-        this.forms.Quantity.status = false
-        this.forms.width.status = true
-        this.forms.reel.status = true
-      }
-      if (name == 'Raw'){
-        this.forms.supplier_name.status = true
-        this.forms.material_name.status = true
-        this.forms.unit.status = true
-        this.forms.Quantity.status = true
-        this.forms.width.status = false
-        this.forms.reel.status = false
+
+        if (name == 'Raw') {
+          this.forms.supplier_name.status = true
+          this.forms.material_name.status = true
+          this.forms.unit.status = true
+          this.forms.Quantity.status = true
+          this.forms.width.status = false
+          this.forms.reel.status = false
+          const params = {
+            "anbar_location": this.forms.from_anbar.value,
+            "real_or_raw": 'Raw'
+          }
+          this.axios.post('/myapp/api/loadDataForMoved', {}, {params: params}).then((response) => {
+            console.log(response.data)
+            this.forms.supplier_name.data = response.data['supplier_names']
+            this.forms.material_name.data = response.data['material_names']
+            this.forms.unit.data = response.data['units']
+          })
+        }
       }
       if (k == 'unit'){
         this.forms.unit.name = name
         this.forms.unit.value = name
       }
+      if (k == 'supplier_name'){
+        this.forms.supplier_name.name = name
+        this.forms.supplier_name.value = name
+      }
+      if (k == 'material_name'){
+        this.forms.material_name.name = name
+        this.forms.material_name.value = name
+      }
+      if (k == 'to_anbar'){
+        this.forms.to_anbar.name = name
+        this.forms.to_anbar.value = name
+      }
     },
     async addSupplier() {
       const params = {
         "from_anbar": this.forms.from_anbar.value,
-        "real": this.forms.real.value,
+        "reel": this.forms.reel.value,
         "supplier_name": this.forms.supplier_name.value,
         "material_name": this.forms.material_name.value,
         "unit": this.forms.unit.value,
@@ -97,16 +122,30 @@ export default {
         "forklift_driver": this.forms.forklift_driver.value,
         "real_or_raw": this.forms.real_or_raw.value
       };
+      console.log(params)
       this.errors = []
-      for (const key in this.forms) {
-        if (this.forms[key].value == ''){
-          if (key!='comment'){
-            this.forms[key].error = true
-            this.errors.push({'message': `${this.forms[key].name} مورد نیاز است`})
-          }
+      // for (const key in this.forms) {
+      //   if (this.forms[key].value == ''){
+      //     if (key!='comment'){
+      //       this.forms[key].error = true
+      //       this.errors.push({'message': `${this.forms[key].name} مورد نیاز است`})
+      //     }
+      //   }else {
+      //      this.forms[key].error = false
+      //   }
+      // }
+      if (this.errors.length == 0){
+        this.error = false
+        const response = await this.axios.post('/myapp/api/moved', {}, {params: params})
+        console.log(response.data); // Access response data
+        if (response.data['status'] == 'success'){
+          this.success = true
         }else {
-           this.forms[key].error = false
+          this.error = true
+          this.errors = response.data['errors']
         }
+      } else {
+        this.error = true
       }
     },
   }
@@ -174,7 +213,7 @@ export default {
                   <ul v-if="key=='reel_numbers'">
                     <li v-for="item in val.value" :key="item">{{ item }}</li>
                   </ul>
-                  <p v-else>{{val.name}}: {{val.value}}</p>
+                  <p v-else>{{val.title}}: {{val.value}}</p>
               </template>
             </div>
           </template>
