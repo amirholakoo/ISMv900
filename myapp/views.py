@@ -565,7 +565,7 @@ def add_new_reel(request):
             # Get all table names from the database
             all_table_names = connection.introspection.table_names()
             anbar_table_names = [name for name in all_table_names if name.startswith('Anbar_')]
-            profile_list = ConsumptionProfile(profile_name=profile_name)
+            profile_list = ConsumptionProfile.objects.filter(profile_name=profile_name)
             for each_line in profile_list:
                 for quantity in each_line.quantity:
                     for anbar_name in anbar_table_names:

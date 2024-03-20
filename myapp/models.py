@@ -220,6 +220,7 @@ class RawMaterial(models.Model):
     # Meta
     class Meta:
         db_table = 'RawMaterial'
+        unique_together = ('material_name', 'supplier_name')
 
     def __str__(self):
         """
@@ -689,13 +690,14 @@ class Unit(models.Model):
     unit_name = models.CharField(max_length=255, null=True, blank=True)
     count = models.FloatField(blank=True, null=True)
     username = models.CharField(max_length=255, null=False, blank=True)
-    date = models.DateTimeField(default=datetime.now, blank=True)
+    date = models.DateTimeField(default=timezone.now, blank=True)
     status = models.CharField(max_length=255, blank=True)
     logs = models.TextField(blank=True)
 
     # Meta
     class Meta:
         db_table = 'Unit'
+        unique_together = ('unit_name', 'supplier_name')
 
     def __str__(self):
         """
