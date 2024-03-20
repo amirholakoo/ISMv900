@@ -1,3 +1,6 @@
+# STOP SERVERS
+# deactivate
+
 # chmod +x deploy.sh
 # ./deploy.sh
 
