@@ -14,61 +14,73 @@ From A to Z setup Linux servers and running services.
 
     cd ~/V9/v988/
 
-### Clone:
+### Rename old folder:
 
-    git clone https://github.com/amirholakoo/ISMv900.git
+admin@raspberrypi:~/V9/v988 $ `mv ISMv900 ISMv900_old_$(date +%Y%m%d%H%M%S)`
+
+### Delete old venv:
+
+admin@raspberrypi:~/V9/v988 $ `rm -r venv`
+
+### Clone new repo:
+
+admin@raspberrypi:~/V9/v988 $ `git clone https://github.com/amirholakoo/ISMv900.git`
+
+### NOTE:  This command changes the ownership of all files and directories within venv and ISMv900 to the current user and group:
+
+`sudo chown -R $USER:$USER ISMv900`
+`sudo chown -R $USER:$USER venv`
 
 ### Install Python:
 
-    sudo apt-get install python3 python3-pip
-
-### NOTE:  This command changes the ownership of all files and directories within venv to the current user and group:
-
-
-    sudo chown -R $USER:$USER ISMv900
-
-OR
-
-    sudo chown -R admin:admin ~
+admin@raspberrypi:~/V9/v988 $ `sudo apt-get install python3 python3-pip`
 
 ### Install Virtual Env:
 
-    sudo pip3 install virtualenv
+sudo pip3 install virtualenv
 
 ### Create/Activate/Deactivate venv:
 
-    python3 -m venv venv
+(venv) admin@raspberrypi:~/V9/v988 $ `python3 -m venv venv`
 
 activate:
 
-    source venv/bin/activate
+`source venv/bin/activate`
 
 deactivate:
 
-    deactivate
+`deactivate`
 
 ### Install Django:
 
-    pip install django
+(venv) admin@raspberrypi:~/V9/v988/ISMv900 $ `pip install django`
 
 OR
 
-    pip install -r requirements.txt
+pip install -r requirements.txt
 
 ### Install jdatetime:
 
-    pip install jdatetime
+(venv) admin@raspberrypi:~/V9/v988/ISMv900 $ `pip install jdatetime`
 
-### Create static/dist
+### Create static/dist in ISMv900 root
 
-- myapp
-- frontend
-- static
-|---dist
-	
-    mkdir static
+|- myapp
 
-	/dist
+|- frontend
+
+.
+
+.
+
+.
+
+|- static
+
+	L---dist
+ 
+
+(venv) admin@raspberrypi:~/V9/v988/ISMv900 $ mkdir -p static/dist
 
 ### Run Django Server:
 
@@ -99,6 +111,13 @@ access:
 ### Make Migrate for myapp:
 
     python manage.py migrate myapp
+
+OR
+
+	python manage.py makemigrations
+	python manage.py migrate
+	python manage.py makemigrations myapp
+	python manage.py migrate myapp
 
 ### Run Django Server:
 
