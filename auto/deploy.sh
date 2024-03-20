@@ -7,63 +7,59 @@
 # Stop Django Server if running
 pkill -f runserver
 
-# Update and upgrade the system packages
+# Update and Upgrade Packages
 sudo apt-get update
 sudo apt-get upgrade -y
 
-# Change to the specified directory and rename the old directory
+# Navigate to the project directory
 cd ~/V9/v988/
-if [ -d "ISMv900" ]; then
-    mv ISMv900 ISMv900_old_$(date +%Y%m%d%H%M%S)  # Rename with a timestamp
-fi
 
-# Clone the repository
-git clone https://github.com/amirholakoo/ISMv900.git v988
+# Rename old project folder with a timestamp
+mv ISMv900 "ISMv900_old_$(date +%Y%m%d%H%M%S)"
 
-# Change ownership of the venv directory
-sudo chown -R $USER:$USER v988
-# Or sudo chown -R admin:admin ~
+# Remove old virtual environment
+rm -rf venv
 
-# Install Python and pip if they are not installed
-sudo apt-get install python3 python3-pip -y
+# Clone new version of the project
+git clone https://github.com/amirholakoo/ISMv900.git
 
-# Install virtualenv if not installed
+# Change ownership of the new project folder and virtual environment (assuming they're already created at some point)
+sudo chown -R $USER:$USER ISMv900
+
+# Install Python3, pip, and virtualenv if not already installed
+sudo apt-get install -y python3 python3-pip
 sudo pip3 install virtualenv
 
-# Create a virtual environment and activate it
-cd v988
+# Create a new virtual environment and activate it
 python3 -m venv venv
 source venv/bin/activate
 
-# Install Django and other dependencies
+# Install Django and jdatetime
 pip install django
-# pip install -r requirements.txt  # If you have a requirements.txt file
 pip install jdatetime
 
-# Create static/dist directories
-mkdir -p static/dist
+# OR install all requirements from a file
+# pip install -r requirements.txt
 
-# Apply Django migrations
-python manage.py makemigrations
-python manage.py migrate
-python manage.py makemigrations myapp
-python manage.py migrate myapp
+# Create static/dist directories in the project root
+mkdir -p ISMv900/static/dist
 
-# Create a superuser
-echo "Creating superuser..."
-python manage.py createsuperuser --noinput || true  # Adjust or remove this line based on your need
+# Navigate to the frontend directory
+cd ISMv900/frontend
 
-# Run the Django development server
-python manage.py runserver &
-
-# Change directory to frontend and set up Vue.js
-cd ../frontend
-
-# Install npm and dependencies
-sudo apt install npm -y
+# Install npm and node packages
+sudo apt install -y npm
 npm install
 
-# Run Vue.js server
-npm run serve
+# Instructions end here. Additional steps can be scripted based on requirements.
+# For example, to run Django and Vue.js servers, you could add:
+# Back in the project root
+cd ..
+python manage.py makemigrations
+python manage.py migrate
+python manage.py createsuperuser
+# Note: Automated superuser creation is complex and might require a separate script or manual process
 
-echo "Deployment script executed successfully."
+# Starting servers (for demonstration, you'd typically use a more robust method in production)
+# python manage.py runserver &
+# cd frontend && npm run serve &
