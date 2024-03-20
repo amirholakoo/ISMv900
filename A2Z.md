@@ -25,7 +25,7 @@ From A to Z setup Linux servers and running services.
 ### NOTE:  This command changes the ownership of all files and directories within venv to the current user and group:
 
 
-    sudo chown -R $USER:$USER ~/ISMv900/venv
+    sudo chown -R $USER:$USER ISMv900
 
 OR
 
