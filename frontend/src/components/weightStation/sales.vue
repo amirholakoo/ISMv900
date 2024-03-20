@@ -11,23 +11,23 @@ export default {
     return {
       forms: {
         lic_number: {type: 'dropdown', name: 'شماره پلاک',title: 'شماره پلاک', data: '', value: ''},
-        customer_name: {type:'input', name: 'اسم مشتری', value: '', disable:true},
-        list_of_reels: {type:'list', name: 'لیست رول ها', value: '', disable:true},
-        weight1: {type:'input', name: 'وزن 1', value: '', disable:true},
-        weight2: {type:'input', name: 'وزن 2', value: '', disable:true},
-        net_weight: {type:'input', name: 'وزن خالص', value: '', disable:true},
-        loading_location: {type:'input', name: 'محل بار شده', value: '', disable:true},
-        consuption_profile_name: {type:'input', name: 'اسم پوفایل مصرفی', value: '', disable:true},
-        price_pre_kg: {type:'input', name: 'قیمت هر کیلوگرم', value: ''},
+        customer_name: {type:'input', name: 'اسم مشتری',title: 'اسم مشتری', value: '', disable:true},
+        list_of_reels: {type:'list', name: 'لیست رول ها',title: 'لیست رول ها', value: '', disable:true},
+        weight1: {type:'input', name: 'وزن 1',title: 'وزن 1', value: '', disable:true},
+        weight2: {type:'input', name: 'وزن 2',title: 'وزن 2', value: '', disable:true},
+        net_weight: {type:'input', name: 'وزن خالص', title: 'وزن خالص', value: '', disable:true},
+        loading_location: {type:'input', name: 'محل بار شده',title: 'محل بار شده', value: '', disable:true},
+        consuption_profile_name: {type:'input', name: 'اسم پوفایل مصرفی',title: 'اسم پوفایل مصرفی', value: '', disable:true},
+        price_pre_kg: {type:'input', name: 'قیمت هر کیلوگرم', title: 'قیمت هر کیلوگرم', value: ''},
         vat: {type: 'dropdown', name: 'مالیات بر ارزش افزوده',title: 'مالیات بر ارزش افزوده', data: ['0%', '1%', '2%', '3%', '4%', '5%', '6%', '7%', '8%', '9%', '10%'], value: '0'},
-        total_price: {type:'input', name: 'قمیت کل', value: '', disable:true},
-        extra_cost: {type:'input', name: 'هزینه اضافی', value: ''},
+        total_price: {type:'input', name: 'قمیت کل',title: 'قمیت کل', value: '', disable:true},
+        extra_cost: {type:'input', name: 'هزینه اضافی',title: 'هزینه اضافی', value: ''},
         invoice_status: {type: 'dropdown', name: 'وضعیت فاکتور',title: 'وضعیت فاکتور', data: ['Sent', 'NA'], value: ''},
-        invoice_number: {type:'input', name: 'شماره فاکتور', value: ''},
+        invoice_number: {type:'input', name: 'شماره فاکتور', title: 'شماره فاکتور', value: ''},
         payment_status:{type:'dropdown', name: 'وضعیت پرداخت',title: 'وضعیت پرداخت', data: ['Terms', 'Paid'], value: ''},
-        document_info: {type:'input', name: 'اظلاعات سند', value: ''},
-        commnet: {type:'input', name: 'کامنت', value: ''},
-        username: {type:'input', name: 'نام کاربری', value: ''},
+        document_info: {type:'input', name: 'اظلاعات سند',title: 'اظلاعات سند', value: ''},
+        commnet: {type:'input', name: 'کامنت',title: 'کامنت', value: ''},
+        username: {type:'input', name: 'نام کاربر',title: 'نام کاربر', value: ''},
       },
       success: false,
       error: false,
@@ -38,14 +38,20 @@ export default {
     total_price(){
       let vat = this.forms.vat.value;
       vat = parseInt(vat.replace('%', ''))
-      return (this.forms.net_weight.value * this.forms.price_pre_kg.value * (vat/100))
+      let price = this.forms.net_weight.value * this.forms.price_pre_kg.value
+      if (vat == 0 ){
+        return price
+      } else {
+         return price+(price * (vat/100))
+      }
     }
   },
   mounted() {
     initFlowbite();
     const params = {
       "status": 'Office',
-      "location": 'Office'
+      "location": 'Office',
+      'shipment_type': 'Outgoing',
     }
     this.axios.post('/myapp/api/getShipmentLicenseNumbers', {}, {params: params}).then((response) => {
       console.log('lics:',response.data)
@@ -83,18 +89,18 @@ export default {
         })
       }
       if (k == 'vat'){
-        this.forms.vat.name = name
+        this.forms.vat.title = name
         this.forms.vat.value = name
         console.log(this.total_price)
         this.forms.total_price.value = this.total_price
         
       }
       if (k == 'invoice_status'){
-        this.forms.invoice_status.name = name
+        this.forms.invoice_status.title = name
         this.forms.invoice_status.value = name
       }
       if (k == 'payment_status'){
-        this.forms.payment_status.name = name
+        this.forms.payment_status.title = name
         this.forms.payment_status.value = name
       }
     },
@@ -219,7 +225,7 @@ export default {
                 <ul v-if="key=='reel_numbers'">
                   <li v-for="item in val.value" :key="item">{{ item }}</li>
                 </ul>
-                <p v-else>{{val.name}}: {{val.value}}</p>
+                <p v-else>{{val.title}}: {{val.value}}</p>
             </template>
           </div>
         </template>

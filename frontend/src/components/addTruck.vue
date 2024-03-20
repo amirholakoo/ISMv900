@@ -33,7 +33,7 @@ export default {
         driver_name: {type: 'input', name: 'اسم راننده',title: 'راننده', data: '', value: ''},
         driver_doc: {type: 'input', name: 'شماره گواهی نامه',title: 'شماره گواهی نامه', data: '', value: ''},
         phone: {type: 'input', name: 'شماره همراه',title: 'شماره همراه', data: '', value: ''},
-        username: {type: 'input', name: 'نام کاربر',title: 'نام کاربری', data: '', value: ''},
+        username: {type: 'input', name: 'نام کاربر',title: 'نام کاربر', data: '', value: ''},
       },
       success: false,
       error: false,

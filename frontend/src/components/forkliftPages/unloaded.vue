@@ -13,9 +13,9 @@ export default {
         lic_number: {type: 'dropdown', name: 'شماره پلاک',title: 'شماره پلاک', data: '', value: ''},
         unloading_location: {type: 'dropdown', name: 'محل تخلیه',title: 'محل تخلیه', data: '', value: ''},
         unit: {type: 'dropdown', name: 'واحد',title: 'واحد', data: '', value: ''},
-        Quantity: {type:'input', name: 'کمیف(مقدار)', value: ''},
-        Quality: {type:'input', name: 'کیفیت', value: ''},
-        forklift_driver: {type:'input', name: 'اسم راننده فرک لیفت', value: ''},
+        Quantity: {type:'input', name: 'مقدار',title: 'مقدار', value: ''},
+        Quality: {type:'input', name: 'کیفیت',title: 'کیفیت', value: ''},
+        forklift_driver: {type:'input', name: 'اسم راننده فرک لیفت',title: 'اسم راننده فرک لیفت', value: ''},
       },
       success: false,
       error: false,
@@ -151,7 +151,7 @@ export default {
                 <ul v-if="key=='reel_numbers'">
                   <li v-for="item in val.value" :key="item">{{ item }}</li>
                 </ul>
-                <p v-else>{{val.name}}: {{val.value}}</p>
+                <p v-else>{{val.title}}: {{val.value}}</p>
             </template>
           </div>
         </template>

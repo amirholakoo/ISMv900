@@ -20,7 +20,7 @@ export default {
         address: {type: 'input', name: 'آدرس',title: 'آدرس', data: '', value: ''},
         phone: {type: 'input', name: 'شماره همراه',title: 'شماره همراه', data: '', value: ''},
         comment: {type: 'input', name: 'توضیحات',title: 'توضیحات', data: '', value: ''},
-        username: {type: 'input', name: 'نام کاربر',title: 'نام کاربری', data: '', value: ''},
+        username: {type: 'input', name: 'نام کاربر',title: 'نام کاربر', data: '', value: ''},
       },
       success: false,
       error: false,

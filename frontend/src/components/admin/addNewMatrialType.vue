@@ -11,8 +11,8 @@ export default {
     return {
       forms: {
         supplier_name: {type: 'dropdown', name: 'فروشنده',title: 'فروشنده', data: '', value: ''},
-        matrial_type: {type:'input', name: 'نوع متریال جدید', value: ''},
-        username: {type:'input', name: 'نام کاربر', value: ''},
+        matrial_type: {type:'input', name: 'نوع متریال جدید',title: 'نوع متریال جدید', value: ''},
+        username: {type:'input', name: 'نام کاربر',title: 'نام کاربر', value: ''},
       },
       success: false,
       error: false,
@@ -135,7 +135,7 @@ export default {
         <template v-slot:text>
           <div class="flex flex-col gap-2 font-bold">
             <template v-for="(val, key) in forms">
-                <p>{{val.name}}: {{val.value}}</p>
+                <p>{{val.title}}: {{val.value}}</p>
             </template>
           </div>
         </template>

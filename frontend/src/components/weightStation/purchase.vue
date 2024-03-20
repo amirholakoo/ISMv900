@@ -11,27 +11,27 @@ export default {
     return {
       forms: {
         lic_number: {type: 'dropdown', name: 'شماره پلاک',title: 'شماره پلاک', data: '', value: ''},
-        supplier_name: {type:'input', name: 'اسم تامین کننده', value: '', disable:true},
-        material_type: {type:'input', name: 'نوع ماده', value: '', disable:true},
-        material_name: {type:'input', name: 'اسم ماده', value: '', disable:true},
-        weight1: {type:'input', name: 'وزن 1', value: '', disable:true},
-        weight2: {type:'input', name: 'وزن 2', value: '', disable:true},
-        net_weight: {type:'input', name: 'وزن خالص', value: '', disable:true},
-        unloaded_location: {type:'input', name: 'محل تخلیه شده', value: '', disable:true},
-        unit: {type:'input', name: 'واحد', value: '', disable:true},
-        quantity: {type:'input', name: 'کمیت (مقدار)', tile: 'کمیت (مقدار)', value: '', disable:true},
+        supplier_name: {type:'input', name: 'اسم تامین کننده', title: 'اسم تامین کننده', value: '', disable:true},
+        material_type: {type:'input', name: 'نوع ماده',  title: 'نوع ماده', value: '', disable:true},
+        material_name: {type:'input', name: 'اسم ماده',  title: 'اسم ماده', value: '', disable:true},
+        weight1: {type:'input', name: 'وزن 1', title: 'وزن 1', value: '', disable:true},
+        weight2: {type:'input', name: 'وزن 2', title: 'وزن 2', value: '', disable:true},
+        net_weight: {type:'input', name: 'وزن خالص', title: 'وزن خالص', value: '', disable:true},
+        unloaded_location: {type:'input', name: 'محل تخلیه شده', title: 'محل تخلیه شده', value: '', disable:true},
+        unit: {type:'input', name: 'واحد',  title: 'واحد', value: '', disable:true},
+        quantity: {type:'input', name: 'مقدار', title: 'مقدار', value: '', disable:true},
         quality: {type: 'input', name: 'کیفیت',title: 'مالیات بر ارزش افزوده', value: '', disable:true},
         penalty: {type:'input', name: 'جریمه', title: 'جریمه', value: ''},
-        price_pre_kg: {type:'input', name: 'قیمت هر کیلوگرم', value: ''},
+        price_pre_kg: {type:'input', name: 'قیمت هر کیلوگرم', title: 'قیمت هر کیلوگرم', value: ''},
         vat: {type: 'dropdown', name: 'مالیات بر ارزش افزوده',title: 'مالیات بر ارزش افزوده', data: ['0%', '1%', '2%', '3%', '4%', '5%', '6%', '7%', '8%', '9%', '10%'], value: '0'},
-        total_price: {type:'input', name: 'قمیت کل', value: '', disable:true},
-        extra_cost: {type:'input', name: 'هزینه اضافی', value: ''},
+        total_price: {type:'input', name: 'قمیت کل', title: 'قمیت کل', value: '', disable:true},
+        extra_cost: {type:'input', name: 'هزینه اضافی', title: 'هزینه اضافی', value: ''},
         invoice_status: {type: 'dropdown', name: 'وضعیت فاکتور',title: 'وضعیت فاکتور', data: ['Received', 'NA'], value: ''},
-        supplier_invoice: {type:'input', name: 'شماره فاکتور تامین کننده', value: ''},
+        supplier_invoice: {type:'input', name: 'شماره فاکتور تامین کننده', title: 'شماره فاکتور تامین کننده', value: ''},
         payment_status:{type:'dropdown', name: 'وضعیت پرداخت',title: 'وضعیت پرداخت', data: ['Terms', 'Paid'], value: ''},
-        document_info: {type:'input', name: 'اظلاعات سند', value: ''},
-        commnet: {type:'input', name: 'کامنت', value: ''},
-        username: {type:'input', name: 'نام کاربری', value: ''},
+        document_info: {type:'input', name: 'اظلاعات سند', title: 'اظلاعات سند', value: ''},
+        commnet: {type:'input', name: 'کامنت', title: 'کامنت', value: ''},
+        username: {type:'input', name: 'نام کاربر', title: 'نام کاربر', value: ''},
       },
       success: false,
       error: false,
@@ -52,14 +52,20 @@ export default {
     total_price(){
       let vat = this.forms.vat.value;
       vat = parseInt(vat.replace('%', ''))
-      return (this.forms.net_weight.value * this.forms.price_pre_kg.value * (vat/100))
+      let price = this.forms.net_weight.value * this.forms.price_pre_kg.value
+      if (vat == 0 ){
+        return price
+      } else {
+         return price+(price * (vat/100))
+      }
     }
   },
   mounted() {
     initFlowbite();
     const params = {
       "status": 'Office',
-      "location": 'Office'
+      "location": 'Office',
+       'shipment_type': 'Incoming',
     }
     this.axios.post('/myapp/api/getShipmentLicenseNumbers', {}, {params: params}).then((response) => {
       console.log('lics:',response.data)
@@ -180,7 +186,7 @@ export default {
         </svg>
         <div>
           <span class="font-medium">
-            مشتری جدید با نام {{ forms.customer_name.value }} با موفقیت به سیستم اضافه شد.
+             با موفقیت به سیستم اضافه شد.
           </span>
         </div>
       </div>
@@ -221,7 +227,7 @@ export default {
                 <ul v-if="key=='reel_numbers'">
                   <li v-for="item in val.value" :key="item">{{ item }}</li>
                 </ul>
-                <p v-else>{{val.name}}: {{val.value}}</p>
+                <p v-else>{{val.title}}: {{val.value}}</p>
             </template>
           </div>
         </template>

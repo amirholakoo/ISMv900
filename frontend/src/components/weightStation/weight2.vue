@@ -11,10 +11,10 @@ export default {
     return {
       forms: {
         lic_number: {type: 'dropdown', name: 'شماره پلاک',title: 'شماره پلاک', data: '', value: ''},
-        weight1: {type:'input', name: 'وزن 1', value: ''},
-        weight2: {type:'input', name: 'وزن 2', value: ''},
-        net_weight: {type:'input', name: 'وزن خالص', value: ''},
-        username: {type:'input', name: 'نام کاربری', value: ''},
+        weight1: {type:'input', name: 'وزن 1', title: 'وزن 1', value: ''},
+        weight2: {type:'input', name: 'وزن 2', title: 'وزن 2', value: ''},
+        net_weight: {type:'input', name: 'وزن خالص', title: 'وزن خالص', value: ''},
+        username: {type:'input', name: 'نام کاربر', title: 'نام کاربر', value: ''},
       },
       success: false,
       error: false,
@@ -155,7 +155,7 @@ export default {
                 <ul v-if="key=='reel_numbers'">
                   <li v-for="item in val.value" :key="item">{{ item }}</li>
                 </ul>
-                <p v-else>{{val.name}}: {{val.value}}</p>
+                <p v-else>{{val.title}}: {{val.value}}</p>
             </template>
           </div>
         </template>

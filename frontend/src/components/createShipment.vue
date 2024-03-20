@@ -18,7 +18,7 @@ export default {
         matrial_type: {status:true, type: 'dropdown', name: 'نوع ماده',title: 'نوع ماده', data: '', value: ''},
         matrial_name: {status:true, type: 'dropdown', name: 'اسم ماده',title: 'اسم ماده', data: '', value: ''},
         customer_name: {status:false, type: 'dropdown', name: 'اسم مشتری',title: 'اسم مشتری', data: '', value: ''},
-        username: {status:true, type: 'input', name: 'نام کاربری',title:'نام کاربری', value: ''},
+        username: {status:true, type: 'input', name: 'نام کاربر',title:'نام کاربری', value: ''},
       },
       Incoming: true,
       success: false,
