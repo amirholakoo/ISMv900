@@ -621,7 +621,7 @@ class Consumption(models.Model):
 
 
 class ConsumptionProfile(models.Model):
-    profile_name = models.ForeignKey(Consumption, on_delete=models.CASCADE, related_name='profile_items')
+    profile_name = models.CharField(max_length=255, null=True, blank=True)
     supplier_name = models.CharField(max_length=255)
     material_type = models.CharField(max_length=255)
     material_name = models.CharField(max_length=255)

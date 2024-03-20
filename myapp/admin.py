@@ -192,7 +192,7 @@ class ConsumptionAdmin(admin.ModelAdmin):
 
 @admin.register(ConsumptionProfile)
 class ConsumptionProfileAdmin(admin.ModelAdmin):
-    list_display =['profile','supplier_name','material_type','material_name','unit','quantity']
+    list_display =['profile_name','supplier_name','material_type','material_name','unit','quantity']
     fields=list_display
 
     
