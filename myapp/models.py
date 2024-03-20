@@ -23,7 +23,8 @@ class Truck(models.Model):
     driver_doc = models.CharField(max_length=255, blank=True)
     phone = models.CharField(max_length=20, blank=True)
     status = models.CharField(max_length=10, choices=[('Free', 'Free'), ('Busy', 'Busy')], default='Free')
-    location = models.CharField(max_length=255, blank=True, choices=[('Entrance', 'Entrance'), ('Weight1', 'Weight1'), ('Weight2', 'Weight2'), ('Office', 'Office'), ('Delivered', 'Delivered')], default='Entrance')
+    # location = models.CharField(max_length=255, blank=True, choices=[('Entrance', 'Entrance'), ('Weight1', 'Weight1'), ('Weight2', 'Weight2'), ('Office', 'Office'), ('Delivered', 'Delivered')], default='Entrance')
+    location = models.CharField(max_length=255, blank=True, default='Entrance') # <--------------------
     username = models.CharField(max_length=255, null=False, blank=True)
     logs = models.TextField(blank=True)
 
@@ -37,7 +38,8 @@ class Truck(models.Model):
 
         Format: "Truck {license_number} - {status}"
         """
-        return f"Truck {self.license_number} - {self.status}"
+        # return f"Truck {self.license_number} - {self.status}"
+        return f"Truck {self.license_number} - {self.driver_name} - {self.status} - {self.location}" # <--------------------
 
 
 class Shipments(models.Model):
