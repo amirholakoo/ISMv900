@@ -20,8 +20,8 @@ cd ~/V9/v988/
 echo "Rename old project folder with a timestamp"
 mv ISMv900 "ISMv900_old_$(date +%Y%m%d%H%M%S)"
 
-echo " Remove old virtual environment"
-rm -rf venv
+#echo " Remove old virtual environment"
+#rm -rf venv
 
 echo " Clone new version of the project"
 git clone https://github.com/amirholakoo/ISMv900.git
@@ -34,7 +34,7 @@ sudo apt-get install -y python3 python3-pip
 # sudo pip3 install virtualenv
 
 echo " Create a new virtual environment and activate it"
-python3 -m venv venv
+# python3 -m venv venv
 source venv/bin/activate
 
 echo " Install Django and jdatetime"
