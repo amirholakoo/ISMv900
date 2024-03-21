@@ -1871,11 +1871,12 @@ def load_data_for_moved(request):
             units = list(unit)
             data = {'supplier_names': supplier_names, 'material_names': material_names, 'units':units}
         if real_or_raw == 'Reel':
-            width = anbar_model.objects.filter(status='In-stock').values('width').distinct()
-            reel_number = anbar_model.objects.filter(status='In-stock').values('reel_number').distinct()
+            widths = anbar_model.objects.filter(status='In-stock').values('width').distinct()
+            reel_numbers = anbar_model.objects.filter(status='In-stock').values('reel_number').distinct()
+
             data = {
-                "width": list(width),
-                "reel_number": list(reel_number),
+                "width": [item['width'] for item in widths],
+                "reel_number": [item['reel_number'] for item in reel_numbers],
             }
 
         # Return the widths as a JSON response

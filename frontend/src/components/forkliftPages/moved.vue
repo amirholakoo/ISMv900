@@ -15,7 +15,7 @@ export default {
         supplier_name: {status:true, type: 'dropdown', name: 'اسم تامین کننده',title: 'اسم تامین کننده', data: '', value: ''},
         material_name: {status:true, type: 'dropdown', name: 'اسم ماده',title: 'اسم ماده', data: '', value: ''},
         unit: {status:true, type: 'dropdown', name: 'واحد',title: 'واحد', data: '', value: ''},
-        Quantity: {status:true, type:'input', name: 'کمیف(مقدار)', title: 'کمیف(مقدار)', value: ''},
+        Quantity: {status:true, type:'input', name: 'مقدار', title: 'مقدار', value: ''},
         width: {status:false, type: 'dropdown', name: 'عرض',title: 'عرض', data: '', value: ''},
         reel: {status:false, type: 'dropdown', name: 'رول',title: 'رول', data: '', value: ''},
         to_anbar: {status:true, type: 'dropdown', name: 'به انبار',title: 'به انبار', data: '', value: ''},
@@ -103,6 +103,14 @@ export default {
       if (k == 'material_name'){
         this.forms.material_name.name = name
         this.forms.material_name.value = name
+      }
+      if (k == 'width'){
+        this.forms.width.name = name
+        this.forms.width.value = name
+      }
+      if (k == 'reel'){
+        this.forms.reel.name = name
+        this.forms.reel.value = name
       }
       if (k == 'to_anbar'){
         this.forms.to_anbar.name = name
