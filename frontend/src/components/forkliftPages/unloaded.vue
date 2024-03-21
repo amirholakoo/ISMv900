@@ -36,10 +36,6 @@ export default {
       console.log(response.data)
       this.forms.unloading_location.data = response.data['data']
     })
-    this.axios.get('/myapp/api/getUnitNames').then((response) => {
-      console.log(response.data)
-      this.forms.unit.data = response.data['unit_names']
-    })
   },
   watch:{
     success(c, p){
@@ -57,6 +53,13 @@ export default {
       if (k == 'lic_number'){
         this.forms.lic_number.name = name
         this.forms.lic_number.value = name
+        const params = {
+          'lic_number': this.forms.lic_number.value,
+        }
+        this.axios.get('/myapp/api/getUnitNamesBasedOnLicenseOfShipment', {params:params}).then((response) => {
+          console.log(response.data)
+          this.forms.unit.data = response.data['unit_names']
+        })
       }
       if (k == 'unloading_location'){
         this.forms.unloading_location.name = name
@@ -67,7 +70,7 @@ export default {
         this.forms.unit.value = name
       }
     },
-    async addSupplier() {
+    async unloaded() {
       const params = {
         "license_number": this.forms.lic_number.value,
         "unloading_location": this.forms.unloading_location.value,
@@ -157,7 +160,7 @@ export default {
         </template>
         <template v-slot:btns>
           <div>
-            <button data-modal-hide="popup-modal" aria-label="Close" @click="addSupplier" type="button" class="inline-flex justify-center w-full px-2 py-1.5 text-xs font-medium text-center text-white        bg-green-500 hover:bg-green-600 focus:ring-4 focus:outline-none focus:ring-green-300  rounded-lg dark:bg-blue-500 dark:hover:bg-blue-600 dark:focus:ring-blue-800">درسته</button>
+            <button data-modal-hide="popup-modal" aria-label="Close" @click="unloaded" type="button" class="inline-flex justify-center w-full px-2 py-1.5 text-xs font-medium text-center text-white        bg-green-500 hover:bg-green-600 focus:ring-4 focus:outline-none focus:ring-green-300  rounded-lg dark:bg-blue-500 dark:hover:bg-blue-600 dark:focus:ring-blue-800">درسته</button>
           </div>
         </template>
       </modal>

@@ -17,10 +17,10 @@ import uuid
 # Create your views here.
 def log_generator(username, action):
     # Get the current timestamp
-    current_time = timezone.now()
+    current_time = timezone.now().strftime('%Y-%m-%d %H:%M')
 
     # Create the log entry
-    new_log_entry = f"{username} {action} on {current_time},"  # Comma at the end for CSV formatting
+    new_log_entry = f"{username} {action} Now {current_time},"  # Comma at the end for CSV formatting
 
     return new_log_entry
 # Incoming process:
@@ -167,7 +167,7 @@ def add_supplier(request):
         # If there are any errors, return them in the response
         if errors:
             return JsonResponse({'status': 'error', 'errors': errors})
-        print(datetime.now())
+
         # Create a new Supplier object
         new_supplier = Supplier(
             supplier_name=supplier_name,
@@ -334,7 +334,7 @@ def add_rawMaterial(request):
         supplier_name = request.GET.get('supplier_name')
         material_type = request.GET.get('material_type')
         material_name = request.GET.get('material_name')
-        description = request.GET.get('comments')
+        comments = request.GET.get('comments')
         username = request.GET.get('username')
 
         # Initialize an empty list to collect error messages
@@ -349,11 +349,8 @@ def add_rawMaterial(request):
             errors.append({'status': 'error', 'message': 'اسم ماده را وارد کنید'})
         if not username:
             errors.append({'status': 'error', 'message': 'نام کاربری را وارد کنید'})
+
         # If there are any errors, return them in the response
-        # Load existing customer names from DB Check for duplicate name
-        if RawMaterial.objects.filter(material_name=material_name).exists():
-            error_message = f"در حال حاضر یک حنس با نام {material_name} در سیستم وجود دارد."
-            errors.append({'status': 'error', 'message': error_message})
         if errors:
             return JsonResponse({'status': 'error', 'errors': errors})
 
@@ -362,7 +359,7 @@ def add_rawMaterial(request):
             supplier_name=supplier_name,
             material_type=material_type,
             material_name=material_name,
-            description=description,
+            comments=comments,
             username=username,
             logs=log_generator(username, 'Created')
         )
@@ -405,13 +402,13 @@ def get_consumption_profile_names(request):
     if request.method == 'GET':
         try:
             # Retrieve all consumption records
-            consumptions = Consumption.objects.all()
+            consumptions = ConsumptionProfile.objects.all()
 
             # Extract the profile names from each record
             profile_names = [consumption.profile_name for consumption in consumptions]
 
             # Return the profile names as a JSON response
-            return JsonResponse({'profile_names': profile_names}, status=200)
+            return JsonResponse({'profile_names': list(set(profile_names))}, status=200)
 
         except Exception as e:
             # Return a   500 error for any exceptions
@@ -506,6 +503,8 @@ def add_new_reel(request):
             grade = request.GET.get('grade')
             profile_name = request.GET.get('consumption_profile_name')
             qr_code = request.GET.get('qr_code')
+            username = request.GET.get('username')
+            commnet = request.GET.get('commnet')
 
             # Initialize an empty list to collect error messages
             errors = []
@@ -525,14 +524,18 @@ def add_new_reel(request):
                 errors.append({'status': 'error', 'message': 'grade is required.'})
             if not profile_name:
                 errors.append({'status': 'error', 'message': 'consumption profile name is required.'})
+            if not username:
+                errors.append({'status': 'error', 'message': 'username is required.'})
 
             # If there are any errors, return them in the response
             if errors:
                 return JsonResponse({'status': 'error', 'errors': errors})
-            # from django.db.models import Q
-            # consumptions  = Consumption.objects.filter(Q(supplier_name=supplier_name) & Q(material_name=material_name)
+
+
             # Create a new Products record
             new_product = Products(
+                location='Anbar_Salon_Tolid',
+                status='In-stock',
                 qr_code=qr_code,
                 reel_number=reel_number,
                 width=width,
@@ -540,9 +543,11 @@ def add_new_reel(request):
                 length=length,
                 breaks=breaks,
                 grade=grade,
+                username=username,
+                comments=commnet,
                 profile_name=profile_name,
                 receive_date=timezone.now(),
-                logs=log_generator('', 'Created')
+                logs=log_generator(username, 'Created')
             )
             new_product.save()
 
@@ -557,8 +562,11 @@ def add_new_reel(request):
                 length=length,
                 breaks=breaks,
                 grade=grade,
+                username=username,
+                comments=commnet,
                 profile_name=profile_name,
                 receive_date=timezone.now(),
+                logs=log_generator(username, 'Created')
             )
             new_anbar_record.save()
 
@@ -567,7 +575,7 @@ def add_new_reel(request):
             anbar_table_names = [name for name in all_table_names if name.startswith('Anbar_')]
             profile_list = ConsumptionProfile.objects.filter(profile_name=profile_name)
             for each_line in profile_list:
-                for quantity in each_line.quantity:
+                for quantity in range(int(each_line.quantity)):
                     for anbar_name in anbar_table_names:
                         AnbarModel = apps.get_model('myapp', anbar_name)
                         anbar_records = AnbarModel.objects.filter(supplier_name=each_line.supplier_name,
@@ -585,7 +593,8 @@ def add_new_reel(request):
                                 material_name=record.material_name,
                                 material_type=record.material_type,
                                 receive_date=timezone.now(),
-                                logs=models.TextField(blank=True)
+                                username=username,
+                                logs=log_generator(record.profile_name, 'Used')
                             )
                             c.save()
 
@@ -735,11 +744,10 @@ def add_shipment(request):
             return JsonResponse({'status': 'error', 'errors': errors})
 
         else:
-            print(shipment_type)
+
             # Create new shipment
             if shipment_type == "Incoming":
                 shipment = Shipments(
-                    truck_id=Truck.objects.get(license_number=license_number),
                     license_number=license_number,
                     supplier_name=supplier_name,
                     material_type=material_type,
@@ -749,11 +757,11 @@ def add_shipment(request):
                     location='Entrance',
                     username=username,
                     entry_time=timezone.now(),
+                    receive_date=timezone.now(),
                     logs=log_generator(username, 'Created')
                 )
             else:
                 shipment = Shipments(
-                    truck_id=Truck.objects.get(license_number=license_number),
                     license_number=license_number,
                     shipment_type=shipment_type,
                     customer_name=customer_name,
@@ -761,6 +769,7 @@ def add_shipment(request):
                     location='Entrance',
                     username=username,
                     entry_time=timezone.now(),
+                    receive_date=timezone.now(),
                     logs=log_generator(username, 'Created')
                 )
 
@@ -1009,14 +1018,13 @@ def update_weight1(request):
             return JsonResponse({'status': 'error', 'errors': errors})
         else:
             try:
+                ship = Shipments.objects.filter(license_number=license_number, status='Registered', location='Entrance').first()
                 Shipments.objects.filter(license_number=license_number, status='Registered', location='Entrance').update(
                     weight1=weight1,
-                    username=username,
                     weight1_time=timezone.now(),
-                    comments=f"{username} updated Weight1",
                     status='LoadingUnloading',
                     location='Weight1',
-                    logs=log_generator(username, 'Weight1')
+                    logs=ship.logs + log_generator(username, 'Weight1')
                 )
                 return JsonResponse({'status': 'success', 'message': 'وزن اولیه بار نامه با موفقیت آپدیت شد.'})
 
@@ -1101,15 +1109,15 @@ def update_weight2(request):
         else:
             try:
                 # Update the Shipments instance
-                Shipments.objects.filter(license_number=license_number, status='LoadedUnloaded', location='Weight2').update(
+                ship = Shipments.objects.filter(license_number=license_number, status='LoadedUnloaded', location='Weight2')
+                ship.update(
                     weight1=weight1,
                     weight2=weight2,
                     net_weight=net_weight,
-                    username=username,
                     weight2_time=timezone.now(),
                     status='Office',
                     location='Office',
-                    logs = log_generator(username, 'Weight2')
+                    logs=ship[0].logs+log_generator(username, 'Weight2')
                 )
 
                 return JsonResponse({'status': 'success', 'message': f'Weight2 and Net Weight for Shipments with License Number {license_number} has been updated successfully.'})
@@ -1197,58 +1205,61 @@ def create_purchase_order(request):
             if errors:
                 return JsonResponse({'status': 'error', 'errors': errors})
             else:
-                Shipments.objects.filter(license_number=license_number, status='Office', location='Office').update(
-                    vat=vat,
-                    penalty=penalty,
-                    price_per_kg=price_per_kg,
-                    extra_cost=extra_cost,
-                    invoice_status=invoice_status,
-                    payment_status=payment_status,
-                    document_info=document_info,
-                    exit_time=timezone.now(),
-                    receive_date=timezone.now(),
-                    status='Delivered',
-                    location='Delivered',
-                    username=username,
-                    comments=commnet,
-                )
-
-                # Update truck status and location
-                Truck.objects.filter(license_number=license_number).update(
-                    status='Free',
-                    location='Entrance'
-                )
-                purchase = Purchases(
-                    date=timezone.now(),
-                    receive_date=timezone.now(),  # Assuming you want to set the current date/time
-                    # supplier_id=Supplier.objects.get(supplier_name=supplier_name),
-                    # truck_id=Truck.objects.get(license_number=license_number),
-                    # material_id=MaterialType.objects.get(material_type=material_type),
-                    # shipment_id=Shipments.objects.get(license_number=license_number),
-                    material_type=material_type,
-                    material_name=material_name,
-                    unit=unit,
-                    quantity=quantity,
-                    quality=quality,
-                    penalty=penalty,
-                    weight1=weight1,
-                    weight2=weight2,
-                    net_weight=net_weight,
-                    price_per_kg=price_per_kg,
-                    vat=vat,
-                    total_price=total_price,
-                    extra_cost=extra_cost,
-                    invoice_status=invoice_status,
-                    invoice_number=supplier_invoice,
-                    status=payment_status,
-                    document_info=document_info,
-                    comments=commnet,
-                    username=username,
-                    logs=log_generator(username, 'Created PO')
-                )
-                # Save the new purchase object to the database
                 try:
+
+                    # Update truck status and location
+                    Truck.objects.filter(license_number=license_number).update(
+                        status='Free',
+                        location='Entrance'
+                    )
+                    ship = Shipments.objects.filter(license_number=license_number, status='Office', location='Office')
+                    purchase = Purchases(
+                        date=timezone.now(),
+                        receive_date=timezone.now(),  # Assuming you want to set the current date/time
+                        # supplier_id=Supplier.objects.get(supplier_name=supplier_name),
+                        license_number=license_number,
+                        # material_id=MaterialType.objects.get(material_type=material_type),
+                        shipment_id=ship[0],
+                        supplier_name=supplier_name,
+                        material_type=material_type,
+                        material_name=material_name,
+                        unit=unit,
+                        quantity=quantity,
+                        quality=quality,
+                        penalty=penalty,
+                        weight1=weight1,
+                        weight2=weight2,
+                        net_weight=net_weight,
+                        price_per_kg=price_per_kg,
+                        vat=vat,
+                        total_price=total_price,
+                        extra_cost=extra_cost,
+                        invoice_status=invoice_status,
+                        invoice_number=supplier_invoice,
+                        status=payment_status,
+                        document_info=document_info,
+                        comments=commnet,
+                        username=username,
+                        logs=log_generator(username, 'Created PO')
+                    )
+                    # Save the new purchase object to the database
                     purchase.save()
+                    ship.update(
+                        purchase_id=purchase.id,
+                        vat=vat,
+                        penalty=penalty,
+                        price_per_kg=price_per_kg,
+                        total_price=total_price,
+                        extra_cost=extra_cost,
+                        invoice_status=invoice_status,
+                        payment_status=payment_status,
+                        document_info=document_info,
+                        exit_time=timezone.now(),
+                        status='Delivered',
+                        location='Delivered',
+                        comments=commnet,
+                        logs=ship[0].logs + log_generator(username, 'Created PO')
+                    )
                     return JsonResponse({'status': 'success', 'message': 'purchase added successfully.'})
                 except Exception as e:
                     # Handle any exceptions that occur during the save operation
@@ -1287,7 +1298,7 @@ def create_sales_order(request):
         invoice_number = request.GET.get('invoice_number')
         payment_status = request.GET.get('payment_status')
         document_info = request.GET.get('document_info')
-        commnet = request.GET.get('commnet')
+        comments = request.GET.get('commnet')
         username = request.GET.get('username')
 
         errors = []
@@ -1323,8 +1334,7 @@ def create_sales_order(request):
             errors.append({'status':'error', 'message': 'وضعیت پرداخت را انتخاب کنید'})
         if not document_info:
             errors.append({'status':'error', 'message': 'اظلاعات سند را وارد کنید'})
-        if not commnet:
-            errors.append({'status':'error', 'message': 'فرم کامنت را پر کنید'})
+
         if not username:
             errors.append({'status':'error', 'message': 'فرم نام کاربری را پر کنید'})
         if errors:
@@ -1333,8 +1343,7 @@ def create_sales_order(request):
             try:
                 customer = Customer.objects.get(customer_name=customer_name)
                 truck = Truck.objects.get(license_number=license_number)
-                shipment = Shipments.objects.get(license_number=license_number, shipment_type='Outgoing')
-
+                ship = Shipments.objects.filter(license_number=license_number, status='Office', location='Office', shipment_type='Outgoing')
                 # Create a new instance of the Sales model
                 sale = Sales(
                     customer=customer,
@@ -1353,34 +1362,39 @@ def create_sales_order(request):
                     invoice_number=invoice_number,
                     status=payment_status,
                     document_info=document_info,
-                    comments=commnet,
+                    comments=comments,
                     username=username,
-                    shipment=shipment,
+                    shipment=ship[0],
                     date=timezone.now(),  # Assuming you want to set the current date and time
+                    logs=log_generator(username, 'Created SO')
                 )
                 # Save the instance
                 sale.save()
 
                 # Retrieve the shipment instance
-                Shipments.objects.filter(license_number=license_number).update(
+
+                ship.update(
                     status='Delivered',
                     location='Delivered',
+                    sales_id=sale.id,
                     price_per_kg=price_pre_kg,
+                    total_price=total_price,
                     vat=vat,
                     extra_cost=extra_cost,
                     invoice_status=invoice_status,
                     payment_status=payment_status,
                     document_info=document_info,
                     exit_time=timezone.now(),
-                    receive_date=timezone.now(),
-                    username=username,
-                    comments=commnet,
+                    comments=comments,
+                    logs=ship[0].logs + log_generator(username, 'Created SO')
                 )
                 # Update truck status and location
                 Truck.objects.filter(license_number=license_number).update(
                     status='Free',
                     location=customer_name
                 )
+                list_of_reels = list(map(int, list_of_reels.split(',')))
+                print(list_of_reels)
                 for reel in list_of_reels:
                     Products.objects.filter(reel_number=reel).update(
                         status='Delivered',
@@ -1389,7 +1403,7 @@ def create_sales_order(request):
                     )
                     # Dynamically get the model based on the anbar_name
                     AnbarModel = apps.get_model('myapp', loading_location)
-                    anbar_instance = AnbarModel.objects.create(
+                    AnbarModel.objects.filter(reel_number=reel).update(
                         status='Delivered',
                         location=customer_name,
                         last_date=timezone.now(),
@@ -1418,6 +1432,7 @@ def get_anbar_table_names(request):
 def get_unit_names(request):
     if request.method == 'GET':
         units = Unit.objects.all()
+
         unit_names = [unit.unit_name for unit in units]
         return JsonResponse({'unit_names':unit_names}, safe=False)
     else:
@@ -1501,10 +1516,11 @@ def unload(request):
         else:
             try:
                 shipment = Shipments.objects.filter(license_number=license_number, status='LoadingUnloading', location='Weight1', shipment_type='Incoming')
-                print([ship for ship in shipment])
+
                 material_name = shipment[0].material_name
+                material_type = shipment[0].material_type
                 supplier_name = shipment[0].supplier_name
-                print('unloaded:',material_name, supplier_name)
+
                 shipment.update(
                     unload_location=unloading_location,
                     unit=unit,
@@ -1512,6 +1528,7 @@ def unload(request):
                     quality=quality,
                     location='Weight2',
                     status='LoadedUnloaded',
+                    logs=shipment[0].logs + log_generator(forklift_driver, 'Unloaded')
                 )
                 # Dynamically get the model based on the anbar_name
                 AnbarModel = apps.get_model('myapp', unloading_location)
@@ -1525,10 +1542,12 @@ def unload(request):
                     anbar_instance = AnbarModel.objects.create(
                         supplier_name=supplier_name,
                         material_name=material_name,
+                        material_type=material_type,
                         unit=unit,
                         status='In-stock',
                         location=unloading_location,
                         receive_date=timezone.now(),
+                        logs=log_generator(forklift_driver, 'Unloaded')
                     )
 
 
@@ -1583,12 +1602,12 @@ def get_reel_numbers_by_width_and_status(request):
         if not anbar_location:
             return JsonResponse({'error': 'Anbar location is required'}, status=400)
 
-            # Dynamically import the model class
-            model_class = apps.get_model('myapp', anbar_location)
+        # Dynamically import the model class
+        model_class = apps.get_model('myapp', anbar_location)
 
-            # Query the model to get reel numbers where the width matches the specified width,
-            # the status is "In-stock", and sort the results by receive_date (old to new)
-            reel_numbers = model_class.objects.filter(width=width, status='In-stock').order_by('receive_date').values_list('reel_number', flat=True)
+        # Query the model to get reel numbers where the width matches the specified width,
+        # the status is "In-stock", and sort the results by receive_date (old to new)
+        reel_numbers = model_class.objects.filter(width=width, status='In-stock').order_by('receive_date').values_list('reel_number', flat=True)
 
         # Return the widths as a JSON response
         return JsonResponse({'reel_numbers': list(reel_numbers)}, status=200)
@@ -1664,27 +1683,27 @@ def loaded(request):
                     AnbarModel.objects.filter(reel_number=reel_number, width=width,).update(
                         status='Sold',
                         location=license_number,
-                        supplier_name=supplier_name,
-                        material_name=material_name,
-                        receive_date=timezone.now(),
-                        last_date=timezone.now(),
+                        # supplier_name=supplier_name,
+                        # material_name=material_name,
+                        # receive_date=timezone.now(),
+                        # last_date=timezone.now(),
                     )
                     product = Products.objects.filter(reel_number=reel_number, width=width,)
                     product.update(
                         status='Sold',
                         location=license_number,
-                        receive_date=timezone.now(),
-                        last_date=timezone.now(),
+                        # receive_date=timezone.now(),
+                        # last_date=timezone.now(),
                     )
                 profile_name = product[0].profile_name
-                print(profile_name)
+                # print(profile_name)
                 shipment.update(
                     profile_name=profile_name,
                     unload_location=loading_location,
                     list_of_reels=','.join(reel_numbers),
                     location='Weight2',
                     status='LoadedUnloaded',
-                    logs=log_generator(forklift_driver, 'Loaded'),
+                    logs=shipment[0].logs + log_generator(forklift_driver, 'Loaded'),
                 )
 
                 # Return a success response
@@ -1727,6 +1746,17 @@ def get_unit_based_supplier_name(request):
             # Handle any exceptions that occur during the process
             return JsonResponse({'error': str(e)}, status=500)
 
+
+def get_unit_names_based_on_license_of_shipment(request):
+    if request.method == 'GET':
+        lic_number = request.GET.get('lic_number')
+        shipment = Shipments.objects.get(license_number=lic_number, status='LoadingUnloading', location='Weight1')
+        supplier_name = shipment.supplier_name
+        units = Unit.objects.filter(supplier_name=supplier_name)
+        unit_names = [unit.unit_name for unit in units]
+        return JsonResponse({'unit_names':unit_names}, safe=False)
+    else:
+        return JsonResponse({"error": "Invalid request method"}, status=400)
 
 @csrf_exempt
 def used(request):
@@ -1779,18 +1809,24 @@ def used(request):
             # Dynamically get the model based on the anbar_name
             AnbarModel = apps.get_model('myapp', unloading_location)
             # Create Consumption records
+            raw = RawMaterial.objects.filter(
+                supplier_name=supplier_name,
+                material_name=material_name,
+            )
+            material_type = raw[0].material_type
             for _ in range(quantity_to_unload):
                 consumption = Consumption(
                     receive_date=timezone.now(),
                     supplier_name=supplier_name,
                     material_name=material_name,
+                    material_type=material_type,
                     unit=unit,
                     status='Used',
                     logs=log_generator(forklift_driver, 'Used')
                 )
                 consumption.save()
-                # Insert data into the specific Anbar table
-                anbar_items = AnbarModel.objects.filter(
+
+                AnbarModel.objects.filter(
                     supplier_name=supplier_name,
                     material_name=material_name,
                     unit=unit,
@@ -1798,7 +1834,6 @@ def used(request):
                     status='Used',
                     location='Consumption DB',
                     logs=log_generator(forklift_driver, 'Used'),
-                    receive_date=timezone.now(),
                     last_date=timezone.now(),
                 )
 
@@ -1938,10 +1973,10 @@ def moved(request):
                 # Update source AnbarGeneric items
                 Products.objects.filter(
                     location=from_anbar,
-                    supplier_name=supplier_name,
-                    material_name=material_name,
-                ).update(
                     width=width,
+                    status='In-stock',
+                    reel_number=reel,
+                ).update(
                     status='Moved',
                     location=to_anbar,
                     last_date=timezone.now(),
@@ -1953,8 +1988,6 @@ def moved(request):
                         receive_date=timezone.now(),
                         location=to_anbar,
                         status='In-stock',
-                        supplier_name=supplier_name,
-                        material_name=material_name,
                         width=width,
                         unit=unit,
                         reel_number=reel
@@ -2187,10 +2220,7 @@ def add_unit(request):
             errors.append({'status': 'error', 'message': 'count are required.'})
         if not username:
             errors.append({'status': 'error', 'message': 'username are required.'})
-        # Load existing customer names from DB Check for duplicate name
-        if Unit.objects.filter(unit_name=unit_name).exists():
-            error_message = f"در حال حاضر یک واحد با نام {unit_name} در سیستم وجود دارد."
-            errors.append({'status': 'error', 'message': error_message})
+
 
         # If there are any errors, return them in the response
         if errors:

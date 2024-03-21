@@ -23,7 +23,7 @@ class Truck(models.Model):
     driver_doc = models.CharField(max_length=255, blank=True)
     phone = models.CharField(max_length=20, blank=True)
     status = models.CharField(max_length=10, choices=[('Free', 'Free'), ('Busy', 'Busy')], default='Free')
-    location = models.CharField(max_length=255, blank=True, choices=[('Entrance', 'Entrance'), ('Weight1', 'Weight1'), ('Weight2', 'Weight2'), ('Office', 'Office'), ('Delivered', 'Delivered')], default='Entrance')
+    location = models.CharField(max_length=255, blank=True, default='Entrance')
     username = models.CharField(max_length=255, null=False, blank=True)
     logs = models.TextField(blank=True)
 
@@ -37,7 +37,7 @@ class Truck(models.Model):
 
         Format: "Truck {license_number} - {status}"
         """
-        return f"Truck {self.license_number} - {self.status}"
+        return f"Truck {self.license_number} - {self.status} - {self.driver_name} - {self.location}"
 
 
 class Shipments(models.Model):
@@ -47,9 +47,9 @@ class Shipments(models.Model):
     # Fields
     shipment_type = models.CharField(max_length=255, choices=[('Incoming', 'Incoming'), ('Outgoing', 'Outgoing')], null=True)
     status = models.CharField(max_length=255, choices=[('Registered', 'Registered'), ('LoadingUnloading', 'LoadingUnloading'), ('LoadedUnloaded', 'LoadedUnloaded'), ('Office', 'Office'), ('Delivered', 'Delivered'), ('Canceled', 'Canceled')], null=True)
-    location = models.CharField(max_length=255, choices=[('Entrance', 'Entrance'), ('Weight1', 'Weight1'), ('Weight2', 'Weight2'), ('Office', 'Office'), ('Delivered', 'Delivered')], null=True)
-    truck_id = models.ForeignKey(Truck, on_delete=models.SET_NULL, blank=True, null=True)
-    license_number = models.CharField(max_length=255, null=True)
+    location = models.CharField(max_length=255, null=True)
+    # truck_id = models.ForeignKey(Truck, on_delete=models.SET_NULL, blank=True, null=True)
+    license_number = models.CharField(max_length=255,null=True)
     receive_date = models.DateTimeField(blank=True, null=True)
     entry_time = models.DateTimeField(blank=True, null=True, default=datetime.now)
     customer_name = models.CharField(max_length=255, null=True)
@@ -68,12 +68,13 @@ class Shipments(models.Model):
     profile_name = models.CharField(max_length=255, null=True)
     sales_id = models.IntegerField(null=True)
     price_per_kg = models.DecimalField(max_digits=10, decimal_places=2, null=True)
+    total_price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     extra_cost = models.DecimalField(max_digits=10, decimal_places=2, null=True)
-    supplier_id = models.IntegerField(null=True)
-    material_id = models.IntegerField(null=True)
+    # supplier_id = models.IntegerField(null=True)
+    # material_id = models.IntegerField(null=True)
     material_type = models.CharField(max_length=255, null=True)
     material_name = models.CharField(max_length=255, null=True)
-    purchase_id = models.IntegerField(null=True)
+    purchase_id = models.ForeignKey('Purchases', on_delete=models.SET_NULL, blank=True, null=True)
     vat = models.DecimalField(max_digits=10, decimal_places=2, null=True) # Assuming VAT is a decimal field
     invoice_status = models.CharField(max_length=255, choices=[('NA', 'NA'), ('Sent', 'Sent'), ('Received', 'Received')], null=True)
     payment_status = models.CharField(max_length=255, choices=[('Terms', 'Terms'), ('Paid', 'Paid')], null=True)
@@ -87,19 +88,20 @@ class Shipments(models.Model):
     # Meta
     class Meta:
         db_table = 'Shipments'
+        verbose_name = 'Shipment'
 
     def __str__(self):
         """
         String representation of the Shipment instance.
         """
-        return f"Shipment {self.id} ({self.shipment_type})"
+        return f"{self.receive_date} - {self.shipment_type} - {self.license_number} - {self.customer_name} - {self.customer_name} - {self.material_type} - {self.material_name} - {self.status} - {self.location}"
 
 
 class Supplier(models.Model):
     supplier_name = models.CharField(max_length=255, null=False)
     address = models.TextField(blank=True)
     phone = models.CharField(max_length=20, blank=True)
-    status = models.CharField(max_length=255, blank=True)
+    status = models.CharField(max_length=255, blank=True, default='Active')
     comments = models.TextField(blank=True)
     username = models.CharField(max_length=255, null=False, blank=True)
     logs = models.TextField(blank=True)
@@ -109,7 +111,7 @@ class Supplier(models.Model):
         db_table = 'Supplier'
 
     def __str__(self):
-        return f"{self.supplier_name} (ID: {self.status})"
+        return f"{self.supplier_name} - {self.status}"
 
 
 class Products(models.Model):
@@ -182,7 +184,7 @@ class Customer(models.Model):
     customer_name = models.CharField(max_length=255, null=False)
     address = models.TextField(blank=True)
     phone = models.CharField(max_length=20, blank=True)
-    status = models.CharField(max_length=255, blank=True)
+    status = models.CharField(max_length=255, blank=True, default='Active')
     comments = models.TextField(blank=True)
     username = models.CharField(max_length=255, null=False, blank=True)
     logs = models.TextField(blank=True)
@@ -220,7 +222,6 @@ class RawMaterial(models.Model):
     # Meta
     class Meta:
         db_table = 'RawMaterial'
-        unique_together = ('material_name', 'supplier_name')
 
     def __str__(self):
         """
@@ -228,7 +229,7 @@ class RawMaterial(models.Model):
 
         Format: "{material_name} (ID: {material_id})"
         """
-        return f"{self.material_name} (ID: {self.id})  (supplier name: {self.supplier_name}) (status: {self.status})"
+        return f"{self.supplier_name} - {self.material_name} - {self.material_type} - {self.description} - {self.status}"
 
 
 class Purchases(models.Model):
@@ -271,12 +272,13 @@ class Purchases(models.Model):
     date = models.DateTimeField(default=datetime.now, blank=True)
     receive_date = models.DateTimeField(blank=True, null=True)
 
-    supplier_id = models.ForeignKey('Supplier', on_delete=models.SET_NULL, blank=True, null=True)
-    truck_id = models.ForeignKey('Truck', on_delete=models.SET_NULL, blank=True, null=True)
+    # supplier_id = models.ForeignKey('Supplier', on_delete=models.SET_NULL, blank=True, null=True)
+    license_number = models.CharField(max_length=255, null=True)
     material_id = models.ForeignKey('MaterialType', on_delete=models.SET_NULL, blank=True, null=True)
 
     material_type = models.CharField(max_length=255, blank=True, null=True)
     material_name = models.CharField(max_length=255, blank=True, null=True)
+    supplier_name = models.CharField(max_length=255, blank=True, null=True)
     unit = models.CharField(max_length=255, blank=True, null=True)
     quantity = models.IntegerField(blank=True, null=True)
 
@@ -306,12 +308,13 @@ class Purchases(models.Model):
     comments = models.TextField(blank=True, null=True)
     cancellation_reason = models.TextField(blank=True, null=True)
 
-    shipment_id = models.ForeignKey('Shipments', on_delete=models.SET_NULL, blank=True, null=True)
+    shipment_id = models.ForeignKey(Shipments, on_delete=models.SET_NULL, blank=True, null=True)
     username = models.CharField(max_length=255, null=False, blank=True)
     logs = models.TextField(blank=True)
 
     class Meta:
         db_table = "Purchases"
+        verbose_name_plural = "Purchases"
 
     def __str__(self):
         """
@@ -382,6 +385,7 @@ class Sales(models.Model):
     # Meta
     class Meta:
         db_table = 'Sales'
+        verbose_name_plural = "Sales"
 
     def __str__(self):
         return f"Sale (ID: {self.id}, Date: {self.date}, Customer: {self.customer})"
@@ -402,7 +406,7 @@ class AnbarGeneric(models.Model):
     reel_number = models.CharField(max_length=255, null=True, blank=True)
 
     # Foreign key to the Supplier model (assuming it exists)
-    supplier_id = models.ForeignKey('Supplier', on_delete=models.SET_NULL, null=True, blank=True)
+    # supplier_id = models.ForeignKey('Supplier', on_delete=models.SET_NULL, null=True, blank=True)
 
     # Name of the supplier
     supplier_name = models.CharField(max_length=255, null=True, blank=True)
@@ -475,7 +479,7 @@ class Anbar_Sangin(AnbarGeneric):
         db_table = 'Anbar_Sangin'
 
     def __str__(self):
-        return f"{self.material_name} ({self.reel_number})"
+        return f"{self.receive_date} - {self.reel_number}  - {self.width} - {self.supplier_name} - {self.material_type} - {self.material_name}- {self.unit} - {self.description} - {self.status} - {self.location}"
 
 
 class Anbar_Salon_Tolid(AnbarGeneric):
@@ -488,7 +492,7 @@ class Anbar_Salon_Tolid(AnbarGeneric):
         db_table = 'Anbar_Salon_Tolid'
 
     def __str__(self):
-        return f"{self.material_name} ({self.reel_number})"
+        return f"{self.receive_date} - {self.reel_number}  - {self.width} - {self.supplier_name} - {self.material_type} - {self.material_name}- {self.unit} - {self.description} - {self.status} - {self.location}"
 
 
 class Anbar_Parvandeh(AnbarGeneric):
@@ -501,7 +505,7 @@ class Anbar_Parvandeh(AnbarGeneric):
         db_table = 'Anbar_Parvandeh'
 
     def __str__(self):
-        return f"{self.material_name} ({self.reel_number})"
+        return f"{self.receive_date} - {self.reel_number}  - {self.width} - {self.supplier_name} - {self.material_type} - {self.material_name}- {self.unit} - {self.description} - {self.status} - {self.location}"
 
 
 class Anbar_Koochak(AnbarGeneric):
@@ -514,7 +518,7 @@ class Anbar_Koochak(AnbarGeneric):
         db_table = 'Anbar_Koochak'
 
     def __str__(self):
-        return f"{self.material_name} ({self.reel_number})"
+        return f"{self.receive_date} - {self.reel_number}  - {self.width} - {self.supplier_name} - {self.material_type} - {self.material_name}- {self.unit} - {self.description} - {self.status} - {self.location}"
 
 
 class Anbar_Khamir_Ghadim(AnbarGeneric):
@@ -527,7 +531,7 @@ class Anbar_Khamir_Ghadim(AnbarGeneric):
         db_table = 'Anbar_Khamir_Ghadim'
 
     def __str__(self):
-        return f"{self.material_name} ({self.reel_number})"
+        return f"{self.receive_date} - {self.reel_number}  - {self.width} - {self.supplier_name} - {self.material_type} - {self.material_name}- {self.unit} - {self.description} - {self.status} - {self.location}"
 
 
 class Anbar_Khamir_Kordan(AnbarGeneric):
@@ -540,7 +544,7 @@ class Anbar_Khamir_Kordan(AnbarGeneric):
         db_table = 'Anbar_Khamir_Kordan'
 
     def __str__(self):
-        return f"{self.material_name} ({self.reel_number})"
+        return f"{self.receive_date} - {self.reel_number}  - {self.width} - {self.supplier_name} - {self.material_type} - {self.material_name}- {self.unit} - {self.description} - {self.status} - {self.location}"
 
 
 class Anbar_Muhvateh_Kardan(AnbarGeneric):
@@ -553,7 +557,7 @@ class Anbar_Muhvateh_Kardan(AnbarGeneric):
         db_table = 'Anbar_Muhvateh_Kardan'
 
     def __str__(self):
-        return f"{self.material_name} ({self.reel_number})"
+        return f"{self.receive_date} - {self.reel_number}  - {self.width} - {self.supplier_name} - {self.material_type} - {self.material_name}- {self.unit} - {self.description} - {self.status} - {self.location}"
 
 
 class Anbar_Akhal(AnbarGeneric):
@@ -566,7 +570,7 @@ class Anbar_Akhal(AnbarGeneric):
         db_table = 'Anbar_Akhal'
 
     def __str__(self):
-        return f"{self.material_name} ({self.reel_number})"
+        return f"{self.receive_date} - {self.reel_number}  - {self.width} - {self.supplier_name} - {self.material_type} - {self.material_name}- {self.unit} - {self.description} - {self.status} - {self.location}"
 
 
 class Consumption(models.Model):
@@ -580,7 +584,7 @@ class Consumption(models.Model):
     receive_date = models.DateTimeField(null=True, blank=True)
 
     # Foreign key to the Supplier model (assuming it exists)
-    supplier_id = models.ForeignKey('Supplier', on_delete=models.SET_NULL, null=True, blank=True)
+    # supplier_id = models.ForeignKey('Supplier', on_delete=models.SET_NULL, null=True, blank=True)
 
     # Name of the supplier
     supplier_name = models.CharField(max_length=255, null=True, blank=True)
@@ -618,7 +622,7 @@ class Consumption(models.Model):
         """
         String representation of the Consumption instance.
         """
-        return self.profile_name
+        return f'{self.receive_date} - {self.supplier_name} - {self.material_type} - {self.material_name} - {self.unit} - {self.reel_number} - {self.profile_name} - {self.cancelling_reason} - {self.status} - {self.location}'
 
 
 class ConsumptionProfile(models.Model):
@@ -639,6 +643,7 @@ class ConsumptionProfile(models.Model):
     def __str__(self):
         return f"{self.material_name} ({self.quantity} {self.unit})"
 
+
 class MaterialType(models.Model):
     """
     MaterialType model represents different types of materials supplied by suppliers.
@@ -654,7 +659,7 @@ class MaterialType(models.Model):
     # Ensure material_type is always provided to avoid empty entries
     material_type = models.CharField(max_length=255)
     username = models.CharField(max_length=255, null=False, blank=True)
-    status = models.CharField(max_length=50, null=True, blank=True)
+    status = models.CharField(max_length=50, null=True, blank=True, default='Active')
     date = models.DateTimeField(default=timezone.now, blank=True)
     logs = models.TextField(blank=True)
 
@@ -667,7 +672,7 @@ class MaterialType(models.Model):
         Returns a string representation of the MaterialType object, including the supplier name, material type, and username.
         This method is used to display a human-readable representation of the object.
         """
-        return f"{self.supplier_name} - {self.material_type} - {self.username}"
+        return f"{self.supplier_name} - {self.material_type} - {self.status}"
 
 
 class Unit(models.Model):
@@ -691,18 +696,17 @@ class Unit(models.Model):
     count = models.FloatField(blank=True, null=True)
     username = models.CharField(max_length=255, null=False, blank=True)
     date = models.DateTimeField(default=timezone.now, blank=True)
-    status = models.CharField(max_length=255, blank=True)
+    status = models.CharField(max_length=255, blank=True, default='Active')
     logs = models.TextField(blank=True)
 
     # Meta
     class Meta:
         db_table = 'Unit'
-        unique_together = ('unit_name', 'supplier_name')
 
     def __str__(self):
         """
         Returns a string representation of the Unit object, including the Unit name, count, and username.
         This method is used to display a human-readable representation of the object.
         """
-        return f"{self.supplier_name} - {self.count} - {self.username}"
+        return f"{self.supplier_name} - {self.material_type} - {self.unit_name} - {self.count} - {self.status}"
 

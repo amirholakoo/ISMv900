@@ -104,7 +104,7 @@ export default {
         this.forms.payment_status.value = name
       }
     },
-    async addSupplier() {
+    async createsSales() {
       let vat = this.forms.vat.value;
       const params = {
         'lic_number': this.forms.lic_number.value,
@@ -225,13 +225,13 @@ export default {
                 <ul v-if="key=='reel_numbers'">
                   <li v-for="item in val.value" :key="item">{{ item }}</li>
                 </ul>
-                <p v-else>{{val.title}}: {{val.value}}</p>
+                <p v-else>{{val.name}}: {{val.value}}</p>
             </template>
           </div>
         </template>
         <template v-slot:btns>
           <div>
-            <button data-modal-hide="popup-modal" aria-label="Close" @click="addSupplier" type="button" class="inline-flex justify-center w-full px-2 py-1.5 text-xs font-medium text-center text-white        bg-green-500 hover:bg-green-600 focus:ring-4 focus:outline-none focus:ring-green-300  rounded-lg dark:bg-blue-500 dark:hover:bg-blue-600 dark:focus:ring-blue-800">درسته</button>
+            <button data-modal-hide="popup-modal" aria-label="Close" @click="createsSales" type="button" class="inline-flex justify-center w-full px-2 py-1.5 text-xs font-medium text-center text-white        bg-green-500 hover:bg-green-600 focus:ring-4 focus:outline-none focus:ring-green-300  rounded-lg dark:bg-blue-500 dark:hover:bg-blue-600 dark:focus:ring-blue-800">درسته</button>
           </div>
         </template>
       </modal>

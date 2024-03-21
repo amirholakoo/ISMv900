@@ -16,8 +16,8 @@ class TruckAdmin(admin.ModelAdmin):
 
 @admin.register(Shipments)
 class ShipmentsAdmin(admin.ModelAdmin):
-    list_display = ('id', 'shipment_type', 'status', 'location', 'truck_id', 'license_number', 'receive_date', 'entry_time', 'customer_name', 'supplier_name', 'weight1', 'weight1_time', 'unload_location', 'unit', 'quantity', 'quality', 'penalty', 'weight2', 'weight2_time', 'net_weight', 'list_of_reels', 'profile_name', 'sales_id', 'price_per_kg', 'extra_cost', 'supplier_id', 'material_id', 'material_type', 'material_name', 'purchase_id', 'vat', 'invoice_status', 'payment_status', 'exit_time', 'document_info', 'comments', 'cancellation_reason', 'username', 'logs')
-    search_fields = ('id', 'shipment_type', 'status', 'location', 'truck_id', 'license_number', 'customer_name', 'supplier_name', 'username')
+    list_display = ('id', 'shipment_type', 'status', 'location', 'license_number', 'receive_date', 'entry_time', 'customer_name', 'supplier_name', 'weight1', 'weight1_time', 'unload_location', 'unit', 'quantity', 'quality', 'penalty', 'weight2', 'weight2_time', 'net_weight', 'list_of_reels', 'profile_name', 'sales_id', 'price_per_kg', 'extra_cost', 'material_type', 'material_name', 'purchase_id', 'vat', 'invoice_status', 'payment_status', 'exit_time', 'document_info', 'comments', 'cancellation_reason', 'username', 'logs')
+    search_fields = ('id', 'shipment_type', 'status', 'location', 'license_number', 'customer_name', 'supplier_name', 'username')
     list_filter = ('shipment_type', 'status', 'location')
 
 
@@ -65,11 +65,11 @@ class RawMaterialAdmin(admin.ModelAdmin):
 @admin.register(Purchases)
 class PurchasesAdmin(admin.ModelAdmin):
 
-    list_display = ('date', 'receive_date', 'supplier_id', 'truck_id', 'material_id', 'material_type', 'material_name', 'unit', 'quantity', 'quality', 'penalty', 'weight1', 'weight2', 'net_weight', 'price_per_kg', 'vat', 'total_price', 'extra_cost', 'invoice_status', 'status', 'payment_details', 'payment_date', 'invoice_number', 'document_info', 'comments', 'cancellation_reason', 'shipment_id', 'username', 'logs')
+    list_display = ('date', 'receive_date', 'material_id', 'material_type', 'material_name','supplier_name', 'unit', 'quantity', 'quality', 'penalty', 'weight1', 'weight2', 'net_weight', 'price_per_kg', 'vat', 'total_price', 'extra_cost', 'invoice_status', 'status', 'payment_details', 'payment_date', 'invoice_number', 'document_info', 'comments', 'cancellation_reason', 'shipment_id', 'username', 'logs',)
 
     search_fields = ('material_name', 'supplier_id')
 
-    list_filter = ('status',)
+    list_filter = ('date', 'receive_date', 'material_id', 'material_type', 'material_name','supplier_name', 'unit', 'quantity', 'quality', 'penalty', 'weight1', 'weight2', 'net_weight', 'price_per_kg', 'vat', 'total_price', 'extra_cost', 'invoice_status', 'status', 'payment_details', 'payment_date', 'invoice_number', 'document_info', 'comments', 'cancellation_reason', 'shipment_id', 'username', 'logs',)
 
 
 @admin.register(Sales)
@@ -81,7 +81,7 @@ class SaleAdmin(admin.ModelAdmin):
 
 
 
-anbar_fields = ('receive_date', 'reel_number', 'supplier_id', 'supplier_name', 'material_type', 'material_name', 'description' ,'status', 'location', 'last_date', 'width', 'gsm', 'length', 'grade', 'breaks', 'comments', 'qr_code', 'unit', 'profile_name', 'username', 'logs',)
+anbar_fields = ('receive_date', 'reel_number', 'supplier_name', 'material_type', 'material_name', 'description' ,'status', 'location', 'last_date', 'width', 'gsm', 'length', 'grade', 'breaks', 'comments', 'qr_code', 'unit', 'profile_name', 'username', 'logs',)
 @admin.register(Anbar_Sangin)
 class AnbarSanginAdmin(admin.ModelAdmin):
 
@@ -196,17 +196,17 @@ class ConsumptionProfileAdmin(admin.ModelAdmin):
     list_display =['profile_name','supplier_name','material_type','material_name','unit','quantity']
     fields=list_display
 
-    
+
 @admin.register(MaterialType)
 class MaterialTypeAdmin(admin.ModelAdmin):
     # Specify the fields to display in the list view
-    list_display = ('supplier_name', 'material_type', 'username', 'date')
+    list_display = ('supplier_name', 'material_type', 'username', 'status', 'date', 'logs',)
     # Specify the fields to use in the search box
     search_fields = ('supplier_name', 'material_type', 'username')
     # Specify the fields to use in the filter sidebar
     list_filter = ('supplier_name', 'material_type')
     # Specify the fields to display in the detail view
-    fields = ('supplier_name', 'material_type', 'username', 'date', 'logs')
+    fields = ('supplier_name', 'material_type', 'username', 'status', 'date', 'logs',)
 
 
 @admin.register(Unit)

@@ -76,7 +76,7 @@ export default {
       }
       console.log(this.forms.reel_numbers.value)
     },
-    async addSupplier() {
+    async loaded() {
       const params = {
         'lic_number': this.forms.lic_number.value,
         'loading_location': this.forms.unloading_location.value,
@@ -175,7 +175,7 @@ export default {
         </template>
         <template v-slot:btns>
           <div>
-            <button data-modal-hide="popup-modal" aria-label="Close" @click="addSupplier" type="button" class="inline-flex justify-center w-full px-2 py-1.5 text-xs font-medium text-center text-white        bg-green-500 hover:bg-green-600 focus:ring-4 focus:outline-none focus:ring-green-300  rounded-lg dark:bg-blue-500 dark:hover:bg-blue-600 dark:focus:ring-blue-800">درسته</button>
+            <button data-modal-hide="popup-modal" aria-label="Close" @click="loaded" type="button" class="inline-flex justify-center w-full px-2 py-1.5 text-xs font-medium text-center text-white        bg-green-500 hover:bg-green-600 focus:ring-4 focus:outline-none focus:ring-green-300  rounded-lg dark:bg-blue-500 dark:hover:bg-blue-600 dark:focus:ring-blue-800">درسته</button>
           </div>
         </template>
       </modal>

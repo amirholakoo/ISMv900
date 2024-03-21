@@ -17,7 +17,7 @@ export default {
         unit: {status:true, type: 'dropdown', name: 'واحد',title: 'واحد', data: '', value: ''},
         Quantity: {status:true, type:'input', name: 'کمیف(مقدار)', title: 'کمیف(مقدار)', value: ''},
         width: {status:false, type: 'dropdown', name: 'عرض',title: 'عرض', data: '', value: ''},
-        reel: {status:false, type: 'dropdown', name: 'عرض',title: 'عرض', data: '', value: ''},
+        reel: {status:false, type: 'dropdown', name: 'رول',title: 'رول', data: '', value: ''},
         to_anbar: {status:true, type: 'dropdown', name: 'به انبار',title: 'به انبار', data: '', value: ''},
         forklift_driver: {status:true, type:'input', name: 'اسم راننده فرک لیفت',title: 'اسم راننده فرک لیفت', value: ''},
       },
@@ -109,7 +109,7 @@ export default {
         this.forms.to_anbar.value = name
       }
     },
-    async addSupplier() {
+    async moved() {
       const params = {
         "from_anbar": this.forms.from_anbar.value,
         "reel": this.forms.reel.value,
@@ -219,7 +219,7 @@ export default {
           </template>
           <template v-slot:btns>
             <div>
-              <button data-modal-hide="popup-modal" aria-label="Close" @click="addSupplier" type="button" class="inline-flex justify-center w-full px-2 py-1.5 text-xs font-medium text-center text-white        bg-green-500 hover:bg-green-600 focus:ring-4 focus:outline-none focus:ring-green-300  rounded-lg dark:bg-blue-500 dark:hover:bg-blue-600 dark:focus:ring-blue-800">درسته</button>
+              <button data-modal-hide="popup-modal" aria-label="Close" @click="moved" type="button" class="inline-flex justify-center w-full px-2 py-1.5 text-xs font-medium text-center text-white        bg-green-500 hover:bg-green-600 focus:ring-4 focus:outline-none focus:ring-green-300  rounded-lg dark:bg-blue-500 dark:hover:bg-blue-600 dark:focus:ring-blue-800">درسته</button>
             </div>
           </template>
         </modal>

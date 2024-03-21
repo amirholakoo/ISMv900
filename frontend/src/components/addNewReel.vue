@@ -40,12 +40,15 @@ export default {
         breaks:{type:'input', name: 'پارگی', title:'پارگی', data:'', value:''},
         grade:{type:'input', name: 'کیفیت', title:'کیفیت', data:'', value:''},
         consumption_profile_name:{type:'dropdown', name:'پروفایل مصرف', title:'پروفایل مصرف', data:'', value:''},
+        commnet: {type:'input', name: 'کامنت', title: 'کامنت', value: ''},
+        username: {type:'input', name: 'نام کاربر', title: 'نام کاربر', value: ''},
       },
       success: false,
       error: false,
       errors: [],
       qrcode: '',
       hide: false,
+      loading: false,
     }
   },
   watch:{
@@ -63,7 +66,8 @@ export default {
         this.forms.consumption_profile_name.name = name
       }
     },
-    async addSupplier() {
+    async addNewReel() {
+      this.loading = true
       let params = {
         "reel_number": this.forms.reel_number.value,
         "width": this.forms.width.value,
@@ -71,27 +75,21 @@ export default {
         "length": this.forms.length.value,
         "breaks": this.forms.breaks.value,
         "grade": this.forms.grade.value,
+        "commnet": this.forms.commnet.value,
         "consumption_profile_name": this.forms.consumption_profile_name.value,
+        "username": this.forms.username.value,
+        "qr_code": this.qrcode,
       };
       this.qrcode = await QRCode.toDataURL(JSON.stringify(params), {
         width: 256,
         height: 256,
       })
-      params = {
-        "reel_number": this.forms.reel_number.value,
-        "width": this.forms.width.value,
-        "gsm": this.forms.GSM.value,
-        "length": this.forms.length.value,
-        "breaks": this.forms.breaks.value,
-        "grade": this.forms.grade.value,
-        "consumption_profile_name": this.forms.consumption_profile_name.value,
-        "qr_code": this.qrcode,
-      };
+      params['qr_code']=this.qrcode
       console.log('params is:',params)
       this.errors = []
       for (const key in this.forms) {
         if (this.forms[key].value == ''){
-          if (key!='comment'){
+          if (key!='commnet'){
             this.forms[key].error = true
             this.errors.push({'message': `${this.forms[key].name} مورد نیاز است`})
           }
@@ -109,7 +107,9 @@ export default {
             width: 256,
             height: 256,
           })
+          this.loading=false
         }else {
+          this.loading=false
           this.error = true
           this.errors = response.data['errors']
         }
@@ -173,6 +173,13 @@ export default {
         </div>
         </template>
       </template>
+      <button disabled type="button" :class="[loading ? '' : 'hidden']" class="inline-flex justify-center w-44  py-2.5 text-white bg-green-500 hover:bg-green-600 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm text-center me-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 inline-flex items-center">
+          <svg aria-hidden="true" role="status" class="inline w-4 h-4 me-3 text-white animate-spin" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="#E5E7EB"/>
+          <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentColor"/>
+          </svg>
+          لطفا صبر کنید ...
+      </button>
       <modal type="confirm">
         <template v-slot:button>اضافه کردن</template>
         <template v-slot:text>
@@ -188,7 +195,7 @@ export default {
         </template>
         <template v-slot:btns>
           <div>
-            <button data-modal-hide="popup-modal" aria-label="Close" @click="addSupplier" type="button" class="inline-flex justify-center w-full px-2 py-1.5 text-xs font-medium text-center text-white        bg-green-500 hover:bg-green-600 focus:ring-4 focus:outline-none focus:ring-green-300  rounded-lg dark:bg-blue-500 dark:hover:bg-blue-600 dark:focus:ring-blue-800">درسته</button>
+            <button data-modal-hide="popup-modal" aria-label="Close" @click="addNewReel" type="button" class="inline-flex justify-center w-full px-2 py-1.5 text-xs font-medium text-center text-white        bg-green-500 hover:bg-green-600 focus:ring-4 focus:outline-none focus:ring-green-300  rounded-lg dark:bg-blue-500 dark:hover:bg-blue-600 dark:focus:ring-blue-800">درسته</button>
           </div>
         </template>
       </modal>

@@ -19,6 +19,7 @@ urlpatterns = [
     path("api/getShipmentDetailsByLicenseNumber", get_shipment_details_by_license_number),
     path("api/getShipmentDetails2ByLicenseNumber", get_shipment_details2_by_license_number),
     path("api/getReelNumbersByWidthAndStatus", get_reel_numbers_by_width_and_status),
+    path("api/getUnitNamesBasedOnLicenseOfShipment", get_unit_names_based_on_license_of_shipment),
     path("api/getWidths", get_widths_view),
     path("api/showWeight1/", show_weight1),
     path("api/getUnitNames", get_unit_names),
