@@ -114,6 +114,13 @@ export default {
         <div>
           <span class="font-medium">
             واحد جدید با نام {{ forms.unit_name.value }} با موفقیت به سیستم اضافه شد.
+            <template v-for="(val, key) in forms">
+                <p v-if="key=='reel_numbers'">شماره رول:</p>
+                <ul v-if="key=='reel_numbers'">
+                  <li v-for="item in val.value" :key="item">{{ item }}</li>
+                </ul>
+                <p v-else>{{val.title}}: {{val.value}}</p>
+            </template>
           </span>
         </div>
       </div>

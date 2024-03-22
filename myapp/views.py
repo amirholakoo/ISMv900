@@ -11,8 +11,6 @@ from django.apps import apps
 from django.db import models
 from django.apps import apps
 from django.db.models.base import ModelBase
-from jdatetime import datetime
-import uuid
 
 # Create your views here.
 def log_generator(username, action):
@@ -907,7 +905,7 @@ def get_shipment_details_by_license_number(request):
             license_number = request.GET.get('license_number')
             if license_number:
                 # Filter Shipments based on the license_number
-                shipment = Shipments.objects.filter(license_number=license_number).first()
+                shipment = Shipments.objects.filter(license_number=license_number, status='Office',location='Office', shipment_type='Incoming').first()
                 if shipment:
                     # Prepare the data to be returned
                     shipment_details = {
@@ -1720,17 +1718,22 @@ def get_supplierNames_based_andbar(request):
         anbar_location = request.GET.get('anbar_location')
         try:
             anbar_model = apps.get_model('myapp', anbar_location)
-            supplier_name = anbar_model.objects.values_list('supplier_name', flat=True)
-            material_name = anbar_model.objects.values_list('material_name', flat=True)
-            unit = anbar_model.objects.values_list('unit', flat=True)
-            supplier_names = list(supplier_name)
-            material_names = list(material_name)
-            units = list(unit)
+            supplier_name = anbar_model.objects.exclude(supplier_name__isnull=True).exclude(
+                supplier_name__exact='').values_list('supplier_name', flat=True).distinct()
+            material_name = anbar_model.objects.exclude(material_name__isnull=True).exclude(
+                material_name__exact='').values_list('material_name', flat=True).distinct()
+            unit = anbar_model.objects.exclude(unit__isnull=True).exclude(unit__exact='').values_list('unit',
+                                                                                                      flat=True).distinct()
+            supplier_names = list(set(supplier_name))
+            material_names = list(set(material_name))
+            units = list(set(unit))
+
             # Return the widths as a JSON response
             return JsonResponse({'supplier_names': supplier_names, 'material_names': material_names, 'units':units}, status=200)
         except Exception as e:
             # Handle any exceptions that occur during the process
             return JsonResponse({'error': str(e)}, status=500)
+
 
 def get_unit_based_supplier_name(request):
     if request.method == 'GET':
@@ -1936,64 +1939,91 @@ def moved(request):
         to_anbar = request.GET.get('to_anbar')
         forklift_driver = request.GET.get('forklift_driver')
         real_or_raw = request.GET.get('real_or_raw')
-        print(real_or_raw)
+
+        errors = []
+
         try:
             AnbarModel1 = apps.get_model('myapp', from_anbar)
             AnbarModel2 = apps.get_model('myapp', to_anbar)
             # Update source AnbarGeneric items
             if real_or_raw == 'Raw':
-
                 sourse = AnbarModel1.objects.filter(
                     location=from_anbar,
                     supplier_name=supplier_name,
                     material_name=material_name,
                 ).order_by('id')[:int(Quantity)]
-
                 # Iterate over the records and update each one
                 for record in sourse:
                     record.status = 'Moved'
                     record.location = to_anbar
                     record.last_date = timezone.now()
-                    record.logs = log_generator(forklift_driver, 'Moved')
-                    # Save the updated record
-                    record.save()
-                # Create new entries in the destination AnbarGeneric location
-                for _ in range(int(Quantity)):
+                    record.logs = record.logs + log_generator(forklift_driver, 'Moved')
+
+                    # Create new entries in the destination AnbarGeneric location
                     new_item = AnbarModel2(
                         receive_date=timezone.now(),
                         location=to_anbar,
                         status='In-stock',
                         supplier_name=supplier_name,
                         material_name=material_name,
+                        material_type=record.material_type,
                         unit=unit,
+                        username=forklift_driver,
                     )
+                    # Save the updated record
+                    record.save()
                     new_item.save()
 
 
             if real_or_raw == 'Reel':
-                # Update source AnbarGeneric items
-                Products.objects.filter(
+                sourse = AnbarModel1.objects.filter(
                     location=from_anbar,
                     width=width,
                     status='In-stock',
                     reel_number=reel,
-                ).update(
-                    status='Moved',
-                    location=to_anbar,
-                    last_date=timezone.now(),
-                    logs=log_generator(forklift_driver, 'Moved')
-                )
-                # Create new entries in the destination AnbarGeneric location
-                for _ in range(int(Quantity)):
+                ).order_by('id')[:int(Quantity)]
+
+                products = Products.objects.filter(
+                    location=from_anbar,
+                    width=width,
+                    status='In-stock',
+                    reel_number=reel,
+                ).order_by('id')[:int(Quantity)]
+                for record in sourse:
+                    # update anbar a
+                    record.last_date = timezone.now()
+                    record.status = 'Moved'
+                    record.location = to_anbar
+                    record.logs =record.logs + log_generator(forklift_driver, 'Moved')
+                    # insert to anbar 2
                     new_item = AnbarModel2(
                         receive_date=timezone.now(),
                         location=to_anbar,
                         status='In-stock',
                         width=width,
                         unit=unit,
-                        reel_number=reel
+                        reel_number=reel,
+                        gsm=record.gsm,
+                        length=record.length,
+                        grade=record.grade,
+                        breaks=record.breaks,
+                        qr_code=record.qr_code,
+                        profile_name=record.profile_name,
+                        username=forklift_driver,
+                        logs=log_generator(forklift_driver, 'Moved')
                     )
+                    record.save()
                     new_item.save()
+                for record in products:
+                    record.status='Moved'
+                    record.location=to_anbar
+                    record.logs =record.logs + log_generator(forklift_driver, 'Moved')
+                    record.save()
+
+            if len(sourse) < int(Quantity):
+                msg = 'انبار' + to_anbar + f'از مقدار که شما انتخاب کردید ( {Quantity} ) ' + 'مقدار کمتری دارد' + len(sourse) +'تا منتقل شد'
+                errors.append({'status': 'error', 'message': msg})
+                return JsonResponse({'status': 'error', 'errors': errors})
 
             # Return a success response
             return JsonResponse({'status': 'success', 'message': f'{Quantity} units of {material_name} have been moved from {from_anbar} to {to_anbar}.'})
@@ -2003,6 +2033,30 @@ def moved(request):
             return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
     else:
         return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=400)
+
+
+def get_returned_data(request):
+    if request.method == 'GET':
+        try:
+
+            # Filter the queryset to include only records with status 'Used'
+            used_consumptions = Consumption.objects.filter(status='Used')
+
+            # Get distinct values for 'supplier_name', 'material_name', and 'unit'
+            supplier_names = used_consumptions.values_list('supplier_name', flat=True).distinct()
+            material_names = used_consumptions.values_list('material_name', flat=True).distinct()
+            units = used_consumptions.values_list('unit', flat=True).distinct()
+
+            supplier_names = list(set(supplier_names))
+            material_names = list(set(material_names))
+            units = list(set(units))
+
+            # Return the widths as a JSON response
+            return JsonResponse({'supplier_names': supplier_names, 'material_names': material_names, 'units': units},
+                                status=200)
+        except Exception as e:
+            # Handle any exceptions that occur during the process
+            return JsonResponse({'error': str(e)}, status=500)
 
 
 @csrf_exempt
@@ -2022,10 +2076,10 @@ def retuned(request):
     if request.method == 'POST':
         # Extract data from the request
         supplier_name = request.GET.get('supplier_name')
-        material_type = request.GET.get('material_type')
-        unit_name = request.GET.get('unit_name')
-        quantity = request.GET.get('quantity')
-        anbar_location = request.GET.get('anbar_location')
+        material_name = request.GET.get('material_name')
+        unit = request.GET.get('unit')
+        quantity = request.GET.get('Quantity')
+        to_anbar = request.GET.get('to_anbar')
         reason = request.GET.get('reason')
         forklift_driver = request.GET.get('forklift_driver')
 
@@ -2034,13 +2088,13 @@ def retuned(request):
         # Check if all required fields are provided
         if not supplier_name:
             errors.append({'status': 'error', 'message': 'supplier name is required.'})
-        if not material_type:
+        if not material_name:
             errors.append({'status': 'error', 'message': 'material type is required.'})
-        if not unit_name:
+        if not unit:
             errors.append({'status': 'error', 'message': 'unit_name is required.'})
         if not quantity:
             errors.append({'status': 'error', 'message': 'quantity is required.'})
-        if not anbar_location:
+        if not to_anbar:
             errors.append({'status': 'error', 'message': 'anbar location is required.'})
         if not reason:
             errors.append({'status': 'error', 'message': 'reason is required.'})
@@ -2050,6 +2104,32 @@ def retuned(request):
         # If there are any errors, return them in the response
         if errors:
             return JsonResponse({'status': 'error', 'errors': errors})
+        else:
+            AnbarModel = apps.get_model('myapp', to_anbar)
+            sourse = Consumption.objects.filter(
+                status='In-stock',
+            ).order_by('id')[:int(quantity)]
+            for record in sourse:
+                record.status = 'Returned'
+                record.location = to_anbar
+                record.last_date = timezone.now()
+                record.logs = log_generator(forklift_driver, 'Moved')
+
+                # Create new entries in the destination AnbarGeneric location
+                new_item = AnbarModel(
+                    receive_date=timezone.now(),
+                    location=to_anbar,
+                    status='In-stock',
+                    supplier_name=supplier_name,
+                    material_name=material_name,
+                    material_type=record.material_type,
+                    unit=unit,
+                    username=forklift_driver,
+                    logs=log_generator(forklift_driver, 'Moved')
+                )
+                # Save the updated record
+                record.save()
+                new_item.save()
     else:
         return JsonResponse({'status': 'error', 'message': 'Invalid request method.'})
 
@@ -2427,3 +2507,45 @@ def cancel_shipment(request):
         return JsonResponse({'status': 'fail', 'message': 'Invalid request method.'})
 
 
+def cancel(request):
+
+    license_number = ''
+    anbar_location = ''
+    cancellation_reason = ''
+    username = ''
+
+    shipment = Shipments.objectst.filter()
+    shipment.update(
+        status='Canceled',
+        cancellation_reason=cancellation_reason,
+        logs=shipment[0].logs+log_generator(username, 'Canceled'),
+    )
+    products = Products.objects.filter()
+
+    for product in products:
+        product.status='In-stock'
+        product.location='Canceled'
+
+    AnbarModel = apps.get_model('myapp', anbar_location)
+
+    # Update truck status and location
+    Truck.objects.filter(license_number=license_number).update(
+        status='Free',
+        location='Entrance'
+    )
+
+    purchases = Purchases.objects.filter()
+    if purchases.exists():
+        purchases.update(
+            status='Canceled',
+            cancellation_reason=cancellation_reason,
+            logs=purchases[0].logs + log_generator(username, 'Canceled')
+        )
+
+    sales = Sales.objects.filter()
+    if sales.exists():
+        sales.update(
+            status='Canceled',
+            cancellation_reason=cancellation_reason,
+            logs=sales[0].logs + log_generator(username, 'Canceled')
+        )

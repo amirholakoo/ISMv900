@@ -15,7 +15,7 @@ export default {
         unit: {type: 'dropdown', name: 'واحد',title: 'واحد', data: '', value: ''},
         Quantity: {type:'input', name: 'کمیف(مقدار)', value: ''},
         to_anbar: {type: 'dropdown', name: 'به انبار',title: 'به انبار', data: '', value: ''},
-        reason: {type: 'dropdown', name: 'علت',title: 'علت', data: '', value: ''},
+        reason: {type: 'input', name: 'علت',title: 'علت', data: '', value: ''},
         forklift_driver: {type:'input', name: 'اسم راننده فرک لیفت', value: ''},
       },
       success: false,
@@ -25,25 +25,46 @@ export default {
   },
   mounted() {
     initFlowbite();
-  },
-  watch:{
-    success(c, p){
-      if (c == true) {
-        setTimeout(() => {
-          this.success = false
-          location.reload();
-        }, 5000)
-      }
-    },
+    this.axios.get('/myapp/api/getAnbarTableNames').then((response) => {
+      console.log(response.data)
+      this.forms.to_anbar.data = response.data['data']
+    })
+    this.axios.get('/myapp/api/getReturnedData').then((response) => {
+      console.log(response.data)
+      this.forms.supplier_name.data = response.data['supplier_names']
+      this.forms.material_name.data = response.data['material_names']
+      this.forms.unit.data = response.data['units']
+    })
   },
   methods: {
+     clicked(k, name){
+      console.log(k, name)
+      if (k == 'supplier_name'){
+        this.forms.supplier_name.name = name
+        this.forms.supplier_name.value = name
+      }
+      if (k == 'material_name'){
+        this.forms.material_name.name = name
+        this.forms.material_name.value = name
+      }
+      if (k == 'unit'){
+        this.forms.unit.name = name
+        this.forms.unit.value = name
+      }
+      if (k == 'to_anbar'){
+        this.forms.to_anbar.name = name
+        this.forms.to_anbar.value = name
+      }
+    },
     async returned() {
       const params = {
-        "customer_name": this.forms.customer_name.value,
-        "address": this.forms.address.value,
-        "phone": this.forms.phone.value,
-        "username": this.forms.username.value,
-        "comments": this.forms.comment.value,
+        "supplier_name": this.forms.supplier_name.value,
+        "material_name": this.forms.material_name.value,
+        "unit": this.forms.unit.value,
+        "Quantity": this.forms.Quantity.value,
+        "to_anbar": this.forms.to_anbar.value,
+        "reason": this.forms.reason.value,
+        "forklift_driver": this.forms.forklift_driver.value,
       };
       this.errors = []
       for (const key in this.forms) {
@@ -58,7 +79,7 @@ export default {
       }
       if (this.errors.length == 0){
         this.error = false
-        const response = await this.axios.post('/myapp/addCustomer/', {}, {params: params})
+        const response = await this.axios.post('/myapp/api/retuned', {}, {params: params})
         console.log(response.data); // Access response data
         if (response.data['status'] == 'success'){
           this.success = true
@@ -94,6 +115,13 @@ export default {
         <div>
           <span class="font-medium">
             مشتری جدید با نام {{ forms.customer_name.value }} با موفقیت به سیستم اضافه شد.
+            <template v-for="(val, key) in forms">
+                <p v-if="key=='reel_numbers'">شماره رول:</p>
+                <ul v-if="key=='reel_numbers'">
+                  <li v-for="item in val.value" :key="item">{{ item }}</li>
+                </ul>
+                <p v-else>{{val.title}}: {{val.value}}</p>
+            </template>
           </span>
         </div>
       </div>

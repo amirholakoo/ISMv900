@@ -28,11 +28,13 @@ urlpatterns = [
     path("api/loaded", loaded),
     path("api/used", used),
     path("api/moved", moved),
+    path("api/retuned", retuned),
     path("api/cancelShipment", cancel_shipment),
     path("api/getSupplierNamesBasedAndbar", get_supplierNames_based_andbar),
     path("api/getUnitBasedSupplierName", get_unit_based_supplier_name),
     path("api/getReelNumber", get_reel_number),
     path("api/loadDataForMoved", load_data_for_moved),
+    path("api/getReturnedData", get_returned_data),
 
     # Following paths are related to Pages:
 

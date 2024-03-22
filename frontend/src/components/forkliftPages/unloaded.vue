@@ -114,6 +114,13 @@ export default {
           <span class="font-medium">
             {{forms.unit.value}} {{forms.Quantity.value}}
             با موفقیت به پلاگ {{forms.lic_number.value}} اضافه شد
+            <template v-for="(val, key) in forms">
+                <p v-if="key=='reel_numbers'">شماره رول:</p>
+                <ul v-if="key=='reel_numbers'">
+                  <li v-for="item in val.value" :key="item">{{ item }}</li>
+                </ul>
+                <p v-else>{{val.title}}: {{val.value}}</p>
+            </template>
           </span>
         </div>
       </div>

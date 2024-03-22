@@ -1,5 +1,4 @@
 from django.utils import timezone
-from jdatetime import datetime
 from django.db import models
 # Create your models here.
 
@@ -51,7 +50,7 @@ class Shipments(models.Model):
     # truck_id = models.ForeignKey(Truck, on_delete=models.SET_NULL, blank=True, null=True)
     license_number = models.CharField(max_length=255,null=True)
     receive_date = models.DateTimeField(blank=True, null=True)
-    entry_time = models.DateTimeField(blank=True, null=True, default=datetime.now)
+    entry_time = models.DateTimeField(blank=True, null=True, default=timezone.now)
     customer_name = models.CharField(max_length=255, null=True)
     supplier_name = models.CharField(max_length=255, null=True)
     weight1 = models.DecimalField(max_digits=10, decimal_places=2, null=True)
@@ -269,7 +268,7 @@ class Purchases(models.Model):
     """
     # Fields
 
-    date = models.DateTimeField(default=datetime.now, blank=True)
+    date = models.DateTimeField(default=timezone.now, blank=True)
     receive_date = models.DateTimeField(blank=True, null=True)
 
     # supplier_id = models.ForeignKey('Supplier', on_delete=models.SET_NULL, blank=True, null=True)
