@@ -41,13 +41,24 @@ export default {
         this.axios.get('/myapp/api/getSupplierNamesBasedAndbar', {params:params}).then((response) => {
           console.log(response.data)
           this.forms.supplier_name.data = response.data['supplier_names']
-          this.forms.material_name.data = response.data['material_names']
-          this.forms.unit.data = response.data['units']
+          // this.forms.material_name.data = response.data['material_names']
+          // this.forms.unit.data = response.data['units']
         })
       }
       if (k == 'supplier_name'){
         this.forms.supplier_name.name = name
         this.forms.supplier_name.value = name
+      //   request for geing materila name and unit name based on supplirt name each anbar
+
+        const params = {
+          'anbar_location': this.forms.unloading_location.value,
+          'supplier_name': name,
+        }
+        this.axios.get('/myapp/api/getUnitAndMaterialNameBasedSupplierNmaeAndbar', {params:params}).then((response) => {
+          console.log(response.data)
+          this.forms.material_name.data = response.data['material_names']
+          this.forms.unit.data = response.data['units']
+        })
       }
       if (k == 'material_name'){
         this.forms.material_name.name = name

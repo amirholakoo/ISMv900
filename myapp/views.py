@@ -572,19 +572,13 @@ def add_new_reel(request):
             all_table_names = connection.introspection.table_names()
             anbar_table_names = [name for name in all_table_names if name.startswith('Anbar_')]
             profile_list = ConsumptionProfile.objects.filter(profile_name=profile_name)
-            print('profile list records is: ',len(profile_list))
-            print('--------------------------------------------')
             for each_line in profile_list:
-                print('quantiy is :'+ str(int(each_line.quantity)))
-                print('supplier_name', each_line.supplier_name)
-                print('material_name', each_line.material_name)
 
                 for anbar_name in anbar_table_names:
                     AnbarModel = apps.get_model('myapp', anbar_name)
                     anbar_records = AnbarModel.objects.filter(supplier_name=each_line.supplier_name,
                                               material_name=each_line.material_name,
                                               status='In-stock').order_by('receive_date')[:each_line.quantity]
-                    print('anbar record is:', len(anbar_records))
                     # Iterate over the source records and create new instances of the target model
                     for record in anbar_records:
                         record.status = 'Used'
@@ -1069,10 +1063,12 @@ def show_weight1(request):
     if request.method == 'GET':
         # Extract data from request.GET
         license_number = request.GET.get('license_number')
-        print(license_number)
+        status = request.GET.get('status')
+        location = request.GET.get('location')
+        # print(license_number)
         if license_number:
             # Filter Shipments based on the license_number
-            shipment = Shipments.objects.filter(license_number=license_number).first()
+            shipment = Shipments.objects.filter(status=status, location=location, license_number=license_number).first()
             if shipment:
                 # Return the weight1 of the shipment
                 return JsonResponse({'weight1': shipment.weight1})
@@ -1751,6 +1747,25 @@ def get_supplierNames_based_andbar(request):
             return JsonResponse({'error': str(e)}, status=500)
 
 
+def get_unit_and_materialName_based_supplierNmae_andbar(request):
+    if request.method == 'GET':
+        anbar_location = request.GET.get('anbar_location')
+        supplier_name = request.GET.get('supplier_name')
+        try:
+            anbar_model = apps.get_model('myapp', anbar_location)
+            anbar = anbar_model.objects.filter(supplier_name=supplier_name, status='In-stock', location=anbar_location)
+            units = []
+            material_names = []
+            for record in anbar:
+                units.append(record.unit)
+                material_names.append(record.material_name)
+            # Return the widths as a JSON response
+            return JsonResponse({'material_names': list(set(material_names)), 'units':list(set(units))}, status=200)
+        except Exception as e:
+            # Handle any exceptions that occur during the process
+            return JsonResponse({'error': str(e)}, status=500)
+
+
 def get_unit_based_supplier_name(request):
     if request.method == 'GET':
         supplier_name = request.GET.get('supplier_name')
@@ -1828,10 +1843,11 @@ def used(request):
             # filtered anbar based on quantity:
             # Dynamically get the model based on the anbar_name
             AnbarModel = apps.get_model('myapp', unloading_location)
-            AnbarModel.objects.filter(
+            anbar = AnbarModel.objects.filter(
                 supplier_name=supplier_name,
                 material_name=material_name,
                 unit=unit,
+                status='In-stock'
             ).order_by('receive_date')[:quantity_to_unload]
             # get material type form rawMaterial
             raw = RawMaterial.objects.filter(
@@ -1839,13 +1855,14 @@ def used(request):
                 material_name=material_name,
             )
             material_type = raw[0].material_type
-            for record in AnbarModel:
+
+            for record in anbar:
                 # update anbar:
                 record.status='Used'
-                record.location='Consumption DB',
-                record.logs=record.logs+log_generator(forklift_driver, 'Used'),
-                record.last_date=timezone.now(),
-
+                record.location='Consumption DB'
+                record.logs=record.logs+log_generator(forklift_driver, 'Used')
+                record.last_date=timezone.now()
+                record.save()
                 consumption = Consumption(
                         receive_date=timezone.now(),
                         supplier_name=supplier_name,
@@ -1853,6 +1870,7 @@ def used(request):
                         material_type=material_type,
                         unit=unit,
                         status='Used',
+                        username=forklift_driver,
                         logs=log_generator(forklift_driver, 'Used')
                     )
                 consumption.save()
@@ -1889,6 +1907,7 @@ def used(request):
             return JsonResponse({'status': 'success', 'message': f'{quantity} units of {material_name} have been marked as used.'})
 
         except Exception as e:
+            print(e)
             return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
     else:
         return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=400)

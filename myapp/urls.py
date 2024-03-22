@@ -31,6 +31,7 @@ urlpatterns = [
     path("api/retuned", retuned),
     path("api/cancelShipment", cancel_shipment),
     path("api/getSupplierNamesBasedAndbar", get_supplierNames_based_andbar),
+    path("api/getUnitAndMaterialNameBasedSupplierNmaeAndbar", get_unit_and_materialName_based_supplierNmae_andbar),
     path("api/getUnitBasedSupplierName", get_unit_based_supplier_name),
     path("api/getReelNumber", get_reel_number),
     path("api/loadDataForMoved", load_data_for_moved),

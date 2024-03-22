@@ -51,6 +51,8 @@ export default {
 
         const params = {
           "license_number": this.forms.lic_number.value,
+          "status": 'LoadedUnloaded',
+          "location": 'Weight2'
         }
         this.axios.get('/myapp/api/showWeight1/', {params:params}).then((response) => {
           console.log(response.data)
