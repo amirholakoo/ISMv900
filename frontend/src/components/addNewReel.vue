@@ -80,11 +80,11 @@ export default {
         "username": this.forms.username.value,
         "qr_code": this.qrcode,
       };
-      this.qrcode = await QRCode.toDataURL(JSON.stringify(params), {
-        width: 256,
-        height: 256,
-      })
-      params['qr_code']=this.qrcode
+      // this.qrcode = await QRCode.toDataURL(JSON.stringify(params), {
+      //   width: 256,
+      //   height: 256,
+      // })
+      // params['qr_code']=this.qrcode
       console.log('params is:',params)
       this.errors = []
       for (const key in this.forms) {

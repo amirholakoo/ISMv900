@@ -89,18 +89,18 @@ export default {
         })
       }
       if (k == 'vat'){
-        this.forms.vat.title = name
+        this.forms.vat.name = name
         this.forms.vat.value = name
         console.log(this.total_price)
         this.forms.total_price.value = this.total_price
         
       }
       if (k == 'invoice_status'){
-        this.forms.invoice_status.title = name
+        this.forms.invoice_status.name = name
         this.forms.invoice_status.value = name
       }
       if (k == 'payment_status'){
-        this.forms.payment_status.title = name
+        this.forms.payment_status.name = name
         this.forms.payment_status.value = name
       }
     },
@@ -232,7 +232,7 @@ export default {
                 <ul v-if="key=='reel_numbers'">
                   <li v-for="item in val.value" :key="item">{{ item }}</li>
                 </ul>
-                <p v-else>{{val.name}}: {{val.value}}</p>
+                <p v-else>{{val.title}}: {{val.value}}</p>
             </template>
           </div>
         </template>

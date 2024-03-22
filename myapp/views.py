@@ -369,7 +369,7 @@ def add_rawMaterial(request):
                                  'message': f'New Material: {material_name} has been added to database successfully!'})
         except Exception as e:
             # Handle any exceptions that occur during the save operation
-            errors.append({'status': 'error', 'message': f'Error adding Customer: {str(e)}'})
+            errors.append({'status': 'error', 'message': f'Error adding RawMaterial: {str(e)}'})
             return JsonResponse({'status': 'error', 'errors': errors})
     else:
         return render(request, 'add_rawMaterial.html')
@@ -507,27 +507,27 @@ def add_new_reel(request):
             # Initialize an empty list to collect error messages
             errors = []
 
-            # Check if all required fields are provided
-            if not reel_number:
-                errors.append({'status': 'error', 'message': 'reel number is required.'})
-            if not width:
-                errors.append({'status': 'error', 'message': 'width is required.'})
-            if not gsm:
-                errors.append({'status': 'error', 'message': 'gsm is required.'})
-            if not length:
-                errors.append({'status': 'error', 'message': 'length is required.'})
-            if not breaks:
-                errors.append({'status': 'error', 'message': 'breaks is required.'})
-            if not grade:
-                errors.append({'status': 'error', 'message': 'grade is required.'})
-            if not profile_name:
-                errors.append({'status': 'error', 'message': 'consumption profile name is required.'})
-            if not username:
-                errors.append({'status': 'error', 'message': 'username is required.'})
-
-            # If there are any errors, return them in the response
-            if errors:
-                return JsonResponse({'status': 'error', 'errors': errors})
+            # # Check if all required fields are provided
+            # if not reel_number:
+            #     errors.append({'status': 'error', 'message': 'reel number is required.'})
+            # if not width:
+            #     errors.append({'status': 'error', 'message': 'width is required.'})
+            # if not gsm:
+            #     errors.append({'status': 'error', 'message': 'gsm is required.'})
+            # if not length:
+            #     errors.append({'status': 'error', 'message': 'length is required.'})
+            # if not breaks:
+            #     errors.append({'status': 'error', 'message': 'breaks is required.'})
+            # if not grade:
+            #     errors.append({'status': 'error', 'message': 'grade is required.'})
+            # if not profile_name:
+            #     errors.append({'status': 'error', 'message': 'consumption profile name is required.'})
+            # if not username:
+            #     errors.append({'status': 'error', 'message': 'username is required.'})
+            #
+            # # If there are any errors, return them in the response
+            # if errors:
+            #     return JsonResponse({'status': 'error', 'errors': errors})
 
 
             # Create a new Products record
@@ -572,29 +572,45 @@ def add_new_reel(request):
             all_table_names = connection.introspection.table_names()
             anbar_table_names = [name for name in all_table_names if name.startswith('Anbar_')]
             profile_list = ConsumptionProfile.objects.filter(profile_name=profile_name)
+            print('profile list records is: ',len(profile_list))
+            print('--------------------------------------------')
             for each_line in profile_list:
-                for quantity in range(int(each_line.quantity)):
-                    for anbar_name in anbar_table_names:
-                        AnbarModel = apps.get_model('myapp', anbar_name)
-                        anbar_records = AnbarModel.objects.filter(supplier_name=each_line.supplier_name,
-                                                  material_name=each_line.material_name,
-                                                  status='In-stock', ).order_by('receive_date')
-                        # Iterate over the source records and create new instances of the target model
-                        for record in anbar_records:
-                            c = Consumption(
-                                status='Used',
-                                location='Consumption DB',
-                                reel_number=record.reel_number,
-                                profile_name=record.profile_name,
-                                unit=record.unit,
-                                supplier_name=record.supplier_name,
-                                material_name=record.material_name,
-                                material_type=record.material_type,
-                                receive_date=timezone.now(),
-                                username=username,
-                                logs=log_generator(record.profile_name, 'Used')
-                            )
-                            c.save()
+                print('quantiy is :'+ str(int(each_line.quantity)))
+                print('supplier_name', each_line.supplier_name)
+                print('material_name', each_line.material_name)
+
+                for anbar_name in anbar_table_names:
+                    AnbarModel = apps.get_model('myapp', anbar_name)
+                    anbar_records = AnbarModel.objects.filter(supplier_name=each_line.supplier_name,
+                                              material_name=each_line.material_name,
+                                              status='In-stock').order_by('receive_date')[:each_line.quantity]
+                    print('anbar record is:', len(anbar_records))
+                    # Iterate over the source records and create new instances of the target model
+                    for record in anbar_records:
+                        record.status = 'Used'
+                        record.location = 'Consumption DB'
+                        record.last_date = timezone.now()
+                        record.save()
+                        c = Consumption(
+                            status='Used',
+                            location='Consumption DB',
+                            reel_number=record.reel_number,
+                            profile_name=record.profile_name,
+                            unit=record.unit,
+                            supplier_name=record.supplier_name,
+                            material_name=record.material_name,
+                            material_type=record.material_type,
+                            receive_date=timezone.now(),
+                            username=username,
+                            logs=log_generator(record.profile_name, 'Used')
+                        )
+                        c.save()
+
+                    # if len(anbar_records) < int(quantity):
+                    #     msg = 'با این حال' + ' مواد کمتری دارد' + str(quantity) + 'انبار شما از مقدار'
+                    #     msg = msg + 'تای ان استفاده شد' + str(len(anbar_records))
+                    #     errors.append({'status': 'error', 'message': msg})
+                    #     return JsonResponse({'status': 'error', 'errors': errors})
 
             # Return a success response
             return JsonResponse({'status': 'success', 'message': 'Reel number has been added'}, status=200)
@@ -1809,36 +1825,63 @@ def used(request):
         try:
             # Calculate the quantity to be unloaded
             quantity_to_unload = int(quantity)
+            # filtered anbar based on quantity:
             # Dynamically get the model based on the anbar_name
             AnbarModel = apps.get_model('myapp', unloading_location)
-            # Create Consumption records
+            AnbarModel.objects.filter(
+                supplier_name=supplier_name,
+                material_name=material_name,
+                unit=unit,
+            ).order_by('receive_date')[:quantity_to_unload]
+            # get material type form rawMaterial
             raw = RawMaterial.objects.filter(
                 supplier_name=supplier_name,
                 material_name=material_name,
             )
             material_type = raw[0].material_type
-            for _ in range(quantity_to_unload):
-                consumption = Consumption(
-                    receive_date=timezone.now(),
-                    supplier_name=supplier_name,
-                    material_name=material_name,
-                    material_type=material_type,
-                    unit=unit,
-                    status='Used',
-                    logs=log_generator(forklift_driver, 'Used')
-                )
-                consumption.save()
+            for record in AnbarModel:
+                # update anbar:
+                record.status='Used'
+                record.location='Consumption DB',
+                record.logs=record.logs+log_generator(forklift_driver, 'Used'),
+                record.last_date=timezone.now(),
 
-                AnbarModel.objects.filter(
-                    supplier_name=supplier_name,
-                    material_name=material_name,
-                    unit=unit,
-                ).update(
-                    status='Used',
-                    location='Consumption DB',
-                    logs=log_generator(forklift_driver, 'Used'),
-                    last_date=timezone.now(),
-                )
+                consumption = Consumption(
+                        receive_date=timezone.now(),
+                        supplier_name=supplier_name,
+                        material_name=material_name,
+                        material_type=material_type,
+                        unit=unit,
+                        status='Used',
+                        logs=log_generator(forklift_driver, 'Used')
+                    )
+                consumption.save()
+            # Dynamically get the model based on the anbar_name
+            # AnbarModel = apps.get_model('myapp', unloading_location)
+            # # Create Consumption records
+
+            # for _ in range(quantity_to_unload):
+            #     consumption = Consumption(
+            #         receive_date=timezone.now(),
+            #         supplier_name=supplier_name,
+            #         material_name=material_name,
+            #         material_type=material_type,
+            #         unit=unit,
+            #         status='Used',
+            #         logs=log_generator(forklift_driver, 'Used')
+            #     )
+            #     consumption.save()
+            #
+            #     AnbarModel.objects.filter(
+            #         supplier_name=supplier_name,
+            #         material_name=material_name,
+            #         unit=unit,
+            #     ).update(
+            #         status='Used',
+            #         location='Consumption DB',
+            #         logs=log_generator(forklift_driver, 'Used'),
+            #         last_date=timezone.now(),
+            #     )
 
 
             # Return a success response
@@ -1969,6 +2012,7 @@ def moved(request):
                         material_type=record.material_type,
                         unit=unit,
                         username=forklift_driver,
+                        logs=log_generator(forklift_driver, 'Moved')
                     )
                     # Save the updated record
                     record.save()
@@ -2021,7 +2065,7 @@ def moved(request):
                     record.save()
 
             if len(sourse) < int(Quantity):
-                msg = 'انبار' + to_anbar + f'از مقدار که شما انتخاب کردید ( {Quantity} ) ' + 'مقدار کمتری دارد' + len(sourse) +'تا منتقل شد'
+                msg = 'انبار' + str(to_anbar) + f'از مقدار که شما انتخاب کردید ( {Quantity} ) ' + 'مقدار کمتری دارد' + str(len(sourse)) +'تا منتقل شد'
                 errors.append({'status': 'error', 'message': msg})
                 return JsonResponse({'status': 'error', 'errors': errors})
 
