@@ -111,7 +111,7 @@ class Supplier(models.Model):
         db_table = 'Supplier'
 
     def __str__(self):
-        return f"{self.supplier_name} (ID: {self.status})"
+        return f"{self.supplier_name} - {self.status})"
 
 
 class Products(models.Model):
