@@ -357,7 +357,7 @@ def add_rawMaterial(request):
             supplier_name=supplier_name,
             material_type=material_type,
             material_name=material_name,
-            comments=comments,
+            description=comments,
             username=username,
             logs=log_generator(username, 'Created')
         )
@@ -588,14 +588,15 @@ def add_new_reel(request):
                         c = Consumption(
                             status='Used',
                             location='Consumption DB',
-                            reel_number=record.reel_number,
-                            profile_name=record.profile_name,
+                            reel_number=reel_number,
+                            profile_name=profile_name,
                             unit=record.unit,
                             supplier_name=record.supplier_name,
                             material_name=record.material_name,
                             material_type=record.material_type,
                             receive_date=timezone.now(),
                             username=username,
+                            comments=commnet,
                             logs=log_generator(record.profile_name, 'Used')
                         )
                         c.save()
@@ -1554,9 +1555,11 @@ def unload(request):
                         material_name=material_name,
                         material_type=material_type,
                         unit=unit,
+                        grade=quality,
                         status='In-stock',
                         location=unloading_location,
                         receive_date=timezone.now(),
+                        username=forklift_driver,
                         logs=log_generator(forklift_driver, 'Unloaded')
                     )
 
@@ -1690,13 +1693,15 @@ def loaded(request):
                 # Dynamically import the model class
                 AnbarModel = apps.get_model('myapp', loading_location)
                 for reel_number in reel_numbers:
-                    AnbarModel.objects.filter(reel_number=reel_number, width=width,).update(
+                    anbar=AnbarModel.objects.filter(reel_number=reel_number, width=width, )
+                    anbar.update(
                         status='Sold',
                         location=license_number,
                         # supplier_name=supplier_name,
                         # material_name=material_name,
                         # receive_date=timezone.now(),
                         # last_date=timezone.now(),
+                        logs=anbar[0].logs + log_generator(forklift_driver, 'Loaded'),
                     )
                     product = Products.objects.filter(reel_number=reel_number, width=width,)
                     product.update(
@@ -1704,6 +1709,7 @@ def loaded(request):
                         location=license_number,
                         # receive_date=timezone.now(),
                         # last_date=timezone.now(),
+                        logs=product[0].logs + log_generator(forklift_driver, 'Loaded'),
                     )
                 profile_name = product[0].profile_name
                 # print(profile_name)
@@ -1899,8 +1905,10 @@ def used(request):
                         supplier_name=supplier_name,
                         material_name=material_name,
                         material_type=material_type,
+                        location='Consumption DB',
                         unit=unit,
                         status='Used',
+                        comments=record.comments,
                         username=forklift_driver,
                         logs=log_generator(forklift_driver, 'Used')
                     )
@@ -2075,14 +2083,14 @@ def moved(request):
                     width=width,
                     status='In-stock',
                     reel_number=reel,
-                ).order_by('id')[:int(Quantity)]
+                ).order_by('receive_date')[:int(Quantity)]
 
                 products = Products.objects.filter(
                     location=from_anbar,
                     width=width,
                     status='In-stock',
                     reel_number=reel,
-                ).order_by('id')[:int(Quantity)]
+                ).order_by('receive_date')[:int(Quantity)]
                 for record in sourse:
                     # update anbar a
                     record.last_date = timezone.now()
@@ -2109,7 +2117,6 @@ def moved(request):
                     record.save()
                     new_item.save()
                 for record in products:
-                    record.status='Moved'
                     record.location=to_anbar
                     record.logs =record.logs + log_generator(forklift_driver, 'Moved')
                     record.save()
