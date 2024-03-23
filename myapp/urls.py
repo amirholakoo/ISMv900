@@ -37,6 +37,7 @@ urlpatterns = [
     path("api/loadDataForMoved", load_data_for_moved),
     path("api/getSupplierNamesBasedConsumtioon", get_supplierNames_based_consumtioon),
     path("api/getUnitAndMaterialNameBasedSupplierNmaeConsumption", get_unit_and_materialName_based_supplierNmae_consumption),
+    path("api/loadShipmentsBaesdLicenseNumberForCanceling", load_shipments_baesd_license_number_for_canceling),
 
     # Following paths are related to Pages:
 
@@ -56,5 +57,6 @@ urlpatterns = [
     path("createPurchaseOrder/", create_purchase_order),
     path("createSalesOrder/", create_sales_order),
     path("forkliftPanel/", forklift_panel),
+    path("cancel/", cancel),
 ]
 

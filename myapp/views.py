@@ -2052,7 +2052,7 @@ def moved(request):
                     location=from_anbar,
                     supplier_name=supplier_name,
                     material_name=material_name,
-                ).order_by('id')[:int(Quantity)]
+                ).order_by('receive_date')[:int(Quantity)]
                 # Iterate over the records and update each one
                 for record in sourse:
                     record.status = 'Moved'
@@ -2627,44 +2627,135 @@ def cancel_shipment(request):
 
 
 def cancel(request):
+    if request.method == 'POST':
+        license_number = request.GET.get('license_number')
+        shipmet_type = request.GET.get('shipmet_type')
+        shipment_obj = request.GET.get('shipment')
+        shipment_obj = json.loads(shipment_obj)
+        anbar_location = request.GET.get('unloading_location')
+        cancellation_reason = request.GET.get('reason')
+        username = request.GET.get('username')
 
-    license_number = ''
-    anbar_location = ''
-    cancellation_reason = ''
-    username = ''
+        status = 'Cancelled'
+        location = 'Cancelled'
+        action = 'Cancelled'
+        print(shipment_obj)
+        shipment = Shipments.objects.get(id=shipment_obj['id'])
+        # Update the attributes of the shipment instance
+        shipment.status = status
+        shipment.location = location
+        shipment.cancellation_reason = cancellation_reason
+        shipment.logs = shipment.logs + log_generator(username, action)
+        # Save the updated instance to the database
+        shipment.save()
 
-    shipment = Shipments.objectst.filter()
-    shipment.update(
-        status='Canceled',
-        cancellation_reason=cancellation_reason,
-        logs=shipment[0].logs+log_generator(username, 'Canceled'),
-    )
-    products = Products.objects.filter()
+        if shipmet_type == "Incoming":
+            purchases = Purchases.objects.filter(shipment_id=shipment)
 
-    for product in products:
-        product.status='In-stock'
-        product.location='Canceled'
+            if purchases.exists():
+                purchases.update(
+                    status=status,
+                    cancellation_reason=cancellation_reason,
+                    logs=purchases[0].logs + log_generator(username, action)
+                )
+            AnbarModel = apps.get_model('myapp', shipment.unload_location)
+            anbar = AnbarModel.objects.filter(
+                supplier_name=shipment.supplier_name,
+                material_name=shipment.material_name,
+            )
 
-    AnbarModel = apps.get_model('myapp', anbar_location)
+            if anbar.exists():
+                anbar = anbar.order_by('receive_date')[:int(shipment.quantity)]
+                for record in anbar:
+                    record.status = status
+                    record.location = location
+                    record.last_date = timezone.now()
+                    record.logs = record.logs + log_generator(username, action)
+                    record.save()
+        else:
+            sales = Sales.objects.filter(shipment=shipment)
+            if sales.exists():
+                sales.update(
+                    status=status,
+                    cancellation_reason=cancellation_reason,
+                    logs=sales[0].logs + log_generator(username, action)
+                )
+            if shipment.list_of_reels:
+                list_of_reel = shipment.list_of_reels.split(',')
+                for reel in list_of_reel:
+                    reel = int(reel)
+                    product = Products.objects.get(reel_number=reel)
+                    product.location = anbar_location
+                    product.status = 'In-srock'
+                    product.last_date = None
+                    product.logs = product.logs + log_generator(username, action)
+                    product.save()
 
-    # Update truck status and location
-    Truck.objects.filter(license_number=license_number).update(
-        status='Free',
-        location='Entrance'
-    )
+                    AnbarModel = apps.get_model('myapp', anbar_location)
+                    anbar_a = AnbarModel(
+                        reel_number=reel,
+                        width=product.width,
+                        gsm=product.gsm,
+                        length=product.length,
+                        grade=product.grade,
+                        breaks=product.breaks,
+                        comments=product.comments,
+                        qr_code=product.qr_code,
+                        profile_name=product.profile_name,
+                        username=product.username,
+                        status='In-stock',
+                        location=anbar_location,
+                        receive_date=timezone.now(),
+                        logs=log_generator(username, 'Cancelled and Added')
+                    )
+                    anbar_a.save()
 
-    purchases = Purchases.objects.filter()
-    if purchases.exists():
-        purchases.update(
-            status='Canceled',
-            cancellation_reason=cancellation_reason,
-            logs=purchases[0].logs + log_generator(username, 'Canceled')
+        # Update truck status and location
+        Truck.objects.filter(license_number=license_number).update(
+            status='Free',
+            location='Entrance'
         )
+        # Return a success response
+        return JsonResponse({'status': 'success', 'message': ''})
 
-    sales = Sales.objects.filter()
-    if sales.exists():
-        sales.update(
-            status='Canceled',
-            cancellation_reason=cancellation_reason,
-            logs=sales[0].logs + log_generator(username, 'Canceled')
-        )
+    else:
+        return render(request, 'cancell_shipment.html')
+
+
+
+
+@csrf_exempt
+def load_shipments_baesd_license_number_for_canceling(request):
+    # Check if the request method is POST
+    if request.method == 'POST':
+        # Extract the license number from the request data
+        license_number = request.GET.get('license_number')
+        shipment_type = request.GET.get('shipment_type')
+
+        shipments = Shipments.objects.filter(license_number=license_number, shipment_type=shipment_type)
+        shipments = shipments.order_by('receive_date')[:10]
+        if shipments.exists():
+            shipment_list = shipments.values(
+                'id',
+                'receive_date',
+                'supplier_name',
+                'customer_name',
+                'net_weight'
+            )
+            # Convert the queryset to a list of dictionaries
+            shipment_list = list(shipment_list)
+            # Convert datetime objects to strings
+            for shipment in shipment_list:
+                if shipment['receive_date']:
+                    shipment['receive_date'] = shipment['receive_date'].strftime('%Y-%m-%d %H:%M')
+
+            json_data = json.dumps(shipment_list)
+            print(shipment_list)
+            return JsonResponse({'isExists': 'false', 'message': 'shipments exists.', 'shipment_list': json_data}, status=200)
+        else:
+            return JsonResponse({'isExists': 'true', 'message': 'License number does not exist.'})
+
+    else:
+        # If the request method is not POST, return an error response
+        return JsonResponse({'status': 'error', 'message': 'Invalid request method.'})
+

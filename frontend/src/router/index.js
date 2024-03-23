@@ -16,6 +16,7 @@ import addNewAnbar from "@/components/admin/addNewAnbar.vue";
 import addNewUnit from "@/components/admin/addNewUnit.vue";
 import addNewMatrialType from "@/components/admin/addNewMatrialType.vue";
 import consumptionProfile from "@/components/admin/consumptionProfile.vue";
+import cancel from "@/components/admin/cancel.vue";
 
 const routes = [
   {
@@ -110,6 +111,11 @@ const routes = [
     path: '/myapp/addConsumptionProfile/',
     name: 'addConsumptionProfile',
     component: consumptionProfile
+  },
+  {
+    path: '/myapp/cancel/',
+    name: 'cancel',
+    component: cancel
   },
 ]
 

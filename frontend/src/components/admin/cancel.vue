@@ -1,6 +1,6 @@
 <script>
 import { initFlowbite } from 'flowbite'
-import Card from './Card'
+import Card from '@/components/Card'
 import modal from "@/components/Modal.vue";
 import Alert from "@/components/Alert.vue";
 import Lic_numer from "@/components/lic_numer.vue";
@@ -13,9 +13,6 @@ export default {
     Card,
     modal,
     Alert
-  },
-  mounted() {
-    initFlowbite();
   },
   data(){
     return {
@@ -30,10 +27,11 @@ export default {
       phone: 0,
       username: '',
       forms: {
-        consumption_list: {type:'list', name: 'لیست مصرف',title: 'لیست مصرف', value: []},
-        driver_name: {type: 'input', name: 'اسم راننده',title: 'راننده', data: '', value: ''},
-        driver_doc: {type: 'input', name: 'شماره گواهی نامه',title: 'شماره گواهی نامه', data: '', value: ''},
-        phone: {type: 'input', name: 'شماره همراه',title: 'شماره همراه', data: '', value: ''},
+        shipmet_type: {type: 'dropdown', name: 'نوع بار نامه',title: 'نوع بار نامه', data: ['Incoming', 'Outgoing'], value: 'Incoming'},
+        load: {type: 'btn', name: 'چک کردن',title: 'چک کردن',},
+        shipment_list: {type:'list', name: 'لیست بارنامه',title: 'لیست بارنامه', value: []},
+        unloading_location: {type: 'dropdown', name: 'محل تخلیه',title: 'محل تخلیه', data: '', value: ''},
+        reason: {type: 'input', name: 'علت لغو',title: 'علت لغو', data: '', value: ''},
         username: {type: 'input', name: 'نام کاربر',title: 'نام کاربر', data: '', value: ''},
       },
       success: false,
@@ -41,40 +39,58 @@ export default {
       errors: [],
     }
   },
+  mounted() {
+    this.axios.get('/myapp/api/getAnbarTableNames').then((response) => {
+      console.log(response.data)
+      this.forms.unloading_location.data = response.data['data']
+    })
+  },
   methods: {
+    select(obj){
+      this.forms.shipment_list.value = obj
+    },
     clicked(k, name){
       console.log(k, name)
       if (k == 'letter'){
         this.letter.val = name
       }
-    },
-    async check_license_number() {
-      const params = {
-        "license_number": this.first.val + this.letter.val + this.second.val +"ایران"+ this.year.val,
-      };
-      const response = await this.axios.post('/myapp/api/checkLicenseNumber', {}, {params: params})
-      console.log(response.data); // Access response data
-      console.log(JSON.parse(response.data['isExists'])); // Access response data
-      this.form = JSON.parse(response.data['isExists'])
-      if (JSON.parse(response.data['isExists'])){
-        this.isExists = true
+      if (k == 'unloading_location'){
+        this.forms.unloading_location.name = name
+        this.forms.unloading_location.value = name
+      }
+      if (k == 'shipmet_type'){
+        this.forms.shipmet_type.name = name
+        this.forms.shipmet_type.value = name
       }
     },
-    async addTruck() {
+    async load_shipments() {
       const params = {
         "license_number": this.first.val + this.letter.val + this.second.val +"ایران"+ this.year.val,
-        "driver_name": this.forms.driver_name.value,
-        "driver_doc": this.forms.driver_doc.value,
-        "phone": this.forms.phone.value,
-        "username": this.forms.username.value,
+        "shipment_type": this.forms.shipmet_type.value,
       };
 
+      const response = await this.axios.post('/myapp/api/loadShipmentsBaesdLicenseNumberForCanceling', {}, {params: params})
+      console.log(response.data); // Access response data
+      // console.log(JSON.parse(response.data['isExists'])); // Access response data
+      this.form = JSON.parse(response.data['isExists'])
+      this.forms.shipment_list.data = JSON.parse(response.data['shipment_list'])
+      // console.log(JSON.parse(response.data['shipment_list']))
+    },
+    async cancel() {
+      const params = {
+        "license_number": this.first.val + this.letter.val + this.second.val +"ایران"+ this.year.val,
+        "shipmet_type": this.forms.shipmet_type.value,
+        "shipment": JSON.stringify(this.forms.shipment_list.value),
+        "unloading_location": this.forms.unloading_location.value,
+        "reason": this.forms.reason.value,
+        "username": this.forms.username.value,
+      };
       this.errors = []
       for (const key in this.forms) {
         if (this.forms[key].value == ''){
-          if (key!='comment'){
+          if (key!='load'){
             this.forms[key].error = true
-          this.errors.push({'message': `${this.forms[key].name} مورد نیاز است`})
+            this.errors.push({'message': `${this.forms[key].name} مورد نیاز است`})
           }
         }else {
            this.forms[key].error = false
@@ -82,7 +98,7 @@ export default {
       }
       if (this.errors.length == 0){
         this.error = false
-        const response = await this.axios.post('/myapp/addTruck/', {}, {params: params})
+        const response = await this.axios.post('/myapp/cancel/', {}, {params: params})
         console.log(response.data); // Access response data
         if (response.data['status'] == 'success'){
           this.success = true
@@ -93,59 +109,17 @@ export default {
       } else {
         this.error = true
       }
-      // console.log(LicenseNumberParser(params.license_number))
-      // const response = await this.axios.post('/myapp/addTruck/', {}, {params: params})
-      // console.log(response.data); // Access response data
-      // this.success = JSON.parse(response.data['success'])
     },
   },
   watch: {
     success(c, p){
       if (c == true) {
-        setTimeout(() => {
-          this.success = false
-          location.reload();
-        }, 5000)
+        // setTimeout(() => {
+        //   this.success = false
+        //   location.reload();
+        // }, 5000)
       }
     }
-    // "letter.val"(c, p){
-  //   // const farsiRange = /[\u0600-\u06FF]/;
-  //   // if (farsiRange.test(c)){
-  //   //   this.letter.error = false
-  //   // } else {
-  //   //   this.letter.error = true
-  //   // }
-  // },
-  //   "first.val"(c, p, n){
-  //     if ( Number.isInteger(parseInt(c))){
-  //       this.first.val = parseInt(c)
-  //       console.log('adad', c, p, n)
-  //       if (this.first.error){
-  //         this.first.error = false
-  //         console.log('letter', c, p, n)
-  //         console.log(this.first)
-  //       }
-  //     }else {
-  //       this.first.val = parseInt(p)
-  //       this.first.error = true
-  //     }
-  //   },
-  // "second.val"(c, p){
-  //   if ( Number.isInteger(parseInt(c)) ){
-  //     this.second.val = parseInt(c)
-  //   }else {
-  //     this.second.val = parseInt(p)
-  //     this.second.error = true
-  //   }
-  // },
-  // "year.val"(c, p){
-  //   if ( Number.isInteger(parseInt(c)) ){
-  //     this.year.val = parseInt(c)
-  //   }else {
-  //     this.year.val = parseInt(p)
-  //     this.year.error = true
-  //   }
-  // }
  }
 }
 </script>
@@ -178,7 +152,7 @@ export default {
     </div>
   </div>
   <!-- license form-->
-  <form v-if="form" class="flex flex-col items-center mt-5 gap-4">
+  <form class="flex flex-col items-center mt-5 gap-4">
     <div class="flex space-x-2 rtl:space-x-reverse">
         <div>
             <label for="code-1" class="sr-only">First code</label>
@@ -211,7 +185,6 @@ export default {
             <input v-model="first.val" :placeholder="first.val" type="text" maxlength="2" data-focus-input-init data-focus-input-prev="code-3" data-focus-input-next="code-5" id="code-4" :class="[first.error ? 'bg-red-50 border border-red-500 text-red-900 placeholder-red-700 text-sm rounded-lg focus:ring-red-500 dark:bg-gray-700 focus:border-red-500 dark:text-red-500 dark:placeholder-red-500 dark:border-red-500' : 'text-gray-900 bg-white border border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500']" class="block w-12 h-9 py-3 text-sm font-extrabold text-center" required />
         </div>
     </div>
-
     <template v-if="isExists">
       <div class="mt-2 flex flex-row items-center gap-1">
         <p class="text-red-600">درحال حاضر پلاک </p>
@@ -226,10 +199,6 @@ export default {
       </div>
     </template>
     <p id="helper-text-explanation" class="text-sm text-gray-500 dark:text-gray-400">لطفا پلاک مورد نطر را وارد کرده و سپس بر روی دکمه چک کردن کلیک کنید.</p>
-<!--    <button @click="form = !form" class="block text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="submit"> چک کردن </button>-->
-    <button @click="check_license_number" class="block text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="button"> چک کردن </button>
-  </form>
-  <form v-else class="flex flex-col items-center mt-5 gap-4">
     <div v-if="error" class="flex p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400" role="alert">
           <svg class="flex-shrink-0 inline w-4 h-4 me-3 mt-[2px]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
             <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
@@ -248,15 +217,7 @@ export default {
           <svg class="flex-shrink-0 inline w-4 h-4 me-3 mt-[2px]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
             <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
           </svg>
-          <p class="font-medium">پلاک جدید </p>
-          <lic_numer :lic="{
-                  first: this.first.val,
-                  letter: this.letter.val,
-                  second: this.second.val,
-                  country: 'ایران',
-                  year: this.year.val
-              }"></lic_numer>
-          <p class="font-medium"> با موفقیت به سیستم اضافه شد.</p>
+          <p class="font-medium">بارنامه با موفقیت کنسل شد</p>
         </div>
       </div>
     </div>
@@ -287,30 +248,38 @@ export default {
           </ul>
       </div>
       </template>
+      <template v-if="val.type=='btn'">
+        <button @click="load_shipments" :id="form_name + 'Button'" class="w-44 block text-white bg-green-500 hover:bg-green-600 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="button">
+          {{val.name}}
+        </button>
+      </template>
       <template v-if="val.type=='list'">
         <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
           <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
               <thead class="text-md text-gray-100 uppercase bg-green-500 dark:bg-gray-700 dark:text-gray-400">
                   <tr>
                       <th scope="col" class="px-6 py-3">
-                          اسم فروشنده
+                          ID
                       </th>
                       <th scope="col" class="px-6 py-3">
-                          اسم ماده
+                          تاریخ
                       </th>
                       <th scope="col" class="px-6 py-3">
-                          واحد
+                        فروشنده
                       </th>
                       <th scope="col" class="px-6 py-3">
-                          مقدار
+                          مشتری
                       </th>
                       <th scope="col" class="px-6 py-3">
-                          <span class="sr-only">حذف</span>
+                          وزن خالص
+                      </th>
+                      <th scope="col" class="px-6 py-3">
+                          <span class="sr-only">افزودن</span>
                       </th>
                   </tr>
               </thead>
               <tbody>
-                  <template v-for="(obj, index) in forms.consumption_list.value">
+                  <template v-for="(obj, index) in forms.shipment_list.data">
                      <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-green-50 dark:hover:bg-gray-600">
                        <template v-for="profile in obj">
                           <td class="px-6 py-4">
@@ -318,7 +287,10 @@ export default {
                           </td>
                        </template>
                           <td class="px-6 py-4 text-right">
-                              <button @click='remove(index)' type="button" class="font-medium text-blue-600 dark:text-blue-500">حدف</button>
+                              <div class="flex items-center rounded">
+                                  <input @click="select(obj)" :id="'bordered-radio-'+index" type="radio" value="" name="bordered-radio" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                                  <label :id="'bordered-radio-'+index" class="w-full py-4 ms-2 text-sm font-medium text-gray-900 dark:text-gray-300"></label>
+                              </div>
                           </td>
                      </tr>
                   </template>
@@ -353,7 +325,7 @@ export default {
       <template v-slot:btns>
         <div>
 <!--          <button data-modal-hide="popup-modal" aria-label="Close" @click="addTruck" type="button" class="inline-flex justify-center w-full px-2 py-1.5 text-xs font-medium text-center text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-500 dark:hover:bg-blue-600 dark:focus:ring-blue-800">درسته</button>-->
-          <button data-modal-hide="popup-modal" aria-label="Close" @click="addTruck" type="button" class="inline-flex justify-center w-full px-2 py-1.5 text-xs font-medium text-center text-white        bg-green-500 hover:bg-green-600 focus:ring-4 focus:outline-none focus:ring-green-300  rounded-lg dark:bg-blue-500 dark:hover:bg-blue-600 dark:focus:ring-blue-800">درسته</button>
+          <button data-modal-hide="popup-modal" aria-label="Close" @click="cancel" type="reset" class="inline-flex justify-center w-full px-2 py-1.5 text-xs font-medium text-center text-white        bg-green-500 hover:bg-green-600 focus:ring-4 focus:outline-none focus:ring-green-300  rounded-lg dark:bg-blue-500 dark:hover:bg-blue-600 dark:focus:ring-blue-800">درسته</button>
         </div>
       </template>
     </modal>

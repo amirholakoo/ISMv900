@@ -45,7 +45,7 @@ class Shipments(models.Model):
     """
     # Fields
     shipment_type = models.CharField(max_length=255, choices=[('Incoming', 'Incoming'), ('Outgoing', 'Outgoing')], null=True)
-    status = models.CharField(max_length=255, choices=[('Registered', 'Registered'), ('LoadingUnloading', 'LoadingUnloading'), ('LoadedUnloaded', 'LoadedUnloaded'), ('Office', 'Office'), ('Delivered', 'Delivered'), ('Canceled', 'Canceled')], null=True)
+    status = models.CharField(max_length=255, choices=[('Registered', 'Registered'), ('LoadingUnloading', 'LoadingUnloading'), ('LoadedUnloaded', 'LoadedUnloaded'), ('Office', 'Office'), ('Delivered', 'Delivered'), ('Cancelled', 'Cancelled')], null=True)
     location = models.CharField(max_length=255, null=True)
     # truck_id = models.ForeignKey(Truck, on_delete=models.SET_NULL, blank=True, null=True)
     license_number = models.CharField(max_length=255,null=True)
@@ -93,7 +93,7 @@ class Shipments(models.Model):
         """
         String representation of the Shipment instance.
         """
-        return f"{self.receive_date} - {self.shipment_type} - {self.license_number} - {self.customer_name} - {self.customer_name} - {self.material_type} - {self.material_name} - {self.status} - {self.location}"
+        return f"{self.receive_date} - {self.shipment_type} - {self.license_number} - {self.supplier_name} - {self.customer_name} - {self.material_type} - {self.material_name} - {self.status} - {self.location}"
 
 
 class Supplier(models.Model):
@@ -319,7 +319,7 @@ class Purchases(models.Model):
         """
         String representation of the Purchase instance.
         """
-        return f"Purchase {self.id} on {self.date}"
+        return f"Purchase {self.id} on {self.date} - {self.username} - {self.receive_date}"
 
 
 class Sales(models.Model):
@@ -425,7 +425,7 @@ class AnbarGeneric(models.Model):
         ('Sold', 'Sold'),
         ('Moved', 'Moved'),
         ('Used', 'Used'),
-        ('Canceled', 'Canceled'),
+        ('Cancelled', 'Cancelled'),
     ]
     status = models.CharField(max_length=50, choices=STATUS_CHOICES, null=True, blank=True)
 
