@@ -1766,6 +1766,37 @@ def get_unit_and_materialName_based_supplierNmae_andbar(request):
             return JsonResponse({'error': str(e)}, status=500)
 
 
+def get_supplierNames_based_consumtioon(request):
+    if request.method == 'GET':
+        try:
+            # Fetch all Consumption records with status 'In-stock'
+            used_records = Consumption.objects.filter(status='Used')
+
+            # If you want to get all unique supplier_names from these records
+            supplier_names = used_records.values_list('supplier_name', flat=True).distinct()
+            supplier_names = list(set(supplier_names))
+            # Return the widths as a JSON response
+            return JsonResponse({'supplier_names': supplier_names}, status=200)
+        except Exception as e:
+            # Handle any exceptions that occur during the process
+            return JsonResponse({'error': str(e)}, status=500)
+
+
+def get_unit_and_materialName_based_supplierNmae_consumption(request):
+    if request.method == 'GET':
+        supplier_name = request.GET.get('supplier_name')
+        try:
+            used_records = Consumption.objects.filter(supplier_name=supplier_name, status='Used')
+            units = used_records.values_list('unit', flat=True).distinct()
+            material_names = used_records.values_list('material_name', flat=True).distinct()
+
+            # Return the widths as a JSON response
+            return JsonResponse({'material_names': list(set(material_names)), 'units':list(set(units))}, status=200)
+        except Exception as e:
+            # Handle any exceptions that occur during the process
+            return JsonResponse({'error': str(e)}, status=500)
+
+
 def get_unit_based_supplier_name(request):
     if request.method == 'GET':
         supplier_name = request.GET.get('supplier_name')
@@ -2168,31 +2199,49 @@ def retuned(request):
         if errors:
             return JsonResponse({'status': 'error', 'errors': errors})
         else:
-            AnbarModel = apps.get_model('myapp', to_anbar)
-            sourse = Consumption.objects.filter(
-                status='In-stock',
-            ).order_by('id')[:int(quantity)]
-            for record in sourse:
-                record.status = 'Returned'
-                record.location = to_anbar
-                record.last_date = timezone.now()
-                record.logs = log_generator(forklift_driver, 'Moved')
-
-                # Create new entries in the destination AnbarGeneric location
-                new_item = AnbarModel(
-                    receive_date=timezone.now(),
-                    location=to_anbar,
-                    status='In-stock',
+            try:
+                print(supplier_name, material_name, unit)
+                AnbarModel = apps.get_model('myapp', to_anbar)
+                consumption = Consumption.objects.filter(
                     supplier_name=supplier_name,
                     material_name=material_name,
-                    material_type=record.material_type,
                     unit=unit,
-                    username=forklift_driver,
-                    logs=log_generator(forklift_driver, 'Moved')
-                )
-                # Save the updated record
-                record.save()
-                new_item.save()
+                    status='Used'
+                ).order_by('receive_date')[:int(quantity)]
+
+                for record in consumption:
+                    record.comments = reason
+                    record.status = 'Returned'
+                    record.location = to_anbar
+                    record.last_date = timezone.now()
+                    record.logs =record.logs + log_generator(forklift_driver, 'Returned')
+
+                    # Create new entries in the destination AnbarGeneric location
+                    new_item = AnbarModel(
+                        receive_date=timezone.now(),
+                        location=to_anbar,
+                        status='In-stock',
+                        supplier_name=supplier_name,
+                        material_name=material_name,
+                        material_type=record.material_type,
+                        unit=unit,
+                        username=forklift_driver,
+                        comments=reason,
+                        logs=log_generator(forklift_driver, 'Returned')
+                    )
+                    # Save the updated record
+                    record.save()
+                    new_item.save()
+                return JsonResponse(
+                    {'status': 'success', 'message': f'ok'})
+            except ValidationError as e:
+                print(e)
+                # Return a validation error response
+                return JsonResponse({'error': str(e)}, status=400)
+            except Exception as e:
+                print(e)
+                # Return a general error response
+                return JsonResponse({'error': str(e)}, status=500)
     else:
         return JsonResponse({'status': 'error', 'message': 'Invalid request method.'})
 

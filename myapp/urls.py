@@ -35,7 +35,8 @@ urlpatterns = [
     path("api/getUnitBasedSupplierName", get_unit_based_supplier_name),
     path("api/getReelNumber", get_reel_number),
     path("api/loadDataForMoved", load_data_for_moved),
-    path("api/getReturnedData", get_returned_data),
+    path("api/getSupplierNamesBasedConsumtioon", get_supplierNames_based_consumtioon),
+    path("api/getUnitAndMaterialNameBasedSupplierNmaeConsumption", get_unit_and_materialName_based_supplierNmae_consumption),
 
     # Following paths are related to Pages:
 

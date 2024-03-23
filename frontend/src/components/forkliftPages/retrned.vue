@@ -13,10 +13,10 @@ export default {
         supplier_name: {type: 'dropdown', name: 'اسم تامین کننده',title: 'اسم تامین کننده', data: '', value: ''},
         material_name: {type: 'dropdown', name: 'اسم ماده',title: 'اسم ماده', data: '', value: ''},
         unit: {type: 'dropdown', name: 'واحد',title: 'واحد', data: '', value: ''},
-        Quantity: {type:'input', name: 'کمیف(مقدار)', value: ''},
+        Quantity: {type:'input', name: 'مقدار',title: 'مقدار', value: ''},
         to_anbar: {type: 'dropdown', name: 'به انبار',title: 'به انبار', data: '', value: ''},
         reason: {type: 'input', name: 'علت',title: 'علت', data: '', value: ''},
-        forklift_driver: {type:'input', name: 'اسم راننده فرک لیفت', value: ''},
+        forklift_driver: {type:'input', name: 'اسم راننده فرک لیفت',title: 'اسم راننده فرک لیفت', value: ''},
       },
       success: false,
       error: false,
@@ -24,17 +24,16 @@ export default {
     }
   },
   mounted() {
-    initFlowbite();
+    // initFlowbite();
     this.axios.get('/myapp/api/getAnbarTableNames').then((response) => {
       console.log(response.data)
       this.forms.to_anbar.data = response.data['data']
     })
-    this.axios.get('/myapp/api/getReturnedData').then((response) => {
+    this.axios.get('/myapp/api/getSupplierNamesBasedConsumtioon').then((response) => {
       console.log(response.data)
       this.forms.supplier_name.data = response.data['supplier_names']
-      this.forms.material_name.data = response.data['material_names']
-      this.forms.unit.data = response.data['units']
     })
+
   },
   methods: {
      clicked(k, name){
@@ -42,6 +41,14 @@ export default {
       if (k == 'supplier_name'){
         this.forms.supplier_name.name = name
         this.forms.supplier_name.value = name
+        const params = {
+          'supplier_name': name,
+        }
+        this.axios.get('/myapp/api/getUnitAndMaterialNameBasedSupplierNmaeConsumption', {params:params}).then((response) => {
+          console.log(response.data)
+          this.forms.material_name.data = response.data['material_names']
+          this.forms.unit.data = response.data['units']
+        })
       }
       if (k == 'material_name'){
         this.forms.material_name.name = name
@@ -114,7 +121,7 @@ export default {
         </svg>
         <div>
           <span class="font-medium">
-            مشتری جدید با نام {{ forms.customer_name.value }} با موفقیت به سیستم اضافه شد.
+            با موفقیت به سیستم اضافه شد.
             <template v-for="(val, key) in forms">
                 <p v-if="key=='reel_numbers'">شماره رول:</p>
                 <ul v-if="key=='reel_numbers'">
@@ -162,7 +169,7 @@ export default {
                 <ul v-if="key=='reel_numbers'">
                   <li v-for="item in val.value" :key="item">{{ item }}</li>
                 </ul>
-                <p v-else>{{val.name}}: {{val.value}}</p>
+                <p v-else>{{val.title}}: {{val.value}}</p>
             </template>
           </div>
         </template>
