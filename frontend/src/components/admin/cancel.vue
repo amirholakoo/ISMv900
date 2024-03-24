@@ -113,6 +113,11 @@ export default {
         //   this.success = false
         //   location.reload();
         // }, 5000)
+        for (const cKey in this.forms) {
+          this.forms[cKey].value = ''
+          this.forms[cKey].data = ''
+          console.log(this.forms[cKey])
+        }
       }
     }
  }
