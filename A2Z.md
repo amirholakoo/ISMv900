@@ -153,9 +153,10 @@ Installing:
 
 ### Install and Run PostgreSQL
 
-Install PostgreSQL: The installation steps vary depending on your operating system. For example, on Ubuntu, you can use:
+Install PostgreSQL: The installation steps vary depending on your operating system.
 
 `sudo apt-get update`
+
 `sudo apt-get install postgresql postgresql-contrib`
 
 Start PostgreSQL service (if not already running):
@@ -167,8 +168,11 @@ Create a PostgreSQL User and Database:
 `sudo -u postgres psql`
 
 `CREATE DATABASE mydatabase;`
+
 `CREATE USER admin WITH ENCRYPTED PASSWORD 'pi';`
+
 `GRANT ALL PRIVILEGES ON DATABASE mydatabase TO admin;`
+
 `\q`
 
 ** find your venv and activate:**
