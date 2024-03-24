@@ -227,67 +227,33 @@ def fetch_anbar_stock_report(request):
 
 def fetch_consumption_report(request):
     """
-    Fetches a report on the consumption of materials.
+    Fetches a detailed report of all consumption records from the database.
 
-    This function aggregates data from the Consumption model to provide a detailed report
-    on the consumed materials, including their types, quantities, and other relevant details.
-
-    Args:
-        request (HttpRequest): The HTTP request object.
-
-    Returns:
-        JsonResponse: A JSON response containing the consumption report.
-    """
-    # Aggregate consumption data
-    consumption_data = Consumption.objects.values(
-        'material_name', 'material_type', 'supplier_name', 'profile_name'
-    ).annotate(
-        total_quantity=Sum('quantity'),
-        total_consumptions=Count('id')
-    ).order_by('material_type', 'material_name')
-
-    return JsonResponse({
-        'status': 'success',
-        'consumption_data': list(consumption_data)
-    })
-
-def check_low_stock_alert(request):
-    """
-    Checks the inventory levels in Products and Anbar models and generates alerts for low stock items.
+    This function retrieves all fields for each consumption record from the Consumption model,
+    providing a comprehensive overview of consumption activities.
 
     Args:
         request (HttpRequest): The HTTP request object.
 
     Returns:
-        JsonResponse: A JSON response containing the low stock alerts for each product and Anbar item.
+        JsonResponse: A JSON response containing all details of consumption records.
     """
-    alerts = []
+    # Retrieve all consumption records and their details
+    consumption_records = Consumption.objects.all().values(
+        'id', 'receive_date', 'supplier_name', 'material_type', 'material_name',
+        'unit', 'reel_number', 'profile_name', 'comments', 'cancelling_reason',
+        'location', 'status', 'username', 'logs'
+    )
 
-    # Check low stock in Products
-    low_stock_products = Products.objects.filter(
-        Q(status='In-stock') & Q(quantity__lt=LOW_STOCK_THRESHOLD)
-    ).values('reel_number', 'quantity', 'material_name')
-
-    for product in low_stock_products:
-        alerts.append(f"Product {product['reel_number']} ({product['material_name']}) is low on stock with only {product['quantity']} items remaining.")
-
-    # Check low stock in each Anbar model
-    anbar_models = [Anbar_Sangin, Anbar_Salon_Tolid, Anbar_Parvandeh, Anbar_Koochak, Anbar_Khamir_Ghadim, Anbar_Khamir_Kordan, Anbar_Muhvateh_Kardan, Anbar_Akhal]
-
-    for anbar_model in anbar_models:
-        low_stock_anbar_items = anbar_model.objects.filter(
-            Q(status='In-stock') & Q(quantity__lt=LOW_STOCK_THRESHOLD)
-        ).values('reel_number', 'quantity', 'material_name')
-
-        for item in low_stock_anbar_items:
-            alerts.append(f"{anbar_model._meta.verbose_name} item {item['reel_number']} ({item['material_name']}) is low on stock with only {item['quantity']} items remaining.")
+    # Convert the QuerySet to a list to make it JSON serializable
+    consumption_records_list = list(consumption_records)
 
     return JsonResponse({
         'status': 'success',
-        'alerts': alerts
+        'consumption_records': consumption_records_list
     })
 
-def check_low_stock_alertv2 (request):
+def check_low_stock_alert (request):
     """
     Checks the inventory levels in Products, RawMaterial, and Anbar models, and generates alerts for low stock items.
 
