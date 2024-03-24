@@ -27,7 +27,6 @@ export default {
       phone: 0,
       username: '',
       forms: {
-        shipmet_type: {type: 'dropdown', name: 'نوع بار نامه',title: 'نوع بار نامه', data: ['Incoming', 'Outgoing'], value: 'Incoming'},
         load: {type: 'btn', name: 'چک کردن',title: 'چک کردن',},
         shipment_list: {type:'list', name: 'لیست بارنامه',title: 'لیست بارنامه', value: []},
         unloading_location: {type: 'dropdown', name: 'محل تخلیه',title: 'محل تخلیه', data: '', value: ''},
@@ -58,15 +57,10 @@ export default {
         this.forms.unloading_location.name = name
         this.forms.unloading_location.value = name
       }
-      if (k == 'shipmet_type'){
-        this.forms.shipmet_type.name = name
-        this.forms.shipmet_type.value = name
-      }
     },
     async load_shipments() {
       const params = {
         "license_number": this.first.val + this.letter.val + this.second.val +"ایران"+ this.year.val,
-        "shipment_type": this.forms.shipmet_type.value,
       };
 
       const response = await this.axios.post('/myapp/api/loadShipmentsBaesdLicenseNumberForCanceling', {}, {params: params})
@@ -79,7 +73,6 @@ export default {
     async cancel() {
       const params = {
         "license_number": this.first.val + this.letter.val + this.second.val +"ایران"+ this.year.val,
-        "shipmet_type": this.forms.shipmet_type.value,
         "shipment": JSON.stringify(this.forms.shipment_list.value),
         "unloading_location": this.forms.unloading_location.value,
         "reason": this.forms.reason.value,
@@ -88,9 +81,11 @@ export default {
       this.errors = []
       for (const key in this.forms) {
         if (this.forms[key].value == ''){
-          if (key!='load'){
-            this.forms[key].error = true
-            this.errors.push({'message': `${this.forms[key].name} مورد نیاز است`})
+          if (this.forms.shipment_list.value.shipment_type == 'Outgoing'){
+            if (key!='load'){
+              this.forms[key].error = true
+              this.errors.push({'message': `${this.forms[key].name} مورد نیاز است`})
+            }
           }
         }else {
            this.forms[key].error = false
@@ -231,7 +226,9 @@ export default {
         </div>
       </template>
       <template v-if="val.type=='dropdown'">
-        <button :id="form_name + 'Button'" :data-dropdown-toggle="form_name+'dropdown'" class="justify-between w-44 text-white bg-green-500 hover:bg-green-600 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="button">
+        <button :id="form_name + 'Button'" :data-dropdown-toggle="form_name+'dropdown'"
+                :class="[forms.shipment_list.value.shipment_type == 'Outgoing'?'':'hidden']"
+                class="justify-between w-44 text-white bg-green-500 hover:bg-green-600 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="button">
           {{val.name}}
           <svg class="w-2.5 h-2.5 ms-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>
@@ -272,6 +269,9 @@ export default {
                       </th>
                       <th scope="col" class="px-6 py-3">
                           وزن خالص
+                      </th>
+                      <th scope="col" class="px-6 py-3">
+                        نوع بارنامه
                       </th>
                       <th scope="col" class="px-6 py-3">
                           <span class="sr-only">افزودن</span>

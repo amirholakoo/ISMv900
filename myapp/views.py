@@ -1694,6 +1694,8 @@ def loaded(request):
                 AnbarModel = apps.get_model('myapp', loading_location)
                 for reel_number in reel_numbers:
                     anbar=AnbarModel.objects.filter(reel_number=reel_number, width=width, )
+                    logs = anbar[0].logs + log_generator(forklift_driver, 'Loaded')
+
                     anbar.update(
                         status='Sold',
                         location=license_number,
@@ -1701,15 +1703,17 @@ def loaded(request):
                         # material_name=material_name,
                         # receive_date=timezone.now(),
                         # last_date=timezone.now(),
-                        logs=anbar[0].logs + log_generator(forklift_driver, 'Loaded'),
+                        logs=logs,
                     )
+
                     product = Products.objects.filter(reel_number=reel_number, width=width,)
+                    logs = product[0].logs + log_generator(forklift_driver, 'Loaded')
                     product.update(
                         status='Sold',
                         location=license_number,
                         # receive_date=timezone.now(),
                         # last_date=timezone.now(),
-                        logs=product[0].logs + log_generator(forklift_driver, 'Loaded'),
+                        logs=logs,
                     )
                 profile_name = product[0].profile_name
                 # print(profile_name)
@@ -2538,98 +2542,10 @@ def add_consumption_profile(request):
         return render(request, 'add_consumption_profile.html')
 
 
-@csrf_exempt
-def cancel_shipment(request):
-    """
-    Handles the POST request to cancel a shipment.
-
-    This view function processes the cancellation request, updates related entities,
-    and manages statuses across different models. It handles potential errors gracefully
-    and provides informative feedback to the user.
-
-    Parameters:
-    - request: The HTTP request object.
-
-    Returns:
-    - A JSON response with the result of the operation.
-    """
-    if request.method == 'POST':
-        try:
-            # Extract data from the request
-            shipment_id = request.GET.get('shipment_id')
-            cancellation_reason = request.GET.get('cancellation_reason')
-
-            # Validate the data
-            if not shipment_id or not cancellation_reason:
-                raise ValidationError("Shipments ID and cancellation reason are required.")
-
-            # Fetch the shipment
-            shipment = Shipments.objects.get(shipment_id=shipment_id)
-
-            # Update shipment status and cancellation reason
-            shipment.status = 'Canceled'
-            shipment.cancellation_reason = cancellation_reason
-            shipment.save()
-
-            # Update related entities (e.g., Truck, Products, AnbarGeneric, Purchases, Sale)
-            # Assuming the shipment is associated with a truck
-            truck = Truck.objects.get(truck_id=shipment.truck_id)
-            truck.status = 'Free'
-            truck.location = 'Entrance'
-            truck.save()
-            # Assuming the shipment has a list of reels (product IDs)
-            reels = shipment.list_of_reels.split(',')
-            for reel in reels:
-                product = Products.objects.get(reel_number=reel)
-                product.status = 'In-stock'
-                product.location = 'Canceled'
-                product.save()
-            # Assuming AnbarGeneric subclasses are Anbar_Sangin, Anbar_Salon_Tolid, etc.
-            # You would need to repeat the update logic for each subclass
-            # For example, updating Anbar_Sangin:
-            # anbar_sangin_reels = Anbar_Sangin.objects.filter(reel_number__in=reels)
-            # for item in anbar_sangin_reels:
-            #     item.status = 'In-stock'
-            #     item.location = 'Canceled'
-            #     item.save()
-            purchases = Purchases.objects.filter(ShipmentID=shipment)
-            for purchase in purchases:
-                purchase.Status = 'Cancelled'
-                purchase.CancellationReason = cancellation_reason
-                purchase.save()
-            sales = Sales.objects.filter(shipment=shipment)
-            for sale in sales:
-                sale.payment_status = 'Cancelled'
-                sale.comments = cancellation_reason
-                sale.save()
-
-            # This is a simplified example; actual implementation will depend on the specific logic required
-            # For example, updating the status of related products to 'In-stock' and their location to 'Canceled'
-
-            # Return success response
-            return JsonResponse({'status': 'success', 'message': f'Shipments {shipment_id} has been canceled.'})
-
-        except Shipments.DoesNotExist:
-            # Handle case where the shipment does not exist
-            return JsonResponse({'status': 'fail', 'message': 'Shipments not found.'})
-
-        except ValidationError as e:
-            # Handle validation errors
-            return JsonResponse({'status': 'fail', 'message': str(e)})
-
-        except Exception as e:
-            # Handle other exceptions
-            return JsonResponse({'status': 'fail', 'message': 'An error occurred: ' + str(e)})
-
-    else:
-        # Handle non-POST requests
-        return JsonResponse({'status': 'fail', 'message': 'Invalid request method.'})
-
 
 def cancel(request):
     if request.method == 'POST':
         license_number = request.GET.get('license_number')
-        shipmet_type = request.GET.get('shipmet_type')
         shipment_obj = request.GET.get('shipment')
         shipment_obj = json.loads(shipment_obj)
         anbar_location = request.GET.get('unloading_location')
@@ -2639,7 +2555,7 @@ def cancel(request):
         status = 'Cancelled'
         location = 'Cancelled'
         action = 'Cancelled'
-        print(shipment_obj)
+
         shipment = Shipments.objects.get(id=shipment_obj['id'])
         # Update the attributes of the shipment instance
         shipment.status = status
@@ -2649,7 +2565,13 @@ def cancel(request):
         # Save the updated instance to the database
         shipment.save()
 
-        if shipmet_type == "Incoming":
+        # Update truck status and location
+        Truck.objects.filter(license_number=license_number).update(
+            status='Free',
+            location='Entrance'
+        )
+
+        if shipment.shipment_type == "Incoming":
             purchases = Purchases.objects.filter(shipment_id=shipment)
 
             if purchases.exists():
@@ -2658,20 +2580,22 @@ def cancel(request):
                     cancellation_reason=cancellation_reason,
                     logs=purchases[0].logs + log_generator(username, action)
                 )
-            AnbarModel = apps.get_model('myapp', shipment.unload_location)
-            anbar = AnbarModel.objects.filter(
-                supplier_name=shipment.supplier_name,
-                material_name=shipment.material_name,
-            )
 
-            if anbar.exists():
-                anbar = anbar.order_by('receive_date')[:int(shipment.quantity)]
-                for record in anbar:
-                    record.status = status
-                    record.location = location
-                    record.last_date = timezone.now()
-                    record.logs = record.logs + log_generator(username, action)
-                    record.save()
+            if shipment.unload_location:
+                AnbarModel = apps.get_model('myapp', shipment.unload_location)
+                anbar = AnbarModel.objects.filter(
+                    supplier_name=shipment.supplier_name,
+                    material_name=shipment.material_name,
+                    status="In-stock"
+                )
+                if anbar.exists():
+                    anbar = anbar.order_by('receive_date')[:int(shipment.quantity)]
+                    for record in anbar:
+                        record.status = status
+                        record.location = location
+                        record.last_date = timezone.now()
+                        record.logs = record.logs + log_generator(username, action)
+                        record.save()
         else:
             sales = Sales.objects.filter(shipment=shipment)
             if sales.exists():
@@ -2683,10 +2607,11 @@ def cancel(request):
             if shipment.list_of_reels:
                 list_of_reel = shipment.list_of_reels.split(',')
                 for reel in list_of_reel:
-                    reel = int(reel)
+                    # reel = int(reel)
                     product = Products.objects.get(reel_number=reel)
+                    print(product)
                     product.location = anbar_location
-                    product.status = 'In-srock'
+                    product.status = 'In-stock'
                     product.last_date = None
                     product.logs = product.logs + log_generator(username, action)
                     product.save()
@@ -2710,11 +2635,6 @@ def cancel(request):
                     )
                     anbar_a.save()
 
-        # Update truck status and location
-        Truck.objects.filter(license_number=license_number).update(
-            status='Free',
-            location='Entrance'
-        )
         # Return a success response
         return JsonResponse({'status': 'success', 'message': ''})
 
@@ -2730,9 +2650,8 @@ def load_shipments_baesd_license_number_for_canceling(request):
     if request.method == 'POST':
         # Extract the license number from the request data
         license_number = request.GET.get('license_number')
-        shipment_type = request.GET.get('shipment_type')
 
-        shipments = Shipments.objects.filter(license_number=license_number, shipment_type=shipment_type)
+        shipments = Shipments.objects.filter(license_number=license_number).exclude(status='Cancelled')
         shipments = shipments.order_by('receive_date')[:10]
         if shipments.exists():
             shipment_list = shipments.values(
@@ -2740,7 +2659,8 @@ def load_shipments_baesd_license_number_for_canceling(request):
                 'receive_date',
                 'supplier_name',
                 'customer_name',
-                'net_weight'
+                'net_weight',
+                'shipment_type'
             )
             # Convert the queryset to a list of dictionaries
             shipment_list = list(shipment_list)
@@ -2750,7 +2670,7 @@ def load_shipments_baesd_license_number_for_canceling(request):
                     shipment['receive_date'] = shipment['receive_date'].strftime('%Y-%m-%d %H:%M')
 
             json_data = json.dumps(shipment_list)
-            print(shipment_list)
+
             return JsonResponse({'isExists': 'false', 'message': 'shipments exists.', 'shipment_list': json_data}, status=200)
         else:
             return JsonResponse({'isExists': 'true', 'message': 'License number does not exist.'})
