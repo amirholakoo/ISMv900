@@ -151,3 +151,75 @@ Installing:
 
     npm run serve
 
+### Install and Run PostgreSQL
+
+Install PostgreSQL: The installation steps vary depending on your operating system.
+
+`sudo apt-get update`
+
+`sudo apt-get install postgresql postgresql-contrib`
+
+Start PostgreSQL service (if not already running):
+
+`sudo service postgresql start`
+
+Create a PostgreSQL User and Database:
+
+`sudo -u postgres psql`
+
+`CREATE DATABASE mydatabase;`
+
+`CREATE USER admin WITH ENCRYPTED PASSWORD 'pi';`
+
+`GRANT ALL PRIVILEGES ON DATABASE mydatabase TO admin;`
+
+`\q`
+
+** find your venv and activate:**
+
+`source venv/bin/activate`
+
+`sudo apt-get install libpq-dev`
+
+`pip install psycopg2`
+
+### Configure Your Django
+
+Modify settings.py: Update the DATABASES setting in `myapp` Django project's `settings.py` file:
+
+**If you can't find it in myapp directory then**
+
+`sudo nano settings.py`
+
+```
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'mydatabase',
+        'USER': 'admin',
+        'PASSWORD': 'pi',
+        'HOST': 'localhost',
+        'PORT': '',
+    }
+}
+```
+
+Replace `mydatabase`, `admin`, and `pi` with your PostgreSQL database and user credentials.
+
+
+### Transfer Your Data
+
+Export Data from SQLite: Use Django's `dumpdata` command to export your existing data:
+
+`python manage.py dumpdata > data.json`
+
+Migrate Your Models: Apply your migrations to the new PostgreSQL database:
+
+`python manage.py migrate`
+
+Import Data to PostgreSQL: Load the data you exported from SQLite into PostgreSQL:
+
+`python manage.py loaddata data.json`
+
+
+
