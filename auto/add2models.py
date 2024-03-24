@@ -11,7 +11,8 @@ from .models import Sales
 from .models import Purchases
 from .models import RawMaterial, AnbarGeneric
 from .models import Consumption
-from .models import Products, Anbar_Sangin, Anbar_Salon_Tolid, Anbar_Parvandeh, Anbar_Koochak, Anbar_Khamir_Ghadim, Anbar_Khamir_Kordan, Anbar_Muhvateh_Kardan, Anbar_Akhal
+# from .models import Products, Anbar_Sangin, Anbar_Salon_Tolid, Anbar_Parvandeh, Anbar_Koochak, Anbar_Khamir_Ghadim, Anbar_Khamir_Kordan, Anbar_Muhvateh_Kardan, Anbar_Akhal
+from .models import Products, RawMaterial, Anbar_Sangin, Anbar_Salon_Tolid, Anbar_Parvandeh, Anbar_Koochak, Anbar_Khamir_Ghadim, Anbar_Khamir_Kordan, Anbar_Muhvateh_Kardan, Anbar_Akhal
 
 
 LOW_STOCK_THRESHOLD = 10  # Define a low stock threshold
@@ -31,7 +32,7 @@ def fetch_ongoing_shipments(request):
         JsonResponse: A JSON response containing a list of ongoing shipments.
     """
     # Define the statuses that indicate an ongoing shipment
-    ongoing_statuses = ['Registered', 'LoadingUnloading', 'LoadedUnloaded']
+    ongoing_statuses = ['Registered', 'LoadingUnloading', 'LoadedUnloaded', 'Office']
     
     # Query the Shipments table for ongoing shipments
     ongoing_shipments = Shipments.objects.filter(status__in=ongoing_statuses).values(
@@ -51,50 +52,61 @@ def fetch_ongoing_shipments(request):
 
 def fetch_sales_report(request):
     """
-    Fetches sales data and aggregates it by customer and date.
+    Fetches a comprehensive report of all sales orders from the database.
+
+    This function retrieves all records from the Sales model and includes all their details
+    to provide a full overview of the sales orders.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
 
     Returns:
-        JsonResponse: A JSON response containing aggregated sales data.
+        JsonResponse: A JSON response containing the details of all sales orders.
     """
-    # Aggregate sales data
-    sales_data = Sales.objects.values('customer__customer_name', 'date').annotate(
-        total_sales=Sum('total_price'),
-        total_weight=Sum('net_weight'),
-        total_units=Sum('quantity')
-    ).order_by('date', 'customer__customer_name')
+    # Retrieve all sales order records
+    sales_orders = Sales.objects.all().values(
+        'id', 'date', 'customer__customer_name', 'truck__license_number', 'list_of_reels',
+        'profile_name', 'weight1', 'weight2', 'net_weight', 'price_per_kg', 'vat',
+        'total_price', 'extra_cost', 'invoice_status', 'invoice_number', 'status',
+        'payment_details', 'payment_date', 'document_info', 'comments', 'cancellation_reason',
+        'shipment__id', 'username', 'logs'
+    )
 
-    # Prepare the data for JSON response
-    formatted_sales_data = []
-    for item in sales_data:
-        formatted_sales_data.append({
-            'customer': item['customer__customer_name'],
-            'date': item['date'].strftime("%Y-%m-%d"),
-            'total_sales': item['total_sales'],
-            'total_weight': item['total_weight'],
-            'total_units': item['total_units'],
-        })
+    # Convert the QuerySet to a list for JSON serialization
+    sales_orders_list = list(sales_orders)
 
-    return JsonResponse({'status': 'success', 'data': formatted_sales_data})
+    return JsonResponse({'status': 'success', 'sales_orders': sales_orders_list})
 
 def fetch_purchase_report(request):
     """
-    Fetches purchase order records from the Purchases model.
+    Fetches a detailed report of all purchase orders from the database.
+
+    This function retrieves all fields for each purchase order from the Purchases model,
+    providing a comprehensive overview of the purchasing activity.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
 
     Returns:
-        JsonResponse: A JSON response containing a list of purchase order records.
+        JsonResponse: A JSON response containing all details of purchase orders.
     """
-    # Query the Purchases table to get all purchase records
+    # Retrieve all purchase orders and their details
     purchase_orders = Purchases.objects.all().values(
-        'id', 'date', 'receive_date', 'supplier_name', 'material_type',
-        'material_name', 'unit', 'quantity', 'price_per_kg', 'total_price',
-        'vat', 'status', 'payment_details', 'invoice_number', 'comments'
+        'id', 'date', 'receive_date', 'license_number', 'material_id__material_type',
+        'material_id__material_name', 'supplier_name', 'unit', 'quantity', 'quality', 
+        'penalty', 'weight1', 'weight2', 'net_weight', 'price_per_kg', 'vat', 
+        'total_price', 'extra_cost', 'invoice_status', 'status', 'payment_details',
+        'payment_date', 'invoice_number', 'document_info', 'comments', 'cancellation_reason',
+        'shipment_id', 'username', 'logs'
     )
 
-    # Convert the query result to a list of dictionaries
-    purchase_data = list(purchase_orders)
+    # Convert the QuerySet to a list to make it JSON serializable
+    purchase_orders_list = list(purchase_orders)
 
-    # Return the JsonResponse
-    return JsonResponse({"status": "success", "purchase_data": purchase_data})
+    return JsonResponse({
+        'status': 'success',
+        'purchase_orders': purchase_orders_list
+    })
 
 def fetch_inventory_report(request):
     """
@@ -275,6 +287,59 @@ def check_low_stock_alert(request):
         'alerts': alerts
     })
 
+def check_low_stock_alertv2 (request):
+    """
+    Checks the inventory levels in Products, RawMaterial, and Anbar models, and generates alerts for low stock items.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+
+    Returns:
+        JsonResponse: A JSON response containing the low stock alerts with detailed information.
+    """
+    alerts = []
+
+    # Check low stock in Products
+    low_stock_products = Products.objects.filter(quantity__lt=LOW_STOCK_THRESHOLD, status='In-stock').values('reel_number', 'quantity', 'material_name', 'location')
+    for product in low_stock_products:
+        alerts.append({
+            'type': 'Product',
+            'reel_number': product['reel_number'],
+            'quantity': product['quantity'],
+            'material_name': product['material_name'],
+            'location': product['location']
+        })
+
+    # Check low stock in RawMaterial
+    low_stock_raw_materials = RawMaterial.objects.filter(quantity__lt=LOW_STOCK_THRESHOLD, status='Active').values('material_name', 'quantity', 'supplier_name', 'material_type')
+    for material in low_stock_raw_materials:
+        alerts.append({
+            'type': 'RawMaterial',
+            'material_name': material['material_name'],
+            'quantity': material['quantity'],
+            'supplier_name': material['supplier_name'],
+            'material_type': material['material_type']
+        })
+
+    # Check low stock in Anbar models
+    anbar_models = [Anbar_Sangin, Anbar_Salon_Tolid, Anbar_Parvandeh, Anbar_Koochak, Anbar_Khamir_Ghadim, Anbar_Khamir_Kordan, Anbar_Muhvateh_Kardan, Anbar_Akhal]
+
+    for anbar_model in anbar_models:
+        low_stock_anbar_items = anbar_model.objects.filter(quantity__lt=LOW_STOCK_THRESHOLD, status='In-stock').values('reel_number', 'quantity', 'material_name', 'material_type', 'location')
+        for item in low_stock_anbar_items:
+            alerts.append({
+                'type': anbar_model._meta.verbose_name,
+                'reel_number': item['reel_number'],
+                'quantity': item['quantity'],
+                'material_name': item['material_name'],
+                'material_type': item['material_type'],
+                'location': item['location']
+            })
+
+    return JsonResponse({
+        'status': 'success',
+        'alerts': alerts
+    })
 
 # Example usage in a Django view
 def report_page_view(request):
