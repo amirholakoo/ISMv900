@@ -17,6 +17,7 @@ import addNewUnit from "@/components/admin/addNewUnit.vue";
 import addNewMatrialType from "@/components/admin/addNewMatrialType.vue";
 import consumptionProfile from "@/components/admin/consumptionProfile.vue";
 import cancel from "@/components/admin/cancel.vue";
+import reportPage from "@/components/admin/reportPage.vue";
 
 const routes = [
   {
@@ -116,6 +117,11 @@ const routes = [
     path: '/myapp/cancel/',
     name: 'cancel',
     component: cancel
+  },
+  {
+    path: '/myapp/report/',
+    name: 'report',
+    component: reportPage
   },
 ]
 

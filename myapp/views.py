@@ -1,4 +1,5 @@
 import json
+import pandas as pd
 import logging
 from django.shortcuts import render, redirect
 from .models import *
@@ -18,7 +19,7 @@ def log_generator(username, action):
     current_time = timezone.now().strftime('%Y-%m-%d %H:%M')
 
     # Create the log entry
-    new_log_entry = f"{username} {action} Now {current_time},"  # Comma at the end for CSV formatting
+    new_log_entry = f"{username} {action} {current_time},"  # Comma at the end for CSV formatting
 
     return new_log_entry
 # Incoming process:
@@ -2634,14 +2635,25 @@ def cancel(request):
                         logs=log_generator(username, 'Cancelled and Added')
                     )
                     anbar_a.save()
+                    if shipment.unload_location:
+                        AnbarModel = apps.get_model('myapp', shipment.unload_location)
+                        anbar = AnbarModel.objects.filter(
+                            reel_number=reel,
+                        )
+                        if anbar.exists():
+                            # anbar = anbar.order_by('receive_date')[:int(shipment.quantity)]
+                            for record in anbar:
+                                record.status = status
+                                record.location = location
+                                # record.last_date = timezone.now()
+                                record.logs = record.logs + log_generator(username, action)
+                                record.save()
 
         # Return a success response
         return JsonResponse({'status': 'success', 'message': ''})
 
     else:
         return render(request, 'cancell_shipment.html')
-
-
 
 
 @csrf_exempt
@@ -2679,3 +2691,84 @@ def load_shipments_baesd_license_number_for_canceling(request):
         # If the request method is not POST, return an error response
         return JsonResponse({'status': 'error', 'message': 'Invalid request method.'})
 
+
+def loadReportData(request):
+    if request.method == 'GET':
+        data = {}
+        shipments = Shipments.objects.all().exclude(status='Cancelled').values()
+        field_names = [k for k in list(shipments)[0]]
+        data['shipments'] = {'values':list(shipments), 'fields': field_names, 'title': 'لیست بارنامه',}
+
+        sales = Sales.objects.all().values()
+        field_names = [k for k in list(sales)[0]]
+        data['sales'] = {'values':list(sales), 'fields': field_names, 'title': 'لیست فروش',}
+
+        purchases = Purchases.objects.all().values()
+        field_names = [k for k in list(purchases)[0]]
+        data['purchases'] = {'values':list(purchases), 'fields': field_names, 'title': 'لیست خرید',}
+
+        rawMaterial = RawMaterial.objects.all().values()
+        field_names = [k for k in list(rawMaterial)[0]]
+        data['rawMaterial'] = {'values':list(rawMaterial), 'fields': field_names, 'title': 'لیست مواد',}
+
+        products = Products.objects.all().values()
+        field_names = [k for k in list(products)[0]]
+        data['products'] = {'values':list(products), 'fields': field_names, 'title': 'لیست محصولات',}
+
+        consumption = Consumption.objects.all().values()
+        field_names = [k for k in list(consumption)[0]]
+        data['consumption'] = {'values':list(consumption), 'fields': field_names, 'title': 'لیست مصرف',}
+
+        return JsonResponse({'status': 'succese', 'data': data})
+    else:
+        return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=400)
+
+def report_page(request):
+    if request.method == 'POST':
+        pass
+    else:
+        return render(request, 'report_page.html')
+
+
+from django.http import JsonResponse
+import pandas as pd
+from django.utils import timezone
+from django.http import FileResponse
+
+def generate_excel_report(request):
+    model_name = request.GET.get('model_name')
+    models = {
+        'shipments': Shipments.objects.all().exclude(status='Cancelled').values(),
+        'sales': Sales.objects.all().exclude(status='Cancelled').values(),
+        'purchases': Purchases.objects.all().exclude(status='Cancelled').values(),
+        'rawMaterial': RawMaterial.objects.all().values(),
+        'products': Products.objects.all().values(),
+        'consumption': Consumption.objects.all().values()
+    }
+    model = models[model_name]
+    # Creating DataFrames
+    df = pd.DataFrame(list(model))
+    # Convert datetime fields to timezone-naive format
+    for col in ['receive_date', 'entry_time', 'weight1_time', 'weight2_time', 'exit_time', 'date', 'payment_date']:
+        if col in df.columns:
+            df[col] = pd.to_datetime(df[col]).dt.tz_localize(None)
+
+
+    # Generate a timestamp
+    timestamp = timezone.now().strftime('%Y%m%d_%H%M%S')
+
+    # Create a filename with the timestamp
+    filename = f'{model_name}_{timestamp}.xlsx'
+
+    # Writing the DataFrame to an Excel file
+    df.to_excel(filename, index=False, engine='openpyxl')
+    # Open the file in binary mode
+    file = open(filename, 'rb')
+
+    # Create a FileResponse object
+    response = FileResponse(file)
+
+    # Set the Content-Disposition header to signal the browser to download the file
+    response['Content-Disposition'] = f'attachment; filename="{filename}"'
+
+    return response
