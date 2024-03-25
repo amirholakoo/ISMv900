@@ -121,7 +121,7 @@ class Products(models.Model):
     """
 
     # Reel number for the product
-    reel_number = models.CharField(max_length=255)
+    reel_number = models.CharField(max_length=255, unique=True)
 
     # Width of the product
     width = models.IntegerField()
