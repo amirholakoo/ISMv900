@@ -2696,28 +2696,34 @@ def loadReportData(request):
     if request.method == 'GET':
         data = {}
         shipments = Shipments.objects.all().exclude(status='Cancelled').values()
-        field_names = [k for k in list(shipments)[0]]
-        data['shipments'] = {'values':list(shipments), 'fields': field_names, 'title': 'لیست بارنامه',}
+        if shipments.exists():
+            field_names = [k for k in list(shipments)[0]]
+            data['shipments'] = {'values':list(shipments), 'fields': field_names, 'title': 'لیست بارنامه',}
 
-        sales = Sales.objects.all().values()
-        field_names = [k for k in list(sales)[0]]
-        data['sales'] = {'values':list(sales), 'fields': field_names, 'title': 'لیست فروش',}
+        sales = Sales.objects.all().exclude(status='Cancelled').values()
+        if sales.exists():
+            field_names = [k for k in list(sales)[0]]
+            data['sales'] = {'values':list(sales), 'fields': field_names, 'title': 'لیست فروش',}
 
-        purchases = Purchases.objects.all().values()
-        field_names = [k for k in list(purchases)[0]]
-        data['purchases'] = {'values':list(purchases), 'fields': field_names, 'title': 'لیست خرید',}
+        purchases = Purchases.objects.all().exclude(status='Cancelled').values()
+        if purchases.exists():
+            field_names = [k for k in list(purchases)[0]]
+            data['purchases'] = {'values':list(purchases), 'fields': field_names, 'title': 'لیست خرید',}
 
-        rawMaterial = RawMaterial.objects.all().values()
-        field_names = [k for k in list(rawMaterial)[0]]
-        data['rawMaterial'] = {'values':list(rawMaterial), 'fields': field_names, 'title': 'لیست مواد',}
+        rawMaterial = RawMaterial.objects.filter(status='In-stock').values()
+        if rawMaterial.exists():
+            field_names = [k for k in list(rawMaterial)[0]]
+            data['rawMaterial'] = {'values':list(rawMaterial), 'fields': field_names, 'title': 'لیست مواد',}
 
-        products = Products.objects.all().values()
-        field_names = [k for k in list(products)[0]]
-        data['products'] = {'values':list(products), 'fields': field_names, 'title': 'لیست محصولات',}
+        products = Products.objects.filter(status='In-stock').values()
+        if products.exists():
+            field_names = [k for k in list(products)[0]]
+            data['products'] = {'values':list(products), 'fields': field_names, 'title': 'لیست محصولات',}
 
         consumption = Consumption.objects.all().values()
-        field_names = [k for k in list(consumption)[0]]
-        data['consumption'] = {'values':list(consumption), 'fields': field_names, 'title': 'لیست مصرف',}
+        if consumption.exists():
+            field_names = [k for k in list(consumption)[0]]
+            data['consumption'] = {'values':list(consumption), 'fields': field_names, 'title': 'لیست مصرف',}
 
         return JsonResponse({'status': 'succese', 'data': data})
     else:
@@ -2759,11 +2765,14 @@ def generate_excel_report(request):
 
     # Create a filename with the timestamp
     filename = f'{model_name}_{timestamp}.xlsx'
+    qrcode_dir = 'reports'
+    if not os.path.exists(qrcode_dir):
+        os.makedirs(qrcode_dir)
 
     # Writing the DataFrame to an Excel file
-    df.to_excel(filename, index=False, engine='openpyxl')
+    df.to_excel(os.path.join(qrcode_dir, filename), index=False, engine='openpyxl')
     # Open the file in binary mode
-    file = open(filename, 'rb')
+    file = open(os.path.join(qrcode_dir, filename), 'rb')
 
     # Create a FileResponse object
     response = FileResponse(file)
@@ -2772,3 +2781,35 @@ def generate_excel_report(request):
     response['Content-Disposition'] = f'attachment; filename="{filename}"'
 
     return response
+
+import os
+import qrcode
+from qrcode.image.pil import PilImage
+def generate_qrCode(request):
+    # print(json.loads(dict(request.GET)))
+    # Data to encode
+    data = dict(request.GET)
+    d =json.loads(data['data'][0])
+    timestamp = timezone.now().strftime('%Y%m%d_%H%M%S')
+    filename = f"reel_number_{d['reel_number']}_{timestamp}.png"
+
+    # Generate QR code
+    qr = qrcode.QRCode(
+        version=1,
+        error_correction=qrcode.constants.ERROR_CORRECT_L,
+        box_size=10,
+        border=4,
+    )
+    qr.add_data(data['data'][0])
+    qr.make(fit=True)
+    # Create an image from the QR Code instance
+    img = qr.make_image(fill_color="black", back_color="white")
+    # Ensure the 'qrcode' directory exists
+    qrcode_dir = 'qrcode'
+    if not os.path.exists(qrcode_dir):
+        os.makedirs(qrcode_dir)
+
+    # Save the image
+    img.save(os.path.join(qrcode_dir, filename))
+
+    return JsonResponse({'status': 'succeses', 'filename': os.path.join(qrcode_dir, filename)})

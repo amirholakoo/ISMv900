@@ -18,50 +18,6 @@ export default {
   data(){
     return {
       forms: {
-        shipment_list: {
-          type:'list',
-          name: 'لیست بارنامه',
-          title: 'لیست بارنامه',
-          value: [],
-          fields:[
-             'شناسه',
-             'نوع حمل و نقل',
-             'وضعیت',
-             'مکان',
-             'شماره مجوز',
-             'تاریخ دریافت',
-             'زمان ورود',
-             'نام مشتری',
-             'نام تامین کننده',
-             'وزن 1',
-             'زمان وزن 1',
-             'مکان بارگیری',
-             'واحد',
-             'تعداد',
-             'کیفیت',
-             'جریمه',
-             'وزن 2',
-             'زمان وزن 2',
-             'وزن خالص',
-             'لیست رل‌ها',
-             'نام پروفایل',
-             'شناسه فروش',
-             'قیمت بر کیلوگرم',
-             'هزینه اضافی',
-             'نوع ماده',
-             'نام ماده',
-             'شناسه خرید',
-             'مالیات',
-             'وضعیت فاکتور',
-             'وضعیت پرداخت',
-             'زمان خروج',
-             'اطلاعات مستند',
-             'نظرات',
-             'دلیل لغو',
-             'نام کاربری',
-             'لاگ‌ها'
-            ]
-        },
       },
       success: false,
       error: false,
@@ -140,7 +96,8 @@ export default {
 </script>
 
 <template>
-<Card title="گزارش">
+<!--<Card title="گزارش">-->
+  <div class="w-screen p-5 container">
   <p class="flex flex-row gap-2 items-center">
     <button @click="reload" class="w-auto block text-white bg-green-500 hover:bg-green-600 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="button">
       بارگیری مجدد
@@ -231,6 +188,7 @@ export default {
         </div>
     </template>
   </form>
-</Card>
+  </div>
+<!--</Card>-->
 </template>
 

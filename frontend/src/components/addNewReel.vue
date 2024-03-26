@@ -78,13 +78,16 @@ export default {
         "commnet": this.forms.commnet.value,
         "consumption_profile_name": this.forms.consumption_profile_name.value,
         "username": this.forms.username.value,
-        "qr_code": this.qrcode,
       };
+      const response = await this.axios.post('/myapp/api/generateQrCode', {}, {params: {'data':JSON.stringify(params)}})
+      console.log(response.data)
+      let filename = response.data.filename
+      console.log(filename)
       // this.qrcode = await QRCode.toDataURL(JSON.stringify(params), {
       //   width: 256,
       //   height: 256,
       // })
-      // params['qr_code']=this.qrcode
+      params['qr_code']=filename
       console.log('params is:',params)
       this.errors = []
       for (const key in this.forms) {
@@ -103,6 +106,17 @@ export default {
         console.log(response.data); // Access response data
         if (response.data['status'] == 'success'){
           this.success = true
+          let params = {
+            "reel_number": this.forms.reel_number.value,
+            "width": this.forms.width.value,
+            "gsm": this.forms.GSM.value,
+            "length": this.forms.length.value,
+            "breaks": this.forms.breaks.value,
+            "grade": this.forms.grade.value,
+            "commnet": this.forms.commnet.value,
+            "consumption_profile_name": this.forms.consumption_profile_name.value,
+            "username": this.forms.username.value,
+          };
           this.qrcode = await QRCode.toDataURL(JSON.stringify(params), {
             width: 256,
             height: 256,

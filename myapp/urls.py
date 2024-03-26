@@ -39,6 +39,7 @@ urlpatterns = [
     path("api/loadShipmentsBaesdLicenseNumberForCanceling", load_shipments_baesd_license_number_for_canceling),
     path("api/loadReportData", loadReportData),
     path("api/generateExcelReport", generate_excel_report),
+    path("api/generateQrCode", generate_qrCode),
 
     # Following paths are related to Pages:
 
