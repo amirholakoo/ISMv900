@@ -40,6 +40,8 @@ source venv/bin/activate
 echo " Install Django and jdatetime"
 pip install django
 pip install jdatetime
+pip install pandas
+pip install openpyxl
 
 # OR install all requirements from a file
 # pip install -r requirements.txt
