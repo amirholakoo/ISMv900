@@ -221,5 +221,33 @@ Import Data to PostgreSQL: Load the data you exported from SQLite into PostgreSQ
 
 `python manage.py loaddata data.json`
 
+### Windows SETUP:
 
+`python -m venv venv`
+
+`venv\Scripts\activate`
+
+`pip install -r requirements.txt`
+
+`mkdir static/dist`
+
+`python manage.py makemigrations`
+
+`python manage.py migrate`
+
+`python manage.py makemigrations myapp`
+
+`python manage.py migrate myapp`
+
+`python manage.py createsuperuser`
+
+`cd frontend`
+
+`npm install`
+
+`npm run serve`
+
+`cd..`
+
+`python manage.py runserver`
 
