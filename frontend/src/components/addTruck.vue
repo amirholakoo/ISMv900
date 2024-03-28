@@ -190,16 +190,16 @@ export default {
   <div class="flex flex-row justify-center">
       <div class="rounded-lg bg-white shadow-lg max-w-sm">
       <div class="flex rounded-lg border-4 border-black shadow">
-        <label class="flex flex-none flex-col items-center px-4 border-e-4 border-black font-bold">
+        <label class="flex flex-none flex-col items-center px-2 justify-center sm:justify-start sm:px-4 border-e-4 border-black font-bold">
           ایران
-          <p class="place-self-center text-4xl">{{ year.val }}</p>
+          <p class="place-self-center sm:text-4xl">{{ year.val }}</p>
         </label>
-        <label class="flex-grow flex flex-row gap-4 justify-center p-4 font-mono text-5xl font-bold">
+        <label class="flex-grow flex flex-row px-2 gap-2 sm:gap-4 justify-center items-center sm:p-4 font-mono text-xl sm:text-5xl font-bold">
           <h>{{ second.val }}</h>
           <h>{{ letter.val }}</h>
           <h>{{ first.val }}</h>
         </label>
-        <label class="flex flex-none flex-col items-end justify-between px-1 py-2 bg-blue-700 border-s-4 border-black font-bold text-sm text-white">
+        <label class="flex flex-none flex-col items-end justify-between px-1 py-1 bg-blue-700 border-s-4 border-black font-bold  sm:text-sm text-white">
           <img src="@/assets/Flag_of_Iran.svg.png" class="h-5">
           <span class="flex flex-col items-end">
             <h>IR</h>
@@ -245,7 +245,7 @@ export default {
     </div>
 
     <template v-if="isExists">
-      <div class="mt-2 flex flex-row items-center gap-1">
+      <div class="mt-2 flex flex-col sm:flex-row items-center gap-1">
         <p class="text-red-600">درحال حاضر پلاک </p>
         <lic_numer :lic="{
                 first: this.first.val,
