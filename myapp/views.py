@@ -2839,7 +2839,7 @@ def generate_excel_report(request):
 
 import os
 import qrcode
-from qrcode.image.pil import PilImage
+# from qrcode.image.pil import PilImage
 def generate_qrCode(request):
     # print(json.loads(dict(request.GET)))
     # Data to encode
