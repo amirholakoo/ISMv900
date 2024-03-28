@@ -12,6 +12,8 @@ from django.apps import apps
 from django.db import models
 from django.apps import apps
 from django.db.models.base import ModelBase
+import jdatetime
+
 
 # Create your views here.
 def log_generator(username, action):
@@ -417,13 +419,15 @@ def get_reel_number(request):
     if request.method == 'GET':
         # Load the last reel number from the Products DB
         try:
-            last_reel_number = Products.objects.latest('reel_number').reel_number
-            width = Products.objects.latest('width').width
-            GSM = Products.objects.latest('gsm').gsm
-            length = Products.objects.latest('length').length
-            breaks = Products.objects.latest('breaks').breaks
-            grade = Products.objects.latest('grade').grade
-            profile_name = Products.objects.latest('profile_name').profile_name
+            last_product = Products.objects.last()
+
+            last_reel_number = last_product.reel_number
+            width = last_product.width
+            GSM = last_product.gsm
+            length = last_product.length
+            breaks = last_product.breaks
+            grade = last_product.grade
+            profile_name = last_product.profile_name
 
         except Products.DoesNotExist:
             last_reel_number = 0
@@ -434,7 +438,7 @@ def get_reel_number(request):
             grade = 0
             profile_name = 0
         next_reel_number = int(last_reel_number) + 1
-        print(next_reel_number, last_reel_number)
+        # print(next_reel_number, last_reel_number)
         data = {
             'next_reel_number': next_reel_number,
             'width': width,
@@ -1020,7 +1024,7 @@ def update_weight1(request):
         if not username:
             errors.append('نام کاربری را وارد کنید')
         # Convert weight1 to a decimal and validate the range
-        weight1 = float(weight1)
+        weight1 = int(weight1)
         if weight1 < 9 or weight1 > 38000:
             errors.append('وزن وارد شده باید بین 9 تا 38000 کیلوگرم باشد.')
 
@@ -1106,9 +1110,9 @@ def update_weight2(request):
         if not username:
             errors.append({'status': 'error', 'message': 'نام کاربری را وارد کنید'})
         try:
-            weight1 = float(weight1)
-            weight2 = float(weight2)
-            net_weight = float(net_weight)
+            weight1 = int(weight1)
+            weight2 = int(weight2)
+            net_weight = int(net_weight)
         except ValueError:
             errors.append({'status': 'error', 'message': 'وزن ثانویه و وزن خالص باید عدد باشند'})
         if not (9 <= weight2 <= 38000) or not (9 <= net_weight <= 38000):
@@ -1239,13 +1243,13 @@ def create_purchase_order(request):
                         quantity=quantity,
                         quality=quality,
                         penalty=penalty,
-                        weight1=weight1,
-                        weight2=weight2,
-                        net_weight=net_weight,
-                        price_per_kg=price_per_kg,
+                        weight1=int(weight1),
+                        weight2=int(weight2),
+                        net_weight=int(net_weight),
+                        price_per_kg=int(price_per_kg),
                         vat=vat,
-                        total_price=total_price,
-                        extra_cost=extra_cost,
+                        total_price=int(total_price),
+                        extra_cost=int(extra_cost),
                         invoice_status=invoice_status,
                         invoice_number=supplier_invoice,
                         status=payment_status,
@@ -2543,7 +2547,7 @@ def add_consumption_profile(request):
         return render(request, 'add_consumption_profile.html')
 
 
-
+from jdatetime import datetime
 def cancel(request):
     if request.method == 'POST':
         license_number = request.GET.get('license_number')
@@ -2679,7 +2683,10 @@ def load_shipments_baesd_license_number_for_canceling(request):
             # Convert datetime objects to strings
             for shipment in shipment_list:
                 if shipment['receive_date']:
-                    shipment['receive_date'] = shipment['receive_date'].strftime('%Y-%m-%d %H:%M')
+                    # Convert Django datetime to Shamsi date
+                    shamsi_date = jdatetime.datetime.fromgregorian(datetime=shipment['receive_date'])
+
+                    shipment['receive_date'] = shamsi_date.strftime('%Y-%m-%d %H:%M')
 
             json_data = json.dumps(shipment_list)
 
@@ -2695,33 +2702,81 @@ def load_shipments_baesd_license_number_for_canceling(request):
 def loadReportData(request):
     if request.method == 'GET':
         data = {}
+        datetime_fields = ['receive_date', 'entry_time', 'weight1_time', 'weight2_time', 'exit_time', 'date', 'payment_date']
+
         shipments = Shipments.objects.all().exclude(status='Cancelled').values()
         if shipments.exists():
+            # Convert each datetime field to Shamsi date
+            for shipment in shipments:
+                for field in datetime_fields:
+                    if field in shipment and shipment[field] is not None:
+                        # Convert to Shamsi date
+                        shamsi_date = jdatetime.datetime.fromgregorian(datetime=shipment[field])
+                        # Update the field in the dictionary
+                        shipment[field] = shamsi_date.strftime('%Y-%m-%d %H:%M')
+
             field_names = [k for k in list(shipments)[0]]
             data['shipments'] = {'values':list(shipments), 'fields': field_names, 'title': 'لیست بارنامه',}
 
         sales = Sales.objects.all().exclude(status='Cancelled').values()
         if sales.exists():
+            for sale in sales:
+                for field in datetime_fields:
+                    if field in sale and sale[field] is not None:
+                        # Convert to Shamsi date
+                        shamsi_date = jdatetime.datetime.fromgregorian(datetime=sale[field])
+                        # Update the field in the dictionary
+                        sale[field] = shamsi_date.strftime('%Y-%m-%d %H:%M')
+
             field_names = [k for k in list(sales)[0]]
             data['sales'] = {'values':list(sales), 'fields': field_names, 'title': 'لیست فروش',}
 
         purchases = Purchases.objects.all().exclude(status='Cancelled').values()
         if purchases.exists():
+            for purchase in purchases:
+                for field in datetime_fields:
+                    if field in purchase and purchase[field] is not None:
+                        # Convert to Shamsi date
+                        shamsi_date = jdatetime.datetime.fromgregorian(datetime=purchase[field])
+                        # Update the field in the dictionary
+                        purchase[field] = shamsi_date.strftime('%Y-%m-%d %H:%M')
+
             field_names = [k for k in list(purchases)[0]]
             data['purchases'] = {'values':list(purchases), 'fields': field_names, 'title': 'لیست خرید',}
 
         rawMaterial = RawMaterial.objects.filter(status='In-stock').values()
         if rawMaterial.exists():
+            for raw in rawMaterial:
+                for field in datetime_fields:
+                    if field in raw and raw[field] is not None:
+                        # Convert to Shamsi date
+                        shamsi_date = jdatetime.datetime.fromgregorian(datetime=raw[field])
+                        # Update the field in the dictionary
+                        raw[field] = shamsi_date.strftime('%Y-%m-%d %H:%M')
             field_names = [k for k in list(rawMaterial)[0]]
             data['rawMaterial'] = {'values':list(rawMaterial), 'fields': field_names, 'title': 'لیست مواد',}
 
         products = Products.objects.filter(status='In-stock').values()
         if products.exists():
+            for product in products:
+                for field in datetime_fields:
+                    if field in product and product[field] is not None:
+                        # Convert to Shamsi date
+                        shamsi_date = jdatetime.datetime.fromgregorian(datetime=product[field])
+                        # Update the field in the dictionary
+                        product[field] = shamsi_date.strftime('%Y-%m-%d %H:%M')
             field_names = [k for k in list(products)[0]]
             data['products'] = {'values':list(products), 'fields': field_names, 'title': 'لیست محصولات',}
 
         consumption = Consumption.objects.all().values()
         if consumption.exists():
+            for con in consumption:
+                for field in datetime_fields:
+                    if field in con and con[field] is not None:
+                        # Convert to Shamsi date
+                        shamsi_date = jdatetime.datetime.fromgregorian(datetime=con[field])
+                        # Update the field in the dictionary
+                        con[field] = shamsi_date.strftime('%Y-%m-%d %H:%M')
             field_names = [k for k in list(consumption)[0]]
             data['consumption'] = {'values':list(consumption), 'fields': field_names, 'title': 'لیست مصرف',}
 

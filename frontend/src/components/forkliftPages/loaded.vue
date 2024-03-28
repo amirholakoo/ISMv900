@@ -94,7 +94,17 @@ export default {
         this.errors = response.data['errors']
       }
     },
-  }
+  },
+  watch:{
+    success(c, p){
+      if (c == true) {
+        setTimeout(() => {
+          this.success = false
+          location.reload();
+        }, 5000)
+      }
+    },
+  },
 }
 </script>
 

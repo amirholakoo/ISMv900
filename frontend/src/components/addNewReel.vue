@@ -11,6 +11,27 @@ export default {
     modal, Alert,
     Card
   },
+  data(){
+    return{
+      forms: {
+        reel_number:{type:'input', name: 'شماره رول', title:'شماره رول', data:'', value:''},
+        width:{type:'input', name: 'عرض', title:'عرض', data:'', value:''},
+        GSM:{type:'input', name: 'گراماژ', title:'گراماژ', data:'', value:''},
+        length:{type:'input', name: 'طول', title:'طول', data:'', value:''},
+        breaks:{type:'input', name: 'پارگی', title:'پارگی', data:'', value:''},
+        grade:{type:'input', name: 'کیفیت', title:'کیفیت', data:'', value:''},
+        consumption_profile_name:{type:'dropdown', name:'پروفایل مصرف', title:'پروفایل مصرف', data:'', value:''},
+        commnet: {type:'input', name: 'توضیحات', title: 'توضیحات', value: ''},
+        username: {type:'input', name: 'نام کاربر', title: 'نام کاربر', value: ''},
+      },
+      success: false,
+      error: false,
+      errors: [],
+      qrcode: '',
+      hide: false,
+      loading: false,
+    }
+  },
   mounted() {
     initFlowbite();
     this.axios.get('/myapp/api/getReelNumber').then((response) => {
@@ -29,27 +50,6 @@ export default {
       console.log(response.data)
       this.forms.consumption_profile_name.data = response.data['profile_names']
     })
-  },
-  data(){
-    return{
-      forms: {
-        reel_number:{type:'input', name: 'شماره رول', title:'شماره رول', data:'', value:''},
-        width:{type:'input', name: 'عرض', title:'عرض', data:'', value:''},
-        GSM:{type:'input', name: 'گراماژ', title:'گراماژ', data:'', value:''},
-        length:{type:'input', name: 'طول', title:'طول', data:'', value:''},
-        breaks:{type:'input', name: 'پارگی', title:'پارگی', data:'', value:''},
-        grade:{type:'input', name: 'کیفیت', title:'کیفیت', data:'', value:''},
-        consumption_profile_name:{type:'dropdown', name:'پروفایل مصرف', title:'پروفایل مصرف', data:'', value:''},
-        commnet: {type:'input', name: 'کامنت', title: 'کامنت', value: ''},
-        username: {type:'input', name: 'نام کاربر', title: 'نام کاربر', value: ''},
-      },
-      success: false,
-      error: false,
-      errors: [],
-      qrcode: '',
-      hide: false,
-      loading: false,
-    }
   },
   watch:{
     hide(c, p){
@@ -91,13 +91,25 @@ export default {
       console.log('params is:',params)
       this.errors = []
       for (const key in this.forms) {
-        if (this.forms[key].value == ''){
+        console.log(key ,':', this.forms[key].value,typeof this.forms[key].value, this.forms[key].value === 0)
+        if ((this.forms[key].value == '')){
           if (key!='commnet'){
-            this.forms[key].error = true
-            this.errors.push({'message': `${this.forms[key].name} مورد نیاز است`})
+            if ((this.forms[key].value !== 0)){
+              this.forms[key].error = true
+              this.loading=false
+              this.errors.push({'message': `${this.forms[key].name} مورد نیاز است`})
+            }
           }
         }else {
            this.forms[key].error = false
+          if (key == 'breaks'){
+            console.log(parseInt(this.forms[key].value))
+            if ((parseInt(this.forms[key].value) <= 0) || (parseInt(this.forms[key].value) >=21)){
+                this.error = true
+                this.errors.push({'message': 'مقدار پارگی باید بین 0 تا 20 باشد'})
+                this.loading=false
+            }
+          }
         }
       }
       if (this.errors.length == 0){

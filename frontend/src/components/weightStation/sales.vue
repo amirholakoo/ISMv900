@@ -18,15 +18,15 @@ export default {
         net_weight: {type:'input', name: 'وزن خالص', title: 'وزن خالص', value: '', disable:true},
         loading_location: {type:'input', name: 'محل بار شده',title: 'محل بار شده', value: '', disable:true},
         consuption_profile_name: {type:'input', name: 'اسم پوفایل مصرفی',title: 'اسم پوفایل مصرفی', value: '', disable:true},
-        price_pre_kg: {type:'input', name: 'قیمت هر کیلوگرم', title: 'قیمت هر کیلوگرم', value: ''},
+        price_pre_kg: {type:'input', name: 'قیمت هر کیلوگرم', title: 'قیمت هر کیلوگرم', value: '', numbertype:true},
         vat: {type: 'dropdown', name: 'مالیات بر ارزش افزوده',title: 'مالیات بر ارزش افزوده', data: ['0%', '1%', '2%', '3%', '4%', '5%', '6%', '7%', '8%', '9%', '10%'], value: '0'},
         total_price: {type:'input', name: 'قمیت کل',title: 'قمیت کل', value: '', disable:true},
-        extra_cost: {type:'input', name: 'هزینه اضافی',title: 'هزینه اضافی', value: ''},
+        extra_cost: {type:'input', name: 'هزینه اضافی',title: 'هزینه اضافی', value: '', numbertype:true},
         invoice_status: {type: 'dropdown', name: 'وضعیت فاکتور',title: 'وضعیت فاکتور', data: ['Sent', 'NA'], value: ''},
         invoice_number: {type:'input', name: 'شماره فاکتور', title: 'شماره فاکتور', value: ''},
         payment_status:{type:'dropdown', name: 'وضعیت پرداخت',title: 'وضعیت پرداخت', data: ['Terms', 'Paid'], value: ''},
         document_info: {type:'input', name: 'اظلاعات سند',title: 'اظلاعات سند', value: ''},
-        commnet: {type:'input', name: 'کامنت',title: 'کامنت', value: ''},
+        commnet: {type:'input', name: 'توضیحات',title: 'توضیحات', value: ''},
         username: {type:'input', name: 'نام کاربر',title: 'نام کاربر', value: ''},
       },
       success: false,
@@ -35,14 +35,17 @@ export default {
     }
   },
   computed:{
+    formattedValue() {
+      return this.formatNumber(this.inputValue);
+    },
     total_price(){
       let vat = this.forms.vat.value;
       vat = parseInt(vat.replace('%', ''))
-      let price = this.forms.net_weight.value * this.forms.price_pre_kg.value
+      let price = parseInt(this.forms.net_weight.value.replace(/,/g, '')) * parseInt(this.forms.price_pre_kg.value.replace(/,/g, ''))
       if (vat == 0 ){
-        return price
+        return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
       } else {
-         return price+(price * (vat/100))
+         return (price+(price * (vat/100))).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
       }
     }
   },
@@ -69,6 +72,13 @@ export default {
     },
   },
   methods:{
+    formatNumber(value) {
+      return value.replace(/\D/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    },
+    formatInput() {
+      this.forms.extra_cost.value = this.formatNumber(this.forms.extra_cost.value);
+      this.forms.price_pre_kg.value = this.formatNumber(this.forms.price_pre_kg.value);
+    },
     clicked(k, name){
       console.log(k, name)
       if (k == 'lic_number'){
@@ -81,9 +91,9 @@ export default {
           console.log(response.data)
           this.forms.customer_name.value = response.data['customer_name']
           this.forms.list_of_reels.value = response.data['list_of_reels']
-          this.forms.weight1.value = response.data['weight1']
-          this.forms.weight2.value = response.data['weight2']
-          this.forms.net_weight.value = response.data['net_weight']
+          this.forms.weight1.value = response.data['weight1'].toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+          this.forms.weight2.value = response.data['weight2'].toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+          this.forms.net_weight.value = response.data['net_weight'].toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
           this.forms.loading_location.value = response.data['unloaded_location']
           this.forms.consuption_profile_name.value = response.data['consuption_profile_name']
         })
@@ -110,15 +120,15 @@ export default {
         'lic_number': this.forms.lic_number.value,
         'customer_name': this.forms.customer_name.value,
         'list_of_reels': this.forms.list_of_reels.value,
-        'weight1': this.forms.weight1.value,
-        'weight2': this.forms.weight2.value,
-        'net_weight': this.forms.net_weight.value,
+        'weight1': parseInt(this.forms.weight1.value.replace(/,/g, '')),
+        'weight2': parseInt(this.forms.weight2.value.replace(/,/g, '')),
+        'net_weight': parseInt(this.forms.net_weight.value.replace(/,/g, '')),
         'loading_location': this.forms.loading_location.value,
         'consuption_profile_name': this.forms.consuption_profile_name.value,
-        'price_pre_kg': this.forms.price_pre_kg.value,
+        'price_pre_kg': this.forms.price_pre_kg.value.replace(/,/g, ''),
         'vat': parseInt(vat.replace('%', '')) ,
-        'total_price': this.forms.total_price.value,
-        'extra_cost': this.forms.extra_cost.value,
+        'total_price': parseInt(this.forms.total_price.value),
+        'extra_cost': parseInt(this.forms.extra_cost.value.replace(/,/g, '')),
         'invoice_status': this.forms.invoice_status.value,
         'invoice_number': this.forms.invoice_number.value,
         'payment_status': this.forms.payment_status.value,
@@ -126,6 +136,7 @@ export default {
         'commnet': this.forms.commnet.value,
         'username': this.forms.username.value,
       };
+      console.log(params)
       this.errors = []
       for (const key in this.forms) {
         if (this.forms[key].value == ''){
@@ -190,7 +201,12 @@ export default {
       <template v-for="(val, form_name) in forms">
         <template v-if="val.type=='input'">
           <div class="relative">
-            <input v-model="val.value" type="text" :id="form_name" :class="[val.error ? 'text-red-900 border-red-500 focus:border-red-500' : 'text-gray-900 focus:border-green-500 border-gray-300']" class="block px-2.5 pb-2.5 pt-4 w-full text-sm  bg-transparent rounded-lg border-1 appearance-none focus:outline-none focus:ring-0 peer" placeholder="" :disabled="val.disable"/>
+            <template v-if="val.numbertype">
+              <input v-model="val.value" @input="formatInput" type="text" :id="form_name" :class="[val.error ? 'text-red-900 border-red-500 focus:border-red-500' : 'text-gray-900 focus:border-green-500 border-gray-300']" class="block px-2.5 pb-2.5 pt-4 w-full text-sm  bg-transparent rounded-lg border-1 appearance-none focus:outline-none focus:ring-0 peer" placeholder="" :disabled="val.disable"/>
+            </template>
+            <template v-else>
+              <input v-model="val.value" type="text" :id="form_name" :class="[val.error ? 'text-red-900 border-red-500 focus:border-red-500' : 'text-gray-900 focus:border-green-500 border-gray-300']" class="block px-2.5 pb-2.5 pt-4 w-full text-sm  bg-transparent rounded-lg border-1 appearance-none focus:outline-none focus:ring-0 peer" placeholder="" :disabled="val.disable"/>
+            </template>
             <label :for="form_name" :class="[val.error ? 'peer-focus:text-red-500 text-red-500' : 'peer-focus:text-green-500 text-gray-500']" class="absolute text-sm dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white dark:bg-gray-900 px-2 peer-focus:px-2  peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1">
               {{val.name}}
             </label>

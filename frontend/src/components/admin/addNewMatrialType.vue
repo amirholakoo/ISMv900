@@ -21,10 +21,7 @@ export default {
   },
   mounted() {
     initFlowbite();
-    this.axios.get('/myapp/api/getSupplierNames').then((response) => {
-      console.log(response.data)
-      this.forms.supplier_name.data = response.data['supplier_names']
-    })
+    this.getSupplierName()
   },
   watch:{
     success(c, p){
@@ -37,6 +34,12 @@ export default {
     },
   },
   methods:{
+    getSupplierName(){
+      this.axios.get('/myapp/api/getSupplierNames').then((response) => {
+        // console.log(response.data)
+        this.forms.supplier_name.data = response.data['supplier_names']
+      })
+    },
     clicked(k, name){
       console.log(k, name)
       if (k == 'supplier_name'){
@@ -78,7 +81,7 @@ export default {
 </script>
 
 <template>
-  <Card title="افزودن جنس ماده جدید">
+  <Card title="افزودن نوع جنس">
     <div class="flex flex-col gap-2 justify-center items-center">
       <div v-if="error" class="flex p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400" role="alert">
             <svg class="flex-shrink-0 inline w-4 h-4 me-3 mt-[2px]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
@@ -119,7 +122,7 @@ export default {
           </div>
         </template>
         <template v-if="val.type=='dropdown'">
-          <button :id="form_name + 'Button'" :data-dropdown-toggle="form_name+'dropdown'" class="justify-between w-44 text-white bg-green-500 hover:bg-green-600 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="button">
+          <button @click="getSupplierName" :id="form_name + 'Button'" :data-dropdown-toggle="form_name+'dropdown'" class="justify-between w-44 text-white bg-green-500 hover:bg-green-600 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="button">
             {{val.name}}
             <svg class="w-2.5 h-2.5 ms-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
               <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>

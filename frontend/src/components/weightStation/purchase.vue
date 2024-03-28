@@ -21,16 +21,16 @@ export default {
         unit: {type:'input', name: 'واحد',  title: 'واحد', value: '', disable:true},
         quantity: {type:'input', name: 'مقدار', title: 'مقدار', value: '', disable:true},
         quality: {type: 'input', name: 'کیفیت',title: 'مالیات بر ارزش افزوده', value: '', disable:true},
-        penalty: {type:'input', name: 'جریمه', title: 'جریمه', value: ''},
-        price_pre_kg: {type:'input', name: 'قیمت هر کیلوگرم', title: 'قیمت هر کیلوگرم', value: ''},
+        penalty: {type:'input', name: 'جریمه', title: 'جریمه', value: '', numbertype:true},
+        price_pre_kg: {type:'input', name: 'قیمت هر کیلوگرم', title: 'قیمت هر کیلوگرم', value: '', numbertype:true},
         vat: {type: 'dropdown', name: 'مالیات بر ارزش افزوده',title: 'مالیات بر ارزش افزوده', data: ['0%', '1%', '2%', '3%', '4%', '5%', '6%', '7%', '8%', '9%', '10%'], value: '0'},
         total_price: {type:'input', name: 'قمیت کل', title: 'قمیت کل', value: '', disable:true},
-        extra_cost: {type:'input', name: 'هزینه اضافی', title: 'هزینه اضافی', value: ''},
+        extra_cost: {type:'input', name: 'هزینه اضافی', title: 'هزینه اضافی', value: '', numbertype:true},
         invoice_status: {type: 'dropdown', name: 'وضعیت فاکتور',title: 'وضعیت فاکتور', data: ['Received', 'NA'], value: ''},
         supplier_invoice: {type:'input', name: 'شماره فاکتور تامین کننده', title: 'شماره فاکتور تامین کننده', value: ''},
         payment_status:{type:'dropdown', name: 'وضعیت پرداخت',title: 'وضعیت پرداخت', data: ['Terms', 'Paid'], value: ''},
         document_info: {type:'input', name: 'اظلاعات سند', title: 'اظلاعات سند', value: ''},
-        commnet: {type:'input', name: 'کامنت', title: 'کامنت', value: ''},
+        commnet: {type:'input', name: 'توضیحات', title: 'توضیحات', value: ''},
         username: {type:'input', name: 'نام کاربر', title: 'نام کاربر', value: ''},
       },
       success: false,
@@ -49,14 +49,17 @@ export default {
     },
   },
   computed:{
+    formattedValue() {
+      return this.formatNumber(this.inputValue);
+    },
     total_price(){
       let vat = this.forms.vat.value;
       vat = parseInt(vat.replace('%', ''))
-      let price = this.forms.net_weight.value * this.forms.price_pre_kg.value
+      let price = parseInt(this.forms.net_weight.value.replace(/,/g, '')) * parseInt(this.forms.price_pre_kg.value.replace(/,/g, ''))
       if (vat == 0 ){
-        return price
+        return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
       } else {
-         return price+(price * (vat/100))
+         return (price+(price * (vat/100))).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
       }
     }
   },
@@ -73,6 +76,14 @@ export default {
     })
   },
   methods:{
+    formatNumber(value) {
+      return value.replace(/\D/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    },
+    formatInput() {
+      this.forms.penalty.value = this.formatNumber(this.forms.penalty.value);
+      this.forms.extra_cost.value = this.formatNumber(this.forms.extra_cost.value);
+      this.forms.price_pre_kg.value = this.formatNumber(this.forms.price_pre_kg.value);
+    },
     clicked(k, name){
       console.log(k, name)
       if (k == 'lic_number'){
@@ -86,13 +97,13 @@ export default {
           this.forms.supplier_name.value = response.data['supplier_name']
           this.forms.material_type.value = response.data['material_type']
           this.forms.material_name.value = response.data['material_name']
-          this.forms.weight1.value = response.data['weight1']
-          this.forms.weight2.value = response.data['weight2']
-          this.forms.net_weight.value = response.data['net_weight']
+          this.forms.weight1.value = response.data['weight1'].toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+          this.forms.weight2.value = response.data['weight2'].toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+          this.forms.net_weight.value = response.data['net_weight'].toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
           this.forms.unloaded_location.value = response.data['unload_location']
           this.forms.unit.value = response.data['unit']
-          this.forms.quantity.value = response.data['quantity']
-          this.forms.quality.value = response.data['quality']
+          this.forms.quantity.value = response.data['quantity'].toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+          this.forms.quality.value = response.data['quality'].toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
         })
       }
       if (k == 'vat'){
@@ -117,18 +128,18 @@ export default {
         'supplier_name': this.forms.supplier_name.value,
         'material_type': this.forms.material_type.value,
         'material_name': this.forms.material_name.value,
-        'weight1': this.forms.weight1.value,
-        'weight2': this.forms.weight2.value,
-        'net_weight': this.forms.net_weight.value,
+        'weight1': parseInt(this.forms.weight1.value.replace(/,/g, '')),
+        'weight2': parseInt(this.forms.weight2.value.replace(/,/g, '')),
+        'net_weight': parseInt(this.forms.net_weight.value.replace(/,/g, '')),
         'unloaded_location': this.forms.unloaded_location.value,
         'unit': this.forms.unit.value,
-        'quantity': this.forms.quantity.value,
-        'quality': this.forms.quality.value,
-        'penalty': this.forms.penalty.value,
-        'price_pre_kg': this.forms.price_pre_kg.value,
+        'quantity': parseInt(this.forms.quantity.value.replace(/,/g, '')),
+        'quality': parseInt(this.forms.quality.value.replace(/,/g, '')),
+        'penalty': parseInt(this.forms.penalty.value.replace(/,/g, '')),
+        'price_pre_kg': parseInt(this.forms.price_pre_kg.value.replace(/,/g, '')),
         'vat': parseInt(vat.replace('%', '')) ,
-        'total_price': this.forms.total_price.value,
-        'extra_cost': this.forms.extra_cost.value,
+        'total_price': parseInt(this.forms.total_price.value),
+        'extra_cost': parseInt(this.forms.extra_cost.value.replace(/,/g, '')),
         'invoice_status': this.forms.invoice_status.value,
         'supplier_invoice': this.forms.supplier_invoice.value,
         'payment_status': this.forms.payment_status.value,
@@ -136,6 +147,7 @@ export default {
         'commnet': this.forms.commnet.value,
         'username': this.forms.username.value,
       };
+      console.log(params)
       this.errors = []
       for (const key in this.forms) {
         if (this.forms[key].value == ''){
@@ -200,7 +212,12 @@ export default {
       <template v-for="(val, form_name) in forms">
         <template v-if="val.type=='input'">
           <div class="relative">
-            <input v-model="val.value" type="text" :id="form_name" :class="[val.error ? 'text-red-900 border-red-500 focus:border-red-500' : 'text-gray-900 focus:border-green-500 border-gray-300']" class="block px-2.5 pb-2.5 pt-4 w-full text-sm  bg-transparent rounded-lg border-1 appearance-none focus:outline-none focus:ring-0 peer" placeholder="" :disabled="val.disable"/>
+            <template v-if="val.numbertype">
+              <input v-model="val.value" @input="formatInput" type="text" :id="form_name" :class="[val.error ? 'text-red-900 border-red-500 focus:border-red-500' : 'text-gray-900 focus:border-green-500 border-gray-300']" class="block px-2.5 pb-2.5 pt-4 w-full text-sm  bg-transparent rounded-lg border-1 appearance-none focus:outline-none focus:ring-0 peer" placeholder="" :disabled="val.disable"/>
+            </template>
+            <template v-else>
+              <input v-model="val.value" type="text" :id="form_name" :class="[val.error ? 'text-red-900 border-red-500 focus:border-red-500' : 'text-gray-900 focus:border-green-500 border-gray-300']" class="block px-2.5 pb-2.5 pt-4 w-full text-sm  bg-transparent rounded-lg border-1 appearance-none focus:outline-none focus:ring-0 peer" placeholder="" :disabled="val.disable"/>
+            </template>
             <label :for="form_name" :class="[val.error ? 'peer-focus:text-red-500 text-red-500' : 'peer-focus:text-green-500 text-gray-500']" class="absolute text-sm dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white dark:bg-gray-900 px-2 peer-focus:px-2  peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1">
               {{val.name}}
             </label>

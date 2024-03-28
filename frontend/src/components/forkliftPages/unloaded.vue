@@ -13,14 +13,19 @@ export default {
         lic_number: {type: 'dropdown', name: 'شماره پلاک',title: 'شماره پلاک', data: '', value: ''},
         unloading_location: {type: 'dropdown', name: 'محل تخلیه',title: 'محل تخلیه', data: '', value: ''},
         unit: {type: 'dropdown', name: 'واحد',title: 'واحد', data: '', value: ''},
-        Quantity: {type:'input', name: 'مقدار',title: 'مقدار', value: ''},
-        Quality: {type:'input', name: 'کیفیت',title: 'کیفیت', value: ''},
+        Quantity: {type:'input', name: 'مقدار',title: 'مقدار', value: '', numbertype:true},
+        Quality: {type:'input', name: 'کیفیت',title: 'کیفیت', value: '', numbertype:true},
         forklift_driver: {type:'input', name: 'اسم راننده فرک لیفت',title: 'اسم راننده فرک لیفت', value: ''},
       },
       success: false,
       error: false,
       errors: [],
     }
+  },
+  computed: {
+    formattedValue() {
+      return this.formatNumber(this.inputValue);
+    },
   },
   mounted() {
     initFlowbite();
@@ -48,6 +53,13 @@ export default {
     },
   },
   methods:{
+    formatNumber(value) {
+      return value.replace(/\D/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    },
+    formatInput() {
+      this.forms.Quantity.value = this.formatNumber(this.forms.Quantity.value);
+      this.forms.Quality.value = this.formatNumber(this.forms.Quality.value);
+    },
     clicked(k, name){
       console.log(k, name)
       if (k == 'lic_number'){
@@ -75,8 +87,8 @@ export default {
         "license_number": this.forms.lic_number.value,
         "unloading_location": this.forms.unloading_location.value,
         "unit": this.forms.unit.value,
-        "quantity": this.forms.Quantity.value,
-        "quality": this.forms.Quality.value,
+        "quantity": this.forms.Quantity.value.replace(/,/g, ''),
+        "quality": this.forms.Quality.value.replace(/,/g, ''),
         "forklift_driver": this.forms.forklift_driver.value
       };
       const response = await this.axios.post('/myapp/api/unload', {}, {params: params})
@@ -127,7 +139,12 @@ export default {
       <template v-for="(val, form_name) in forms">
         <template v-if="val.type=='input'">
           <div class="relative">
-            <input v-model="val.value" type="text" :id="form_name" :class="[val.error ? 'text-red-900 border-red-500 focus:border-red-500' : 'text-gray-900 focus:border-green-500 border-gray-300']" class="block px-2.5 pb-2.5 pt-4 w-full text-sm  bg-transparent rounded-lg border-1 appearance-none focus:outline-none focus:ring-0 peer" placeholder="" />
+            <template v-if="val.numbertype">
+              <input v-model="val.value" @input="formatInput" type="text" :id="form_name" :class="[val.error ? 'text-red-900 border-red-500 focus:border-red-500' : 'text-gray-900 focus:border-green-500 border-gray-300']" class="block px-2.5 pb-2.5 pt-4 w-full text-sm  bg-transparent rounded-lg border-1 appearance-none focus:outline-none focus:ring-0 peer" placeholder="" />
+            </template>
+            <template v-else>
+              <input v-model="val.value" type="text" :id="form_name" :class="[val.error ? 'text-red-900 border-red-500 focus:border-red-500' : 'text-gray-900 focus:border-green-500 border-gray-300']" class="block px-2.5 pb-2.5 pt-4 w-full text-sm  bg-transparent rounded-lg border-1 appearance-none focus:outline-none focus:ring-0 peer" placeholder="" />
+            </template>
             <label :for="form_name" :class="[val.error ? 'peer-focus:text-red-500 text-red-500' : 'peer-focus:text-green-500 text-gray-500']" class="absolute text-sm dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white dark:bg-gray-900 px-2 peer-focus:px-2  peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1">
               {{val.name}}
             </label>

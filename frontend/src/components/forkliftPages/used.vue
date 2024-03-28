@@ -10,7 +10,7 @@ export default {
   data(){
     return {
       forms: {
-        unloading_location: {type: 'dropdown', name: 'محل تخلیه',title: 'محل تخلیه', data: '', value: ''},
+        unloading_location: {type: 'dropdown', name: 'انبار مورد نظر',title: 'انبار مورد نظر', data: '', value: ''},
         supplier_name: {type: 'dropdown', name: 'اسم تامین کننده',title: 'اسم تامین کننده', data: '', value: ''},
         material_name: {type: 'dropdown', name: 'اسم ماده',title: 'اسم ماده', data: '', value: ''},
         unit: {type: 'dropdown', name: 'واحد',title: 'واحد', data: '', value: ''},
@@ -87,7 +87,17 @@ export default {
         this.errors = response.data['errors']
       }
     },
-  }
+  },
+  watch:{
+    success(c, p){
+      if (c == true) {
+        setTimeout(() => {
+          this.success = false
+          location.reload();
+        }, 5000)
+      }
+    },
+  },
 }
 </script>
 

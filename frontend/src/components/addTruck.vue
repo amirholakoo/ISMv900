@@ -48,18 +48,22 @@ export default {
       }
     },
     async check_license_number() {
-      const params = {
-        "license_number": this.first.val + this.letter.val + this.second.val +"ایران"+ this.year.val,
-      };
-      const response = await this.axios.post('/myapp/api/checkLicenseNumber', {}, {params: params})
-      console.log(response.data); // Access response data
-      console.log(JSON.parse(response.data['isExists'])); // Access response data
-      this.form = JSON.parse(response.data['isExists'])
-      if (JSON.parse(response.data['isExists'])){
-        this.isExists = true
+      if (this.error!=false){
+        const params = {
+          "license_number": this.first.val + this.letter.val + this.second.val +"ایران"+ this.year.val,
+        };
+        const response = await this.axios.post('/  myapp/api/checkLicenseNumber', {}, {params: params})
+        console.log(response.data); // Access response data
+        console.log(JSON.parse(response.data['isExists'])); // Access response data
+        this.form = JSON.parse(response.data['isExists'])
+        if (JSON.parse(response.data['isExists'])){
+          this.isExists = true
+        }
       }
     },
     async addTruck() {
+      this.forms[key].error = false
+
       const params = {
         "license_number": this.first.val + this.letter.val + this.second.val +"ایران"+ this.year.val,
         "driver_name": this.forms.driver_name.value,
@@ -67,18 +71,18 @@ export default {
         "phone": this.forms.phone.value,
         "username": this.forms.username.value,
       };
-
       this.errors = []
       for (const key in this.forms) {
         if (this.forms[key].value == ''){
           if (key!='comment'){
             this.forms[key].error = true
-          this.errors.push({'message': `${this.forms[key].name} مورد نیاز است`})
+            this.errors.push({'message': `${this.forms[key].name} مورد نیاز است`})
           }
         }else {
            this.forms[key].error = false
         }
       }
+
       if (this.errors.length == 0){
         this.error = false
         const response = await this.axios.post('/myapp/addTruck/', {}, {params: params})
@@ -106,7 +110,7 @@ export default {
           location.reload();
         }, 5000)
       }
-    }
+    },
     // "letter.val"(c, p){
   //   // const farsiRange = /[\u0600-\u06FF]/;
   //   // if (farsiRange.test(c)){
@@ -115,36 +119,65 @@ export default {
   //   //   this.letter.error = true
   //   // }
   // },
-  //   "first.val"(c, p, n){
-  //     if ( Number.isInteger(parseInt(c))){
-  //       this.first.val = parseInt(c)
-  //       console.log('adad', c, p, n)
-  //       if (this.first.error){
-  //         this.first.error = false
-  //         console.log('letter', c, p, n)
-  //         console.log(this.first)
-  //       }
-  //     }else {
-  //       this.first.val = parseInt(p)
-  //       this.first.error = true
-  //     }
-  //   },
-  // "second.val"(c, p){
-  //   if ( Number.isInteger(parseInt(c)) ){
-  //     this.second.val = parseInt(c)
-  //   }else {
-  //     this.second.val = parseInt(p)
-  //     this.second.error = true
-  //   }
-  // },
-  // "year.val"(c, p){
-  //   if ( Number.isInteger(parseInt(c)) ){
-  //     this.year.val = parseInt(c)
-  //   }else {
-  //     this.year.val = parseInt(p)
-  //     this.year.error = true
-  //   }
-  // }
+    "first.val"(c, p, n){
+      if ( Number.isInteger(parseInt(c))){
+        this.first.val = parseInt(c)
+        console.log('adad', c, p, n)
+        if (this.first.error){
+          this.first.error = false
+          console.log('letter', c, p, n)
+          console.log(this.first)
+        }
+      }else {
+        this.first.val = parseInt(p)
+        this.first.error = true
+      }
+      let f = this.first.val.toString()
+      console.log(f, typeof f,f.length === 2,f[1] == '0',f.length === 2 && f[1] == '0')
+      if (f.length === 2 && f[1] == '0'){
+            this.first.error = true
+            this.error = true
+            // this.errors.push({'message': 'eror'})
+      }
+    },
+  "second.val"(c, p){
+    if ( Number.isInteger(parseInt(c)) ){
+      this.second.val = parseInt(c)
+      if (this.second.error){
+        this.second.error = false
+      }
+    }else {
+      this.second.val = parseInt(p)
+      this.second.error = true
+    }
+
+    let f = this.second.val.toString()
+    console.log(f, typeof f,f.length === 2,f[1] == '0',f.length === 2 && f[1] == '0')
+    if (f.length === 2 && f[1] == '0' || f[2] == '0'){
+          this.second.error = true
+          this.error = true
+          // this.errors.push({'message': 'eror'})
+    }
+  },
+  "year.val"(c, p){
+    if ( Number.isInteger(parseInt(c)) ){
+      this.year.val = parseInt(c)
+      if (this.year.error){
+        this.year.error = false
+      }
+    }else {
+      this.year.val = parseInt(p)
+      this.year.error = true
+    }
+
+    let f = this.year.val.toString()
+    console.log(f, typeof f,f.length === 2,f[1] == '0',f.length === 2 && f[1] == '0')
+    if (f.length === 2 && f[1] == '0'){
+          this.year.error = true
+          this.error = true
+          // this.errors.push({'message': 'eror'})
+    }
+  }
  }
 }
 </script>
@@ -320,7 +353,3 @@ export default {
   </form>
 </Card>
 </template>
-
-<style scoped>
-
-</style>

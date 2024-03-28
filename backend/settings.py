@@ -113,10 +113,10 @@ AUTH_PASSWORD_VALIDATORS = [
 #
 LANGUAGE_CODE = 'fa' # Farsi
 
-# TIME_ZONE = 'Asia/Tehran'
+TIME_ZONE = 'Asia/Tehran'
 # DEFAULT_CHARSET = 'utf-8'
 
-TIME_ZONE = "UTC"
+# TIME_ZONE = "UTC"
 
 USE_I18N = True
 
