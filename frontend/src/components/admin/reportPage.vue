@@ -18,7 +18,19 @@ export default {
   data(){
     return {
       forms: {
+        shipments:{type:'input', title: 'لیست بارنامه',filter:'فیلتر', data:'', value:'', fields: []},
+        sales:{type:'input', title: 'لیست فروش',filter:'فیلتر', data:'', value:'', fields: []},
+        purchases:{type:'input', title: 'لیست خرید',filter:'فیلتر', data:'', value:'', fields: []},
+        rawMaterial:{type:'input', title: 'لیست مواد',filter:'فیلتر', data:'', value:'', fields: []},
+        products:{type:'input', title: 'لیست محصولات',filter:'فیلتر', data:'', value:'', fields: []},
+        consumption:{type:'input', title: 'لیست مصرف',filter:'فیلتر', data:'', value:'', fields: []},
       },
+      filters: [
+        {lable:'یک سال اخیر', value: 'year'},
+        {lable:'یک ماه اخیر', value: 'month'},
+        {lable:'هفته اخیر', value: 'week'},
+        {lable:'امروز', value: 'day'},
+      ],
       success: false,
       error: false,
       errors: [],
@@ -34,8 +46,15 @@ export default {
     },
   },
   mounted() {
-    this.load_data()
+    initFlowbite();
+    // this.load_data()
     this.startCountdown();
+    this.report_shipment('year')
+    this.report_Sales('year')
+    this.report_Purchases('year')
+    this.report_RawMaterial('year')
+    this.report_Products('year')
+    this.report_Consumption('year')
   },
   methods: {
     async generate_excel_report(model_name){
@@ -60,14 +79,30 @@ export default {
     select(obj){
       this.forms.shipment_list.value = obj
     },
-    clicked(k, name){
-      console.log(k, name)
-      if (k == 'letter'){
-        this.letter.val = name
+    clicked(k, data){
+      if (k == 'shipments'){
+        this.forms.shipments.filter = data.lable
+        this.report_shipment(data.value)
       }
-      if (k == 'unloading_location'){
-        this.forms.unloading_location.name = name
-        this.forms.unloading_location.value = name
+      if (k == 'sales'){
+        this.forms.sales.filter = data.lable
+        this.report_Sales(data.value)
+      }
+      if (k == 'purchases'){
+        this.forms.purchases.filter = data.lable
+        this.report_Purchases(data.value)
+      }
+      if (k == 'rawMaterial'){
+        this.forms.rawMaterial.filter = data.lable
+        this.report_RawMaterial(data.value)
+      }
+      if (k == 'products'){
+        this.forms.products.filter = data.lable
+        this.report_Products(data.value)
+      }
+      if (k == 'consumption'){
+        this.forms.consumption.filter = data.lable
+        this.report_Consumption(data.value)
       }
     },
     async load_data() {
@@ -90,12 +125,111 @@ export default {
             doc.addImage(imgData, 'PNG', 0, 0, 210, imgHeight);
             doc.save('table.pdf');
         });
+    },
+ async report_Sales(filter) {
+ try {
+    const params = {
+      'filter': filter,
     }
+    const response = await this.axios.post('/myapp/api/reportSales', {}, {params:params})
+    console.log(response.data);
+    this.forms['sales'].data = response.data['values']
+    this.forms['sales'].fields = response.data['fields']
+ } catch (error) {
+    console.error("Error fetching sales report:", error);
+    // Optionally, display an error message to the user
+    // this.errorMessage = "Failed to fetch sales report. Please try again.";
+ }
+},
+
+async report_Purchases(filter) {
+ try {
+    const params = {
+      'filter': filter,
+    }
+    const response = await this.axios.post('/myapp/api/reportPurchases', {}, {params:params})
+    console.log(response.data);
+    this.forms['purchases'].data = response.data['values']
+    this.forms['purchases'].fields = response.data['fields']
+ } catch (error) {
+    console.error("Error fetching purchases report:", error);
+    // Optionally, display an error message to the user
+    // this.errorMessage = "Failed to fetch purchases report. Please try again.";
+ }
+},
+
+async report_RawMaterial(filter) {
+ try {
+    const params = {
+      'filter': filter,
+    }
+    const response = await this.axios.post('/myapp/api/reportRawMaterial', {}, {params:params})
+    console.log(response.data);
+    this.forms['rawMaterial'].data = response.data['values']
+    this.forms['rawMaterial'].fields = response.data['fields']
+ } catch (error) {
+    console.error("Error fetching raw material report:", error);
+    // Optionally, display an error message to the user
+    // this.errorMessage = "Failed to fetch raw material report. Please try again.";
+ }
+},
+
+async report_Products(filter) {
+ try {
+    const params = {
+      'filter': filter,
+    }
+    const response = await this.axios.post('/myapp/api/reportProducts', {}, {params:params})
+    console.log(response.data);
+    this.forms['products'].data = response.data['values']
+    this.forms['products'].fields = response.data['fields']
+ } catch (error) {
+    console.error("Error fetching products report:", error);
+    // Optionally, display an error message to the user
+    // this.errorMessage = "Failed to fetch products report. Please try again.";
+ }
+},
+
+async report_Consumption(filter) {
+ try {
+    const params = {
+      'filter': filter,
+    }
+    const response = await this.axios.post('/myapp/api/reportConsumption', {}, {params:params})
+    console.log(response.data);
+    this.forms['consumption'].data = response.data['values']
+    this.forms['consumption'].fields = response.data['fields']
+ } catch (error) {
+    console.error("Error fetching consumption report:", error);
+    // Optionally, display an error message to the user
+    // this.errorMessage = "Failed to fetch consumption report. Please try again.";
+ }
+},
+
+async report_shipment(filter) {
+ try {
+    const params = {
+      'filter': filter,
+    }
+    const response = await this.axios.post('/myapp/api/reportShipment', {}, {params:params})
+    console.log(response.data);
+    this.forms['shipments'].data = response.data['values']
+    this.forms['shipments'].fields = response.data['fields']
+    console.log(this.forms.shipments)
+ } catch (error) {
+    console.error("Error fetching shipment report:", error);
+    // Optionally, display an error message to the user
+    // this.errorMessage = "Failed to fetch shipment report. Please try again.";
+ }
+},
+
   },
 }
 </script>
 
 <template>
+
+
 <!--<Card title="گزارش">-->
   <div class="w-screen p-5 container">
   <p class="flex flex-row gap-2 items-center">
@@ -112,57 +246,32 @@ export default {
 
                     <div class="flex flex-row gap-2 items-center">
                       {{val.title}}
-                    <button @click="printTable(form_name)" class="w-auto block text-white bg-green-500 hover:bg-green-600 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="button">
-                      PDF
-                    </button>
-                    <button @click="generate_excel_report(form_name)"  class="w-auto block text-white bg-green-500 hover:bg-green-600 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="button">
+                      <button @click="printTable(form_name)" class="w-auto block text-white bg-green-500 hover:bg-green-600 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="button">
+                        PDF
+                      </button>
+                      <button @click="generate_excel_report(form_name)"  class="w-auto block text-white bg-green-500 hover:bg-green-600 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="button">
                       XLS
                     </button>
+
+                      <button :id="form_name + 'Button1'" :data-dropdown-toggle="form_name+'dropdown1'" class="justify-between w-44 text-white bg-green-500 hover:bg-green-600 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="button">
+                        {{ val.filter }}
+                        <svg class="w-2.5 h-2.5 ms-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+                          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>
+                        </svg>
+                      </button>
+                      <!-- Dropdown menu -->
+                      <div :id="form_name+'dropdown1'" class="z-50 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
+                        <ul class="overflow-y-auto h-auto max-h-48 py-2 text-sm text-gray-700 dark:text-gray-200" :aria-labelledby="form_name + 'Button1'">
+                          <li v-for="data in filters">
+                            <a @click='clicked(form_name ,data)' type="button" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
+                              {{ data.lable }}
+                            </a>
+                          </li>
+                        </ul>
+                      </div>
+
                     </div>
-<!--                 <button id="dropdownRadioButton" data-dropdown-toggle="dropdownRadio" class="inline-flex items-center text-gray-500 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-3 py-1.5 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700" type="button">-->
-<!--                <svg class="w-3 h-3 text-gray-500 dark:text-gray-400 me-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">-->
-<!--                        <path d="M10 0a10 10 0 1 0 10 10A10.011 10.011 0 0 0 10 0Zm3.982 13.982a1 1 0 0 1-1.414 0l-3.274-3.274A1.012 1.012 0 0 1 9 10V6a1 1 0 0 1 2 0v3.586l2.982 2.982a1 1 0 0 1 0 1.414Z"/>-->
-<!--                    </svg>-->
-<!--                Last 30 days-->
-<!--                <svg class="w-2.5 h-2.5 ms-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">-->
-<!--                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>-->
-<!--                </svg>-->
-<!--            </button>-->
-<!--                &lt;!&ndash; Dropdown menu &ndash;&gt;-->
-<!--                <div id="dropdownRadio" class="z-10 hidden w-48 bg-white divide-y divide-gray-100 rounded-lg shadow dark:bg-gray-700 dark:divide-gray-600" data-popper-reference-hidden="" data-popper-escaped="" data-popper-placement="top" style="position: absolute; inset: auto auto 0px 0px; margin: 0px; transform: translate3d(522.5px, 3847.5px, 0px);">-->
-<!--                <ul class="p-3 space-y-1 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownRadioButton">-->
-<!--                    <li>-->
-<!--                        <div class="flex items-center p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-600">-->
-<!--                            <input id="filter-radio-example-1" type="radio" value="" name="filter-radio" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">-->
-<!--                            <label for="filter-radio-example-1" class="w-full ms-2 text-sm font-medium text-gray-900 rounded dark:text-gray-300">Last day</label>-->
-<!--                        </div>-->
-<!--                    </li>-->
-<!--                    <li>-->
-<!--                        <div class="flex items-center p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-600">-->
-<!--                            <input checked="" id="filter-radio-example-2" type="radio" value="" name="filter-radio" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">-->
-<!--                            <label for="filter-radio-example-2" class="w-full ms-2 text-sm font-medium text-gray-900 rounded dark:text-gray-300">Last 7 days</label>-->
-<!--                        </div>-->
-<!--                    </li>-->
-<!--                    <li>-->
-<!--                        <div class="flex items-center p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-600">-->
-<!--                            <input id="filter-radio-example-3" type="radio" value="" name="filter-radio" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">-->
-<!--                            <label for="filter-radio-example-3" class="w-full ms-2 text-sm font-medium text-gray-900 rounded dark:text-gray-300">Last 30 days</label>-->
-<!--                        </div>-->
-<!--                    </li>-->
-<!--                    <li>-->
-<!--                        <div class="flex items-center p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-600">-->
-<!--                            <input id="filter-radio-example-4" type="radio" value="" name="filter-radio" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">-->
-<!--                            <label for="filter-radio-example-4" class="w-full ms-2 text-sm font-medium text-gray-900 rounded dark:text-gray-300">Last month</label>-->
-<!--                        </div>-->
-<!--                    </li>-->
-<!--                    <li>-->
-<!--                        <div class="flex items-center p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-600">-->
-<!--                            <input id="filter-radio-example-5" type="radio" value="" name="filter-radio" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">-->
-<!--                            <label for="filter-radio-example-5" class="w-full ms-2 text-sm font-medium text-gray-900 rounded dark:text-gray-300">Last year</label>-->
-<!--                        </div>-->
-<!--                    </li>-->
-<!--                </ul>-->
-<!--            </div>-->
+
                 </caption>
                 <thead class="text-xs text-gray-100 uppercase bg-green-500 dark:bg-gray-700 dark:text-gray-400">
                     <tr>
@@ -174,7 +283,7 @@ export default {
                     </tr>
                 </thead>
                 <tbody>
-                    <template v-for="(v, index) in val.values">
+                    <template v-for="(v, index) in val.data">
                           <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-green-50 dark:hover:bg-gray-600">
                             <template v-for="(i ,k) in v">
                               <td class="w-4 p-4">

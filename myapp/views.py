@@ -2704,19 +2704,19 @@ def loadReportData(request):
         data = {}
         datetime_fields = ['receive_date', 'entry_time', 'weight1_time', 'weight2_time', 'exit_time', 'date', 'payment_date']
 
-        shipments = Shipments.objects.all().exclude(status='Cancelled').values()
-        if shipments.exists():
-            # Convert each datetime field to Shamsi date
-            for shipment in shipments:
-                for field in datetime_fields:
-                    if field in shipment and shipment[field] is not None:
-                        # Convert to Shamsi date
-                        shamsi_date = jdatetime.datetime.fromgregorian(datetime=shipment[field])
-                        # Update the field in the dictionary
-                        shipment[field] = shamsi_date.strftime('%Y-%m-%d %H:%M')
-
-            field_names = [k for k in list(shipments)[0]]
-            data['shipments'] = {'values':list(shipments), 'fields': field_names, 'title': 'لیست بارنامه',}
+        # shipments = Shipments.objects.all().exclude(status='Cancelled').values()
+        # if shipments.exists():
+        #     # Convert each datetime field to Shamsi date
+        #     for shipment in shipments:
+        #         for field in datetime_fields:
+        #             if field in shipment and shipment[field] is not None:
+        #                 # Convert to Shamsi date
+        #                 shamsi_date = jdatetime.datetime.fromgregorian(datetime=shipment[field])
+        #                 # Update the field in the dictionary
+        #                 shipment[field] = shamsi_date.strftime('%Y-%m-%d %H:%M')
+        #
+        #     field_names = [k for k in list(shipments)[0]]
+        #     data['shipments'] = {'values':list(shipments), 'fields': field_names, 'title': 'لیست بارنامه',}
 
         sales = Sales.objects.all().exclude(status='Cancelled').values()
         if sales.exists():
@@ -2868,3 +2868,253 @@ def generate_qrCode(request):
     img.save(os.path.join(qrcode_dir, filename))
 
     return JsonResponse({'status': 'succeses', 'filename': os.path.join(qrcode_dir, filename)})
+
+
+datetime_fields = ['receive_date', 'entry_time', 'weight1_time', 'weight2_time', 'exit_time', 'date', 'payment_date']
+from datetime import timedelta
+
+from django.http import JsonResponse
+from django.utils import timezone
+from datetime import timedelta
+from .models import Shipments
+import jdatetime
+
+def report_shipment(request):
+    try:
+        if request.method == 'POST':
+            filter_type = request.GET.get('filter')
+            current_time = timezone.now()
+
+
+            if filter_type == 'year':
+                shipments = Shipments.objects.filter(receive_date__year=current_time.year).exclude(status='Cancelled').values()
+            elif filter_type == 'month':
+                shipments = Shipments.objects.filter(receive_date__month=current_time.month).exclude(status='Cancelled').values()
+            elif filter_type == 'week':
+                start_of_last_week = current_time - timedelta(days=6)
+                end_of_last_week = current_time
+                shipments = Shipments.objects.filter(receive_date__range=(start_of_last_week, end_of_last_week)).exclude(status='Cancelled').values()
+            elif filter_type == 'day':
+                hours_ago = current_time - timedelta(hours=24)
+                shipments = Shipments.objects.filter(receive_date__gte=hours_ago, receive_date__lt=current_time).exclude(status='Cancelled').values()
+            else:
+                return JsonResponse({'status': 'error', 'message': 'Invalid filter type'}, status=400)
+
+            if shipments.exists():
+                for shipment in shipments:
+                    for field in datetime_fields:
+                        if field in shipment and shipment[field] is not None:
+                            # Convert to Shamsi date
+                            shamsi_date = jdatetime.datetime.fromgregorian(datetime=shipment[field])
+                            # Update the field in the dictionary
+                            shipment[field] = shamsi_date.strftime('%Y-%m-%d %H:%M')
+                field_names = [k for k in list(shipments)[0]]
+                data = {'values': list(shipments), 'fields': field_names, 'title': 'لیست بارنامه',}
+                return JsonResponse(data=data, status=200)
+            else:
+                return JsonResponse({'status': 'error', 'message': 'No shipment records found'}, status=404)
+        else:
+            return JsonResponse({'status': 'error', 'message': 'Invalid request method'}, status=405)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+
+
+
+def report_Sales(request):
+    try:
+        if request.method == 'POST':
+            filter_type = request.GET.get('filter')
+            current_time = timezone.now()
+
+
+            if filter_type == 'year':
+                sales = Sales.objects.filter(date__year=current_time.year).exclude(status='Cancelled').values()
+            elif filter_type == 'month':
+                sales = Sales.objects.filter(date__month=current_time.month).exclude(status='Cancelled').values()
+            elif filter_type == 'week':
+                start_of_last_week = current_time - timedelta(days=6)
+                end_of_last_week = current_time
+                sales = Sales.objects.filter(date__range=(start_of_last_week, end_of_last_week)).exclude(status='Cancelled').values()
+            elif filter_type == 'day':
+                hours_ago = current_time - timedelta(hours=24)
+                sales = Sales.objects.filter(date__gte=hours_ago, date__lt=current_time).exclude(status='Cancelled').values()
+            else:
+                return JsonResponse({'status': 'error', 'message': 'Invalid filter type'}, status=400)
+
+            if sales.exists():
+                for sale in sales:
+                    for field in datetime_fields:
+                        if field in sale and sale[field] is not None:
+                            # Convert to Shamsi date
+                            shamsi_date = jdatetime.datetime.fromgregorian(datetime=sale[field])
+                            # Update the field in the dictionary
+                            sale[field] = shamsi_date.strftime('%Y-%m-%d %H:%M')
+                field_names = [k for k in list(sales)[0]]
+                data = {'values': list(sales), 'fields': field_names, 'title': 'لیست فروش',}
+                return JsonResponse(data=data, status=200)
+            else:
+                return JsonResponse({'status': 'error', 'message': 'No sale records found'}, status=404)
+        else:
+            return JsonResponse({'status': 'error', 'message': 'Invalid request method'}, status=405)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+
+
+def report_Purchases(request):
+    try:
+        if request.method == 'POST':
+            filter_type = request.GET.get('filter')
+            current_time = timezone.now()
+
+
+            if filter_type == 'year':
+                purchases = Purchases.objects.filter(date__year=current_time.year).exclude(status='Cancelled').values()
+            elif filter_type == 'month':
+                purchases = Purchases.objects.filter(date__month=current_time.month).exclude(status='Cancelled').values()
+            elif filter_type == 'week':
+                start_of_last_week = current_time - timedelta(days=6)
+                end_of_last_week = current_time
+                purchases = Purchases.objects.filter(date__range=(start_of_last_week, end_of_last_week)).exclude(status='Cancelled').values()
+            elif filter_type == 'day':
+                hours_ago = current_time - timedelta(hours=24)
+                purchases = Purchases.objects.filter(date__gte=hours_ago, date__lt=current_time).exclude(status='Cancelled').values()
+            else:
+                return JsonResponse({'status': 'error', 'message': 'Invalid filter type'}, status=400)
+
+            if purchases.exists():
+                for purchase in purchases:
+                    for field in datetime_fields:
+                        if field in purchase and purchase[field] is not None:
+                            # Convert to Shamsi date
+                            shamsi_date = jdatetime.datetime.fromgregorian(datetime=purchase[field])
+                            # Update the field in the dictionary
+                            purchase[field] = shamsi_date.strftime('%Y-%m-%d %H:%M')
+                field_names = [k for k in list(purchases)[0]]
+                data = {'values': list(purchases), 'fields': field_names, 'title': 'لیست خرید',}
+                return JsonResponse(data=data, status=200)
+            else:
+                return JsonResponse({'status': 'error', 'message': 'No purchase records found'}, status=404)
+        else:
+            return JsonResponse({'status': 'error', 'message': 'Invalid request method'}, status=405)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+
+
+def report_RawMaterial(request):
+    try:
+        if request.method == 'POST':
+            filter_type = request.GET.get('filter')
+            current_time = timezone.now()
+
+
+            # if filter_type == 'year':
+            #     rawMaterial = RawMaterial.objects.filter(receive_date__year=current_time.year).exclude(status='Cancelled').values()
+            # elif filter_type == 'month':
+            #     rawMaterial = RawMaterial.objects.filter(receive_date__month=current_time.month).exclude(status='Cancelled').values()
+            # elif filter_type == 'week':
+            #     start_of_last_week = current_time - timedelta(days=6)
+            #     end_of_last_week = current_time
+            #     rawMaterial = RawMaterial.objects.filter(receive_date__range=(start_of_last_week, end_of_last_week)).exclude(status='Cancelled').values()
+            # elif filter_type == 'day':
+            #     hours_ago = current_time - timedelta(hours=24)
+            #     rawMaterial = RawMaterial.objects.filter(receive_date__gte=hours_ago, receive_date__lt=current_time).exclude(status='Cancelled').values()
+            # else:
+            #     return JsonResponse({'status': 'error', 'message': 'Invalid filter type'}, status=400)
+
+            rawMaterial = RawMaterial.objects.all().values()
+            if rawMaterial.exists():
+                for raw in rawMaterial:
+                    for field in datetime_fields:
+                        if field in raw and raw[field] is not None:
+                            # Convert to Shamsi date
+                            shamsi_date = jdatetime.datetime.fromgregorian(datetime=raw[field])
+                            # Update the field in the dictionary
+                            raw[field] = shamsi_date.strftime('%Y-%m-%d %H:%M')
+                field_names = [k for k in list(rawMaterial)[0]]
+                data = {'values': list(rawMaterial), 'fields': field_names, 'title': 'لیست مواد',}
+                return JsonResponse(data=data, status=200)
+            else:
+                return JsonResponse({'status': 'error', 'message': 'No raw material records found'}, status=404)
+        else:
+            return JsonResponse({'status': 'error', 'message': 'Invalid request method'}, status=405)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+
+
+def report_Products(request):
+    try:
+        if request.method == 'POST':
+            filter_type = request.GET.get('filter')
+            current_time = timezone.now()
+
+            if filter_type == 'year':
+                products = Products.objects.filter(receive_date__year=current_time.year).order_by('width').values()
+            elif filter_type == 'month':
+                products = Products.objects.filter(receive_date__month=current_time.month).order_by('width').values()
+            elif filter_type == 'week':
+                start_of_last_week = current_time - timedelta(days=6)
+                end_of_last_week = current_time
+                products = Products.objects.filter(receive_date__range=(start_of_last_week, end_of_last_week)).order_by('width').values()
+            elif filter_type == 'day':
+                hours_ago = current_time - timedelta(hours=24)
+                products = Products.objects.filter(receive_date__gte=hours_ago, receive_date__lt=current_time).order_by('width').values()
+            else:
+                return JsonResponse({'status': 'error', 'message': 'Invalid filter type'}, status=400)
+
+            if products.exists():
+                for product in products:
+                    for field in datetime_fields:
+                        if field in product and product[field] is not None:
+                            # Convert to Shamsi date
+                            shamsi_date = jdatetime.datetime.fromgregorian(datetime=product[field])
+                            # Update the field in the dictionary
+                            product[field] = shamsi_date.strftime('%Y-%m-%d %H:%M')
+                field_names = [k for k in list(products)[0]]
+                data = {'values': list(products), 'fields': field_names, 'title': 'لیست محصولات',}
+                return JsonResponse(data=data, status=200)
+            else:
+                return JsonResponse({'status': 'error', 'message': 'No product records found'}, status=404)
+        else:
+            return JsonResponse({'status': 'error', 'message': 'Invalid request method'}, status=405)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+
+
+def report_Consumption(request):
+    try:
+        if request.method == 'POST':
+            filter_type = request.GET.get('filter')
+            current_time = timezone.now()
+
+            if filter_type == 'year':
+                consumption = Consumption.objects.filter(receive_date__year=current_time.year).exclude(status='Cancelled').values()
+            elif filter_type == 'month':
+                consumption = Consumption.objects.filter(receive_date__month=current_time.month).exclude(status='Cancelled').values()
+            elif filter_type == 'week':
+                start_of_last_week = current_time - timedelta(days=6)
+                end_of_last_week = current_time
+                consumption = Consumption.objects.filter(receive_date__range=(start_of_last_week, end_of_last_week)).exclude(status='Cancelled').values()
+            elif filter_type == 'day':
+                hours_ago = current_time - timedelta(hours=24)
+                consumption = Consumption.objects.filter(receive_date__gte=hours_ago, receive_date__lt=current_time).exclude(status='Cancelled').values()
+            else:
+                return JsonResponse({'status': 'error', 'message': 'Invalid filter type'}, status=400)
+
+            if consumption.exists():
+                for con in consumption:
+                    for field in datetime_fields:
+                        if field in con and con[field] is not None:
+                            # Convert to Shamsi date
+                            shamsi_date = jdatetime.datetime.fromgregorian(datetime=con[field])
+                            # Update the field in the dictionary
+                            con[field] = shamsi_date.strftime('%Y-%m-%d %H:%M')
+                field_names = [k for k in list(consumption)[0]]
+                data = {'values': list(consumption), 'fields': field_names, 'title': 'لیست مصرف',}
+                return JsonResponse(data=data, status=200)
+            else:
+                return JsonResponse({'status': 'error', 'message': 'No consumption records found'}, status=404)
+        else:
+            return JsonResponse({'status': 'error', 'message': 'Invalid request method'}, status=405)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+

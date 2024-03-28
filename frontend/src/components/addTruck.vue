@@ -48,11 +48,11 @@ export default {
       }
     },
     async check_license_number() {
-      if (this.error!=false){
+      if (this.error==false){
         const params = {
           "license_number": this.first.val + this.letter.val + this.second.val +"ایران"+ this.year.val,
         };
-        const response = await this.axios.post('/  myapp/api/checkLicenseNumber', {}, {params: params})
+        const response = await this.axios.post('/myapp/api/checkLicenseNumber', {}, {params: params})
         console.log(response.data); // Access response data
         console.log(JSON.parse(response.data['isExists'])); // Access response data
         this.form = JSON.parse(response.data['isExists'])
@@ -62,7 +62,7 @@ export default {
       }
     },
     async addTruck() {
-      this.forms[key].error = false
+      // this.forms[key].error = false
 
       const params = {
         "license_number": this.first.val + this.letter.val + this.second.val +"ایران"+ this.year.val,
