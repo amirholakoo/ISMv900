@@ -1371,6 +1371,7 @@ def create_sales_order(request):
                     net_weight=net_weight,
                     price_per_kg=price_pre_kg,
                     vat=vat,
+                    width=ship[0].width,
                     total_price=total_price,
                     extra_cost=extra_cost,
                     invoice_status=invoice_status,
@@ -1691,8 +1692,8 @@ def loaded(request):
         else:
             try:
                 shipment = Shipments.objects.filter(license_number=license_number, status='LoadingUnloading',location='Weight1', shipment_type='Outgoing')
-                material_name = shipment[0].material_name
-                supplier_name = shipment[0].supplier_name
+                # material_name = shipment[0].material_name
+                # supplier_name = shipment[0].supplier_name
 
                 # Dynamically import the model class
                 AnbarModel = apps.get_model('myapp', loading_location)
@@ -1727,6 +1728,7 @@ def loaded(request):
                     list_of_reels=','.join(reel_numbers),
                     location='Weight2',
                     status='LoadedUnloaded',
+                    width=width,
                     logs=shipment[0].logs + log_generator(forklift_driver, 'Loaded'),
                 )
 
