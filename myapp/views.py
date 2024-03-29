@@ -1919,6 +1919,7 @@ def used(request):
                         location='Consumption DB',
                         unit=unit,
                         status='Used',
+                        grade=record.grade,
                         comments=record.comments,
                         username=forklift_driver,
                         logs=log_generator(forklift_driver, 'Used')
