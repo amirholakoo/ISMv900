@@ -23,6 +23,16 @@ def log_generator(username, action):
     # Create the log entry
     log = f' {current_time} {action} By {username},'
     return log
+
+
+def not_enough_log_generator(location):
+    # Get the current timestamp
+    current_time = timezone.now().strftime('%Y-%m-%d %H:%M')
+
+    # Create the log entry
+    log = f' {current_time} ERROR:NOT ENOUGH IN {location} by SYSERR,'
+
+    return log
 # Incoming process:
 # Add Truck
 # Add Shipments
@@ -1925,33 +1935,6 @@ def used(request):
                         logs=log_generator(forklift_driver, 'Used')
                 )
                 consumption.save()
-            # Dynamically get the model based on the anbar_name
-            # AnbarModel = apps.get_model('myapp', unloading_location)
-            # # Create Consumption records
-
-            # for _ in range(quantity_to_unload):
-            #     consumption = Consumption(
-            #         receive_date=timezone.now(),
-            #         supplier_name=supplier_name,
-            #         material_name=material_name,
-            #         material_type=material_type,
-            #         unit=unit,
-            #         status='Used',
-            #         logs=log_generator(forklift_driver, 'Used')
-            #     )
-            #     consumption.save()
-            #
-            #     AnbarModel.objects.filter(
-            #         supplier_name=supplier_name,
-            #         material_name=material_name,
-            #         unit=unit,
-            #     ).update(
-            #         status='Used',
-            #         location='Consumption DB',
-            #         logs=log_generator(forklift_driver, 'Used'),
-            #         last_date=timezone.now(),
-            #     )
-
 
             # Return a success response
 
@@ -2089,20 +2072,29 @@ def moved(request):
                     new_item.save()
 
 
+                if len(sourse) < int(Quantity):
+                    msg = 'انبار' + str(to_anbar) + f'از مقدار که شما انتخاب کردید ( {Quantity} ) ' + 'مقدار کمتری دارد' + str(len(sourse)) +'تا منتقل شد'
+                    errors.append({'status': 'error', 'message': msg})
+                    return JsonResponse({'status': 'error', 'errors': errors})
+
+                # Return a success response
+                return JsonResponse({'status': 'success', 'message': f'{Quantity} units of {material_name} have been moved from {from_anbar} to {to_anbar}.'})
+
             if real_or_raw == 'Reel':
                 sourse = AnbarModel1.objects.filter(
                     location=from_anbar,
                     width=width,
                     status='In-stock',
                     reel_number=reel,
-                ).order_by('receive_date')[:int(Quantity)]
+                ).order_by('receive_date')
 
                 products = Products.objects.filter(
                     location=from_anbar,
                     width=width,
                     status='In-stock',
                     reel_number=reel,
-                ).order_by('receive_date')[:int(Quantity)]
+                ).order_by('receive_date')
+
                 for record in sourse:
                     # update anbar a
                     record.last_date = timezone.now()
@@ -2115,7 +2107,7 @@ def moved(request):
                         location=to_anbar,
                         status='In-stock',
                         width=width,
-                        unit=unit,
+                        unit=record.unit,
                         reel_number=reel,
                         gsm=record.gsm,
                         length=record.length,
@@ -2134,13 +2126,8 @@ def moved(request):
                     record.logs =record.logs + log_generator(forklift_driver, 'Moved')
                     record.save()
 
-            if len(sourse) < int(Quantity):
-                msg = 'انبار' + str(to_anbar) + f'از مقدار که شما انتخاب کردید ( {Quantity} ) ' + 'مقدار کمتری دارد' + str(len(sourse)) +'تا منتقل شد'
-                errors.append({'status': 'error', 'message': msg})
-                return JsonResponse({'status': 'error', 'errors': errors})
-
-            # Return a success response
-            return JsonResponse({'status': 'success', 'message': f'{Quantity} units of {material_name} have been moved from {from_anbar} to {to_anbar}.'})
+                # Return a success response
+                return JsonResponse({'status': 'success', 'message': f'1 units of {material_name} have been moved from {from_anbar} to {to_anbar}.'})
 
         except Exception as e:
             print(e)
