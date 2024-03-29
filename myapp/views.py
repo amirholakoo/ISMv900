@@ -599,6 +599,7 @@ def add_new_reel(request):
                             material_name=record.material_name,
                             material_type=record.material_type,
                             receive_date=timezone.now(),
+                            grade=record.grade,
                             username=username,
                             comments=commnet,
                             logs=log_generator(record.profile_name, 'Used')
