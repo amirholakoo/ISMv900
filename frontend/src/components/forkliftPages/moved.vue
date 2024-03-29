@@ -19,7 +19,7 @@ export default {
         width: {status:false, type: 'dropdown', name: 'عرض',title: 'عرض', data: '', value: ''},
         reel: {status:false, type: 'dropdown', name: 'رول',title: 'رول', data: '', value: ''},
         to_anbar: {status:true, type: 'dropdown', name: 'به انبار',title: 'به انبار', data: '', value: ''},
-        forklift_driver: {status:true, type:'input', name: 'اسم راننده فرک لیفت',title: 'اسم راننده فرک لیفت', value: ''},
+        forklift_driver: {status:true, type:'input', name: 'اسم راننده لیفت تراک',title: 'اسم راننده لیفت تراک', value: ''},
       },
       success: false,
       error: false,

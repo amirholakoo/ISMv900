@@ -15,7 +15,7 @@ export default {
         material_name: {type: 'dropdown', name: 'اسم ماده',title: 'اسم ماده', data: '', value: ''},
         unit: {type: 'dropdown', name: 'واحد',title: 'واحد', data: '', value: ''},
         Quantity: {type:'input', name: 'مقدار',title: 'مقدار', value: ''},
-        forklift_driver: {type:'input', name: 'اسم راننده فرک لیفت',title: 'اسم راننده فرک لیفت', value: ''},
+        forklift_driver: {type:'input', name: 'اسم راننده لیفت تراک',title: 'اسم راننده لیفت تراک', value: ''},
       },
       success: false,
       error: false,

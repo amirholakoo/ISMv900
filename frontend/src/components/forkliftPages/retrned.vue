@@ -16,7 +16,7 @@ export default {
         Quantity: {type:'input', name: 'مقدار',title: 'مقدار', value: ''},
         to_anbar: {type: 'dropdown', name: 'به انبار',title: 'به انبار', data: '', value: ''},
         reason: {type: 'input', name: 'علت',title: 'علت', data: '', value: ''},
-        forklift_driver: {type:'input', name: 'اسم راننده فرک لیفت',title: 'اسم راننده فرک لیفت', value: ''},
+        forklift_driver: {type:'input', name: 'اسم راننده لیفت تراک',title: 'اسم راننده لیفت تراک', value: ''},
       },
       success: false,
       error: false,

@@ -15,7 +15,7 @@ export default {
         unit: {type: 'dropdown', name: 'واحد',title: 'واحد', data: '', value: ''},
         Quantity: {type:'input', name: 'مقدار',title: 'مقدار', value: '', numbertype:true},
         Quality: {type:'input', name: 'کیفیت',title: 'کیفیت', value: '', numbertype:true},
-        forklift_driver: {type:'input', name: 'اسم راننده فرک لیفت',title: 'اسم راننده فرک لیفت', value: ''},
+        forklift_driver: {type:'input', name: 'اسم راننده لیفت تراک',title: 'اسم راننده لیفت تراک', value: ''},
       },
       success: false,
       error: false,

@@ -14,7 +14,7 @@ export default {
         unloading_location: {type: 'dropdown', name: 'محل بار شده',title: 'محل تخلیه', data: '', value: ''},
         width: {type: 'dropdown', name: 'عرض',title: 'عرض', data: '', value: ''},
         reel_numbers: {type: 'check', name: 'عرض',title: 'عرض', data: '', value: []},
-        forklift_driver: {type:'input', name: 'اسم راننده فرک لیفت',title: 'اسم راننده فرک لیفت', value: ''},
+        forklift_driver: {type:'input', name: 'اسم راننده لیفت تراک',title: 'اسم راننده لیفت تراک', value: ''},
       },
       success: false,
       error: false,
