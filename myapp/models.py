@@ -605,6 +605,9 @@ class Consumption(models.Model):
     # Profile name for the material
     profile_name = models.CharField(max_length=255, null=True, blank=True)
 
+    # Grade of matterials
+    grade = models.CharField(max_length=255, null=True, blank=True)
+
     # Additional comments about the consumption
     comments = models.TextField(null=True, blank=True)
     cancelling_reason = models.TextField(null=True, blank=True)
