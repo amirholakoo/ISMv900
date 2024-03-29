@@ -21,9 +21,8 @@ def log_generator(username, action):
     current_time = timezone.now().strftime('%Y-%m-%d %H:%M')
 
     # Create the log entry
-    new_log_entry = f"{username} {action} {current_time},"  # Comma at the end for CSV formatting
-
-    return new_log_entry
+    log = f' {current_time} {action} By {username},'
+    return log
 # Incoming process:
 # Add Truck
 # Add Shipments
@@ -1920,7 +1919,7 @@ def used(request):
                         comments=record.comments,
                         username=forklift_driver,
                         logs=log_generator(forklift_driver, 'Used')
-                    )
+                )
                 consumption.save()
             # Dynamically get the model based on the anbar_name
             # AnbarModel = apps.get_model('myapp', unloading_location)
@@ -2119,6 +2118,7 @@ def moved(request):
                         grade=record.grade,
                         breaks=record.breaks,
                         qr_code=record.qr_code,
+                        comments=record.comments,
                         profile_name=record.profile_name,
                         username=forklift_driver,
                         logs=log_generator(forklift_driver, 'Moved')
@@ -2248,6 +2248,7 @@ def retuned(request):
                     # Save the updated record
                     record.save()
                     new_item.save()
+
                 return JsonResponse(
                     {'status': 'success', 'message': f'ok'})
             except ValidationError as e:
