@@ -1,6 +1,9 @@
 import logging
 from sikuli import *  # Importing Sikuli functions
 
+counter = 1
+cycle = 2
+
 # Setup logging with a file handler
 FORMAT = '%(asctime)-15s %(message)s'
 logger = logging.getLogger('AddTruckLogger')
@@ -49,9 +52,10 @@ def fillInputBox1C(image, text):
     logger.debug("Filled input box with image {} and text {} for Truck {}".format(image, text, counter))
     
 # Main script
-counter = 1
+
+
 try:
-    while counter <= 2:  # Add 6 different trucks
+    while counter <= cycle:  # Add different trucks
         refreshBrowser()
         fillInputBox(TWO_DIGIT_BOX_IMAGE, str(counter) + str(counter))
         fillInputBox(THREE_DIGIT_BOX_IMAGE, str(counter) * 3)
