@@ -138,7 +138,7 @@ export default {
         'penalty': parseInt(this.forms.penalty.value.replace(/,/g, '')),
         'price_pre_kg': parseInt(this.forms.price_pre_kg.value.replace(/,/g, '')),
         'vat': parseInt(vat.replace('%', '')) ,
-        'total_price': parseInt(this.forms.total_price.value),
+        'total_price': parseInt(this.forms.total_price.value.replace(/,/g, '')),
         'extra_cost': parseInt(this.forms.extra_cost.value.replace(/,/g, '')),
         'invoice_status': this.forms.invoice_status.value,
         'supplier_invoice': this.forms.supplier_invoice.value,
