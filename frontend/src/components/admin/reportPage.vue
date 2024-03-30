@@ -62,8 +62,26 @@ export default {
       const params = {
         'model_name':model_name,
       }
-      const response = await this.axios.post('/myapp/api/generateExcelReport',{}, {params:params})
-      console.log(response.data['data'])
+      const response = await this.axios.post('/myapp/api/generateExcelReport',{}, {params:params,responseType: 'blob',},)
+      // Create a URL for the blob
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+
+      // Suggest a filename for the downloaded file
+      const filename = response.headers['content-disposition'].split('filename=')[1];
+      link.setAttribute('download', filename);
+
+      // Append the link to the body
+      document.body.appendChild(link);
+
+      // Simulate click to download the file
+      link.click();
+
+      // Remove the link from the body
+      document.body.removeChild(link);
+
+      console.log(response.data)
     },
     reload(){location.reload();},
     startCountdown() {
