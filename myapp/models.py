@@ -67,9 +67,9 @@ class Shipments(models.Model):
     profile_name = models.CharField(max_length=255, null=True)
     width = models.IntegerField(null=True, blank=True)
     sales_id = models.IntegerField(null=True)
-    price_per_kg = models.IntegerField(null=True)
-    total_price = models.IntegerField(null=True)
-    extra_cost = models.IntegerField(null=True)
+    price_per_kg = models.BigIntegerField(null=True)
+    total_price = models.BigIntegerField(null=True)
+    extra_cost = models.BigIntegerField(null=True)
     # supplier_id = models.IntegerField(null=True)
     # material_id = models.IntegerField(null=True)
     material_type = models.CharField(max_length=255, null=True)
@@ -289,13 +289,13 @@ class Purchases(models.Model):
     weight2 = models.IntegerField(null=True)
     net_weight = models.IntegerField(null=True)
 
-    price_per_kg = models.IntegerField(null=True)
+    price_per_kg = models.BigIntegerField(null=True)
 
     # VAT field needs further information on data type
     vat = models.IntegerField(null=True)
 
-    total_price = models.IntegerField(null=True)
-    extra_cost = models.IntegerField(null=True)
+    total_price = models.BigIntegerField(null=True)
+    extra_cost = models.BigIntegerField(null=True)
 
     invoice_status = models.CharField(max_length=255, choices=[('Received', 'Received'), ('NA', 'NA')], blank=True, null=True)
     status = models.CharField(max_length=225, choices=[('Paid', 'Paid'), ('Terms', 'Terms'), ('Cancelled', 'Cancelled')], blank=True, null=True)
@@ -367,10 +367,10 @@ class Sales(models.Model):
     weight1 = models.IntegerField(null=True)
     weight2 = models.IntegerField(null=True)
     net_weight = models.IntegerField(null=True)
-    price_per_kg = models.IntegerField(null=True)
+    price_per_kg = models.BigIntegerField(null=True)
     vat = models.IntegerField(null=True)
-    total_price = models.IntegerField(null=True)
-    extra_cost = models.IntegerField(null=True)
+    total_price = models.BigIntegerField(null=True)
+    extra_cost = models.BigIntegerField(null=True)
     width = models.IntegerField(null=True, blank=True)
     invoice_status = models.CharField(max_length=255, choices=[('Sent', 'Sent'), ('NA', 'NA')], null=True)
     invoice_number = models.CharField(max_length=255, null=True)
