@@ -127,7 +127,7 @@ export default {
         'consuption_profile_name': this.forms.consuption_profile_name.value,
         'price_pre_kg': this.forms.price_pre_kg.value.replace(/,/g, ''),
         'vat': parseInt(vat.replace('%', '')) ,
-        'total_price': parseInt(this.forms.total_price.value),
+        'total_price': parseInt(this.forms.total_price.value.replace(/,/g, '')),
         'extra_cost': parseInt(this.forms.extra_cost.value.replace(/,/g, '')),
         'invoice_status': this.forms.invoice_status.value,
         'invoice_number': this.forms.invoice_number.value,
