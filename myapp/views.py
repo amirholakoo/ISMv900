@@ -2879,16 +2879,16 @@ def report_shipment(request):
 
 
             if filter_type == 'year':
-                shipments = Shipments.objects.filter(receive_date__year=current_time.year).exclude(status='Cancelled').values()
+                shipments = Shipments.objects.filter(receive_date__year=current_time.year).exclude(status='Cancelled').exclude(status='Delivered').values()
             elif filter_type == 'month':
-                shipments = Shipments.objects.filter(receive_date__month=current_time.month).exclude(status='Cancelled').values()
+                shipments = Shipments.objects.filter(receive_date__month=current_time.month).exclude(status='Cancelled').exclude(status='Delivered').values()
             elif filter_type == 'week':
                 start_of_last_week = current_time - timedelta(days=6)
                 end_of_last_week = current_time
-                shipments = Shipments.objects.filter(receive_date__range=(start_of_last_week, end_of_last_week)).exclude(status='Cancelled').values()
+                shipments = Shipments.objects.filter(receive_date__range=(start_of_last_week, end_of_last_week)).exclude(status='Cancelled').exclude(status='Delivered').values()
             elif filter_type == 'day':
                 hours_ago = current_time - timedelta(hours=24)
-                shipments = Shipments.objects.filter(receive_date__gte=hours_ago, receive_date__lt=current_time).exclude(status='Cancelled').values()
+                shipments = Shipments.objects.filter(receive_date__gte=hours_ago, receive_date__lt=current_time).exclude(status='Cancelled').exclude(status='Delivered').values()
             else:
                 return JsonResponse({'status': 'error', 'message': 'Invalid filter type'}, status=400)
 
