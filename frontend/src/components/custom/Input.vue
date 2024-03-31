@@ -32,7 +32,7 @@ export default {
   methods: {
     updateValue(newValue) {
       if (this.type == 'text'){
-        let pattern = /^[\u0600-\u06FF]$/
+        let pattern = /^[\u0600-\u06FF\s]*$/
         if (pattern.test(newValue) == false){
           this.error = true;
           this.message = 'لطفا از حروف فارسی استفاده کنید.'
@@ -42,7 +42,7 @@ export default {
         }
       }
       if (this.type == 'number'){
-        if (Number.isInteger(parseInt(newValue))){
+        if (!Number.isInteger(parseInt(newValue))){
           this.error = true;
           this.message = 'لطفا فقط از اعداد استفاده کنید.'
         } else {
@@ -62,7 +62,7 @@ export default {
         }
       }
       if (this.type == 'comment'){
-        let pattern =  /^(?!.*,)[\u0600-\u06FF]*$/;
+        let pattern =  /^(?!.*,)[\u0600-\u06FF\s]*$/;
         if (pattern.test(newValue) == false){
           this.error = true;
           this.message = 'لطفا از حروف فارسی بدون کاما استفاده کنید.'

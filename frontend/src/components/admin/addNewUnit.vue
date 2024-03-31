@@ -3,17 +3,20 @@ import {initFlowbite} from "flowbite";
 import modal from "@/components/Modal.vue";
 import Alert from "@/components/Alert.vue";
 import Card from "@/components/Card.vue";
+import Input from "@/components/custom/Input.vue";
+import Dropdown from "@/components/custom/Dropdown.vue";
+import ModalButton from "@/components/custom/ModalButton.vue";
 
 export default {
   name: "addNewUnit",
-  components: {Card, Alert, modal},
+  components: {ModalButton, Dropdown, Input, Card, Alert, modal},
   data(){
     return {
       forms: {
         supplier_name: {type: 'dropdown', name: 'فروشنده',title: 'فروشنده', data: '', value: ''},
         material_type: {type:'dropdown', name: 'جنس ماده جدید',title: 'جنس ماده جدید', data:'', value: ''},
         unit_name: {type:'input', name:'نام واحد', title:'نام واحد', value: ''},
-        count: {type:'input', name: 'مفدار',title: 'مفدار', value: ''},
+        count: {type:'input', name: 'مفدار',title: 'مفدار', value: '', lable:'number'},
         username: {type:'input', name: 'نام کاربر',title: 'نام کاربر', value: ''},
       },
       success: false,
@@ -126,30 +129,27 @@ export default {
       </div>
       <template v-for="(val, form_name) in forms">
         <template v-if="val.type=='input'">
-          <div class="relative">
-            <input v-model="val.value" type="text" :id="form_name" :class="[val.error ? 'text-red-900 border-red-500 focus:border-red-500' : 'text-gray-900 focus:border-green-500 border-gray-300']" class="block px-2.5 pb-2.5 pt-4 w-full text-sm  bg-transparent rounded-lg border-1 appearance-none focus:outline-none focus:ring-0 peer" placeholder="" />
-            <label :for="form_name" :class="[val.error ? 'peer-focus:text-red-500 text-red-500' : 'peer-focus:text-green-500 text-gray-500']" class="absolute text-sm dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white dark:bg-gray-900 px-2 peer-focus:px-2  peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1">
-              {{val.name}}
-            </label>
-          </div>
+            <Input
+              :formName="form_name"
+              :label="val.name"
+              :type="val.lable"
+              :disabled="val.disabled"
+              @update="val.value = $event"
+            />
         </template>
         <template v-if="val.type=='dropdown'">
-          <button :id="form_name + 'Button'" :data-dropdown-toggle="form_name+'dropdown'" class="justify-between w-44 text-white bg-green-500 hover:bg-green-600 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="button">
-            {{val.name}}
-            <svg class="w-2.5 h-2.5 ms-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
-              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>
-            </svg>
-          </button>
-          <!-- Dropdown menu -->
-          <div :id="form_name+'dropdown'" class="z-50 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
-            <ul class="overflow-y-auto h-auto max-h-48 py-2 text-sm text-gray-700 dark:text-gray-200" :aria-labelledby="form_name + 'Button'">
-              <li v-for="data in val.data">
-                <a @click='clicked(form_name ,data)' type="button" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
+          <Dropdown :formName="form_name">
+            <template v-slot:btnName>
+              {{val.name}}
+            </template>
+            <template v-slot:list>
+              <li v-for="(data, index) in val.data" :key="index">
+                <a @click="clicked(form_name, data)" type="button" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
                   {{ data }}
                 </a>
               </li>
-            </ul>
-        </div>
+            </template>
+          </Dropdown>
         </template>
       </template>
       <modal type="confirm">
@@ -167,7 +167,7 @@ export default {
         </template>
         <template v-slot:btns>
           <div>
-            <button data-modal-hide="popup-modal" aria-label="Close" @click="addNewUnit" type="button" class="inline-flex justify-center w-full px-2 py-1.5 text-xs font-medium text-center text-white        bg-green-500 hover:bg-green-600 focus:ring-4 focus:outline-none focus:ring-green-300  rounded-lg dark:bg-blue-500 dark:hover:bg-blue-600 dark:focus:ring-blue-800">درسته</button>
+            <ModalButton @close="addNewUnit" />
           </div>
         </template>
       </modal>

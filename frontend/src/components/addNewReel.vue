@@ -4,25 +4,27 @@ import Card from './Card'
 import Alert from "@/components/Alert.vue";
 import modal from "@/components/Modal.vue";
 import QRCode from "qrcode";
+import ModalButton from "@/components/custom/ModalButton.vue";
 
 export default {
   name: "addNewReel",
   components: {
+    ModalButton,
     modal, Alert,
     Card
   },
   data(){
     return{
       forms: {
-        reel_number:{type:'input', name: 'شماره رول', title:'شماره رول', data:'', value:''},
-        width:{type:'input', name: 'عرض', title:'عرض', data:'', value:''},
-        GSM:{type:'input', name: 'گراماژ', title:'گراماژ', data:'', value:''},
-        length:{type:'input', name: 'طول', title:'طول', data:'', value:''},
-        breaks:{type:'input', name: 'پارگی', title:'پارگی', data:'', value:''},
-        grade:{type:'input', name: 'کیفیت', title:'کیفیت', data:'', value:''},
+        reel_number:{type:'input', name: 'شماره رول', title:'شماره رول', data:'', value:'', lable:'number'},
+        width:{type:'input', name: 'عرض', title:'عرض', data:'', value:'', lable:'number'},
+        GSM:{type:'input', name: 'گراماژ', title:'گراماژ', data:'', value:'', lable:'number'},
+        length:{type:'input', name: 'طول', title:'طول', data:'', value:'', lable:'number'},
+        breaks:{type:'input', name: 'پارگی', title:'پارگی', data:'', value:'', lable:'number'},
+        grade:{type:'input', name: 'کیفیت', title:'کیفیت', data:'', value:'', lable:'number'},
         consumption_profile_name:{type:'dropdown', name:'پروفایل مصرف', title:'پروفایل مصرف', data:'', value:''},
-        commnet: {type:'input', name: 'توضیحات', title: 'توضیحات', value: ''},
-        username: {type:'input', name: 'نام کاربر', title: 'نام کاربر', value: ''},
+        commnet: {type:'input', name: 'توضیحات', title: 'توضیحات', value: '', lable:'text'},
+        username: {type:'input', name: 'نام کاربر', title: 'نام کاربر', value: '', lable:'text'},
       },
       success: false,
       error: false,
@@ -238,7 +240,7 @@ export default {
         </template>
         <template v-slot:btns>
           <div>
-            <button data-modal-hide="popup-modal" aria-label="Close" @click="addNewReel" type="button" class="inline-flex justify-center w-full px-2 py-1.5 text-xs font-medium text-center text-white        bg-green-500 hover:bg-green-600 focus:ring-4 focus:outline-none focus:ring-green-300  rounded-lg dark:bg-blue-500 dark:hover:bg-blue-600 dark:focus:ring-blue-800">درسته</button>
+            <ModalButton @close="addNewReel" />
           </div>
         </template>
       </modal>
