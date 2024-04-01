@@ -27,9 +27,13 @@ export default {
     return {
       error: false,
       message: '',
+      inputValue: this.value
     }
   },
   methods: {
+    formatNumber(value) {
+      return value.replace(/\D/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    },
     updateValue(newValue) {
       if (this.type == 'text'){
         let pattern = /^[\u0600-\u06FF\s]*$/
@@ -49,6 +53,8 @@ export default {
           this.error = false
           this.message = ''
         }
+        newValue = this.formatNumber(newValue)
+        this.inputValue = newValue
       }
       if (this.type == 'phone'){
         let pattern =  /^((0?9)|(\+?989))\d{9}$/g
@@ -74,12 +80,19 @@ export default {
       this.$emit('update', newValue);
     },
   },
+  watch: {
+     value(newVal) {
+        this.inputValue = newVal;
+        // console.log(newVal, this.value, this.inputValue, this.type)
+     }
+  }
 };
 </script>
 
 <template>
  <div class="relative">
     <input
+      v-model="inputValue"
       @input="updateValue($event.target.value)"
       type="text"
       :id="formName"

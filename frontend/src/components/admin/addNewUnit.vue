@@ -65,7 +65,7 @@ export default {
         'supplier_name': this.forms.supplier_name.value,
         'material_type': this.forms.material_type.value,
         'unit_name': this.forms.unit_name.value,
-        'count': this.forms.count.value,
+        'count': parseInt(this.forms.count.value.replace(/,/g, '')),
         'username': this.forms.username.value,
       };
       this.errors = []
@@ -135,6 +135,7 @@ export default {
               :type="val.lable"
               :disabled="val.disabled"
               @update="val.value = $event"
+              :value="val.value"
             />
         </template>
         <template v-if="val.type=='dropdown'">

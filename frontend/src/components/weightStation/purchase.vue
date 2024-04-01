@@ -3,34 +3,37 @@ import {initFlowbite} from "flowbite";
 import modal from "@/components/Modal.vue";
 import Alert from "@/components/Alert.vue";
 import Card from "@/components/Card.vue";
+import Input from "@/components/custom/Input.vue";
+import Dropdown from "@/components/custom/Dropdown.vue";
+import ModalButton from "@/components/custom/ModalButton.vue";
 
 export default {
   name: "purchase",
-  components: {Card, Alert, modal},
+  components: {ModalButton, Dropdown, Input, Card, Alert, modal},
   data(){
     return {
       forms: {
         lic_number: {type: 'dropdown', name: 'شماره پلاک',title: 'شماره پلاک', data: '', value: ''},
-        supplier_name: {type:'input', name: 'اسم تامین کننده', title: 'اسم تامین کننده', value: '', disable:true},
-        material_type: {type:'input', name: 'نوع ماده',  title: 'نوع ماده', value: '', disable:true},
-        material_name: {type:'input', name: 'اسم ماده',  title: 'اسم ماده', value: '', disable:true},
-        weight1: {type:'input', name: 'وزن 1', title: 'وزن 1', value: '', disable:true},
-        weight2: {type:'input', name: 'وزن 2', title: 'وزن 2', value: '', disable:true},
-        net_weight: {type:'input', name: 'وزن خالص', title: 'وزن خالص', value: '', disable:true},
-        unloaded_location: {type:'input', name: 'محل تخلیه شده', title: 'محل تخلیه شده', value: '', disable:true},
-        unit: {type:'input', name: 'واحد',  title: 'واحد', value: '', disable:true},
-        quantity: {type:'input', name: 'مقدار', title: 'مقدار', value: '', disable:true},
-        quality: {type: 'input', name: 'کیفیت',title: 'مالیات بر ارزش افزوده', value: '', disable:true},
-        penalty: {type:'input', name: 'جریمه', title: 'جریمه', value: '', numbertype:true},
-        price_pre_kg: {type:'input', name: 'قیمت هر کیلوگرم', title: 'قیمت هر کیلوگرم', value: '', numbertype:true},
+        supplier_name: {type:'input', name: 'اسم تامین کننده', title: 'اسم تامین کننده', value: '', disabled:true},
+        material_type: {type:'input', name: 'نوع ماده',  title: 'نوع ماده', value: '', disabled:true},
+        material_name: {type:'input', name: 'اسم ماده',  title: 'اسم ماده', value: '', disabled:true},
+        weight1: {type:'input', name: 'وزن 1', title: 'وزن 1', value: '', disabled:true, lable:'number'},
+        weight2: {type:'input', name: 'وزن 2', title: 'وزن 2', value: '', disabled:true, lable:'number'},
+        net_weight: {type:'input', name: 'وزن خالص', title: 'وزن خالص', value: '', disabled:true, lable:'number'},
+        unloaded_location: {type:'input', name: 'محل تخلیه شده', title: 'محل تخلیه شده', value: '', disabled:true},
+        unit: {type:'input', name: 'واحد',  title: 'واحد', value: '', disabled:true},
+        quantity: {type:'input', name: 'مقدار', title: 'مقدار', value: '', disabled:true, lable:'number'},
+        quality: {type: 'input', name: 'کیفیت',title: 'مالیات بر ارزش افزوده', value: '', disabled:true},
+        penalty: {type:'input', name: 'جریمه', title: 'جریمه', value: '', numbertype:true, lable:''},
+        price_pre_kg: {type:'input', name: 'قیمت هر کیلوگرم', title: 'قیمت هر کیلوگرم', value: '', numbertype:true, lable:'number'},
         vat: {type: 'dropdown', name: 'مالیات بر ارزش افزوده',title: 'مالیات بر ارزش افزوده', data: ['0%', '1%', '2%', '3%', '4%', '5%', '6%', '7%', '8%', '9%', '10%'], value: '0'},
-        total_price: {type:'input', name: 'قمیت کل', title: 'قمیت کل', value: '', disable:true},
-        extra_cost: {type:'input', name: 'هزینه اضافی', title: 'هزینه اضافی', value: '', numbertype:true},
+        total_price: {type:'input', name: 'قمیت کل', title: 'قمیت کل', value: '', disabled:true, lable:'number'},
+        extra_cost: {type:'input', name: 'هزینه اضافی', title: 'هزینه اضافی', value: '', numbertype:true, lable:'number'},
         invoice_status: {type: 'dropdown', name: 'وضعیت فاکتور',title: 'وضعیت فاکتور', data: ['Received', 'NA'], value: ''},
-        supplier_invoice: {type:'input', name: 'شماره فاکتور تامین کننده', title: 'شماره فاکتور تامین کننده', value: ''},
+        supplier_invoice: {type:'input', name: 'شماره فاکتور تامین کننده', title: 'شماره فاکتور تامین کننده', value: '', lable:'number'},
         payment_status:{type:'dropdown', name: 'وضعیت پرداخت',title: 'وضعیت پرداخت', data: ['Terms', 'Paid'], value: ''},
         document_info: {type:'input', name: 'اظلاعات سند', title: 'اظلاعات سند', value: ''},
-        commnet: {type:'input', name: 'توضیحات', title: 'توضیحات', value: ''},
+        commnet: {type:'input', name: 'توضیحات', title: 'توضیحات', value: '', lable:'comment'},
         username: {type:'input', name: 'نام کاربر', title: 'نام کاربر', value: ''},
       },
       success: false,
@@ -80,7 +83,7 @@ export default {
       return value.replace(/\D/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     },
     formatInput() {
-      this.forms.penalty.value = this.formatNumber(this.forms.penalty.value);
+      // this.forms.penalty.value = this.formatNumber(this.forms.penalty.value);
       this.forms.extra_cost.value = this.formatNumber(this.forms.extra_cost.value);
       this.forms.price_pre_kg.value = this.formatNumber(this.forms.price_pre_kg.value);
     },
@@ -141,7 +144,7 @@ export default {
         'total_price': parseInt(this.forms.total_price.value.replace(/,/g, '')),
         'extra_cost': parseInt(this.forms.extra_cost.value.replace(/,/g, '')),
         'invoice_status': this.forms.invoice_status.value,
-        'supplier_invoice': this.forms.supplier_invoice.value,
+        'supplier_invoice': parseInt(this.forms.supplier_invoice.value.replace(/,/g, '')),
         'payment_status': this.forms.payment_status.value,
         'document_info': this.forms.document_info.value,
         'commnet': this.forms.commnet.value,
@@ -210,36 +213,60 @@ export default {
         </div>
       </div>
       <template v-for="(val, form_name) in forms">
-        <template v-if="val.type=='input'">
-          <div class="relative">
-            <template v-if="val.numbertype">
-              <input v-model="val.value" @input="formatInput" type="text" :id="form_name" :class="[val.error ? 'text-red-900 border-red-500 focus:border-red-500' : 'text-gray-900 focus:border-green-500 border-gray-300']" class="block px-2.5 pb-2.5 pt-4 w-full text-sm  bg-transparent rounded-lg border-1 appearance-none focus:outline-none focus:ring-0 peer" placeholder="" :disabled="val.disable"/>
-            </template>
-            <template v-else>
-              <input v-model="val.value" type="text" :id="form_name" :class="[val.error ? 'text-red-900 border-red-500 focus:border-red-500' : 'text-gray-900 focus:border-green-500 border-gray-300']" class="block px-2.5 pb-2.5 pt-4 w-full text-sm  bg-transparent rounded-lg border-1 appearance-none focus:outline-none focus:ring-0 peer" placeholder="" :disabled="val.disable"/>
-            </template>
-            <label :for="form_name" :class="[val.error ? 'peer-focus:text-red-500 text-red-500' : 'peer-focus:text-green-500 text-gray-500']" class="absolute text-sm dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white dark:bg-gray-900 px-2 peer-focus:px-2  peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1">
-              {{val.name}}
-            </label>
-          </div>
+<!--        <template v-if="val.type=='input'">-->
+<!--          <div class="relative">-->
+<!--            <template v-if="val.numbertype">-->
+<!--              <input v-model="val.value" @input="formatInput" type="text" :id="form_name" :class="[val.error ? 'text-red-900 border-red-500 focus:border-red-500' : 'text-gray-900 focus:border-green-500 border-gray-300']" class="block px-2.5 pb-2.5 pt-4 w-full text-sm  bg-transparent rounded-lg border-1 appearance-none focus:outline-none focus:ring-0 peer" placeholder="" :disabled="val.disabled"/>-->
+<!--            </template>-->
+<!--            <template v-else>-->
+<!--              <input v-model="val.value" type="text" :id="form_name" :class="[val.error ? 'text-red-900 border-red-500 focus:border-red-500' : 'text-gray-900 focus:border-green-500 border-gray-300']" class="block px-2.5 pb-2.5 pt-4 w-full text-sm  bg-transparent rounded-lg border-1 appearance-none focus:outline-none focus:ring-0 peer" placeholder="" :disabled="val.disabled"/>-->
+<!--            </template>-->
+<!--            <label :for="form_name" :class="[val.error ? 'peer-focus:text-red-500 text-red-500' : 'peer-focus:text-green-500 text-gray-500']" class="absolute text-sm dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white dark:bg-gray-900 px-2 peer-focus:px-2  peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1">-->
+<!--              {{val.name}}-->
+<!--            </label>-->
+<!--          </div>-->
+<!--        </template>-->
+<!--        <template v-if="val.type=='dropdown'">-->
+<!--          <button :id="form_name + 'Button'" :data-dropdown-toggle="form_name+'dropdown'" class="justify-between w-44 text-white bg-green-500 hover:bg-green-600 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="button">-->
+<!--            {{val.name}}-->
+<!--            <svg class="w-2.5 h-2.5 ms-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">-->
+<!--              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>-->
+<!--            </svg>-->
+<!--          </button>-->
+<!--          &lt;!&ndash; Dropdown menu &ndash;&gt;-->
+<!--          <div :id="form_name+'dropdown'" class="z-50 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">-->
+<!--            <ul class="overflow-y-auto h-auto max-h-48 py-2 text-sm text-gray-700 dark:text-gray-200" :aria-labelledby="form_name + 'Button'">-->
+<!--              <li v-for="data in val.data">-->
+<!--                <a @click='clicked(form_name ,data)' type="button" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">-->
+<!--                  {{ data }}-->
+<!--                </a>-->
+<!--              </li>-->
+<!--            </ul>-->
+<!--        </div>-->
+<!--        </template>-->
+                <template v-if="val.type=='input'">
+            <Input
+              :formName="form_name"
+              :label="val.name"
+              :type="val.lable"
+              :disabled="val.disabled"
+              @update="val.value = $event"
+              :value="val.value"
+            />
         </template>
         <template v-if="val.type=='dropdown'">
-          <button :id="form_name + 'Button'" :data-dropdown-toggle="form_name+'dropdown'" class="justify-between w-44 text-white bg-green-500 hover:bg-green-600 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="button">
-            {{val.name}}
-            <svg class="w-2.5 h-2.5 ms-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
-              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>
-            </svg>
-          </button>
-          <!-- Dropdown menu -->
-          <div :id="form_name+'dropdown'" class="z-50 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
-            <ul class="overflow-y-auto h-auto max-h-48 py-2 text-sm text-gray-700 dark:text-gray-200" :aria-labelledby="form_name + 'Button'">
-              <li v-for="data in val.data">
-                <a @click='clicked(form_name ,data)' type="button" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
+          <Dropdown :formName="form_name">
+            <template v-slot:btnName>
+              {{val.name}}
+            </template>
+            <template v-slot:list>
+              <li v-for="(data, index) in val.data" :key="index">
+                <a @click="clicked(form_name, data)" type="button" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
                   {{ data }}
                 </a>
               </li>
-            </ul>
-        </div>
+            </template>
+          </Dropdown>
         </template>
       </template>
       <modal type="confirm">
@@ -257,7 +284,8 @@ export default {
         </template>
         <template v-slot:btns>
           <div>
-            <button data-modal-hide="popup-modal" aria-label="Close" @click="createPurchase" type="button" class="inline-flex justify-center w-full px-2 py-1.5 text-xs font-medium text-center text-white        bg-green-500 hover:bg-green-600 focus:ring-4 focus:outline-none focus:ring-green-300  rounded-lg dark:bg-blue-500 dark:hover:bg-blue-600 dark:focus:ring-blue-800">درسته</button>
+<!--            <button data-modal-hide="popup-modal" aria-label="Close" @click="createPurchase" type="button" class="inline-flex justify-center w-full px-2 py-1.5 text-xs font-medium text-center text-white        bg-green-500 hover:bg-green-600 focus:ring-4 focus:outline-none focus:ring-green-300  rounded-lg dark:bg-blue-500 dark:hover:bg-blue-600 dark:focus:ring-blue-800">درسته</button>-->
+            <ModalButton @close="createPurchase"/>
           </div>
         </template>
       </modal>
