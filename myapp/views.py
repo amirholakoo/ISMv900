@@ -33,6 +33,14 @@ def not_enough_log_generator(location):
     log = f' {current_time} ERROR:NOT ENOUGH IN {location} by SYSERR,'
 
     return log
+
+def append_log(fields, page):
+    current_time = timezone.now().strftime('%Y-%m-%d %H:%M')
+    logs = ''
+    for filed, message in fields.items():
+        logs += f" {current_time} {message} by {page} FOR {filed},"
+    return logs
+
 # Incoming process:
 # Add Truck
 # Add Shipments
@@ -108,7 +116,7 @@ def add_truck(request):
         phone = request.GET.get('phone')
         username = request.GET.get('username')
         errors = []
-        print(driver_name)
+        # print(driver_name)
         # Create new truck
         new_truck = Truck(
             license_number=license_number,
@@ -125,8 +133,8 @@ def add_truck(request):
             new_truck.save()
             return JsonResponse({'status': 'success', 'message': f'New license number {license_number} has been added to database successfully!'})
         except Exception as e:
-            print(e)
-            print(license_number)
+            # print(e)
+            # print(license_number)
             # Handle any exceptions that occur during the save operation
             errors.append({'status': 'error', 'message': f'Error adding license number: {str(e)}'})
             return JsonResponse({'status': 'error', 'errors': errors})
@@ -186,7 +194,7 @@ def add_supplier(request):
             comments=comments,
             username=username,
             status='Active',
-            logs=log_generator(username, 'Created')
+            logs=log_generator(username, 'Created') + append_log({'comments': comments}, 'add Supplier')
         )
 
         # Save the new Supplier object to the database
@@ -254,7 +262,7 @@ def add_customer(request):
             comments=comments,
             username=username,
             status='Active',
-            logs=log_generator(username, 'Created')
+            logs=log_generator(username, 'Created') + append_log({'comments':comments}, 'add Customer')
         )
 
         # Save the new Customer object to the database
@@ -371,7 +379,7 @@ def add_rawMaterial(request):
             material_name=material_name,
             description=comments,
             username=username,
-            logs=log_generator(username, 'Created')
+            logs=log_generator(username, 'Created') + append_log({'description': comments}, 'add RawMaterial')
         )
 
         # Save the new Customer object to the database
@@ -559,7 +567,7 @@ def add_new_reel(request):
                 comments=commnet,
                 profile_name=profile_name,
                 receive_date=timezone.now(),
-                logs=log_generator(username, 'Created')
+                logs=log_generator(username, 'Created') + append_log({'comments': commnet}, 'add New Reel')
             )
             new_product.save()
 
@@ -578,7 +586,7 @@ def add_new_reel(request):
                 comments=commnet,
                 profile_name=profile_name,
                 receive_date=timezone.now(),
-                logs=log_generator(username, 'Created')
+                logs=log_generator(username, 'Created') + append_log({'comments': commnet}, 'add New Reel')
             )
             new_anbar_record.save()
 
@@ -612,7 +620,7 @@ def add_new_reel(request):
                             grade=record.grade,
                             username=username,
                             comments=commnet,
-                            logs=log_generator(record.profile_name, 'Used')
+                            logs=log_generator(record.profile_name, 'Used') + append_log({'comments': commnet}, 'add New Reel')
                         )
                         c.save()
 
@@ -1266,7 +1274,7 @@ def create_purchase_order(request):
                         document_info=document_info,
                         comments=commnet,
                         username=username,
-                        logs=log_generator(username, 'Created PO')
+                        logs=log_generator(username, 'Created PO') + append_log({'comments': commnet, 'quality':quality, 'penalty':penalty}, 'PO')
                     )
                     # Save the new purchase object to the database
                     purchase.save()
@@ -1284,7 +1292,7 @@ def create_purchase_order(request):
                         status='Delivered',
                         location='Delivered',
                         comments=commnet,
-                        logs=ship[0].logs + log_generator(username, 'Created PO')
+                        logs=ship[0].logs + log_generator(username, 'Created PO') + append_log({'comments': commnet, 'penalty':penalty}, 'PO')
                     )
                     return JsonResponse({'status': 'success', 'message': 'purchase added successfully.'})
                 except Exception as e:
@@ -1294,7 +1302,7 @@ def create_purchase_order(request):
             return JsonResponse({'status': 'success', 'message': 'Purchase Order created successfully.'})
 
         except Exception as e:
-            print(e)
+            # print(e)
             return JsonResponse({'status': 'error', 'message': str(e)})
 
     else:
@@ -1393,7 +1401,7 @@ def create_sales_order(request):
                     username=username,
                     shipment=ship[0],
                     date=timezone.now(),  # Assuming you want to set the current date and time
-                    logs=log_generator(username, 'Created SO')
+                    logs=log_generator(username, 'Created SO') + append_log({'comments': comments}, 'SO')
                 )
                 # Save the instance
                 sale.save()
@@ -1413,7 +1421,7 @@ def create_sales_order(request):
                     document_info=document_info,
                     exit_time=timezone.now(),
                     comments=comments,
-                    logs=ship[0].logs + log_generator(username, 'Created SO')
+                    logs=ship[0].logs + log_generator(username, 'Created SO') + append_log({'comments': comments}, 'SO')
                 )
                 # Update truck status and location
                 Truck.objects.filter(license_number=license_number).update(
@@ -1441,7 +1449,7 @@ def create_sales_order(request):
             except Shipments.DoesNotExist:
                 return JsonResponse({'status': 'error', 'message': 'Shipments not found.'}, status=404)
             except Exception as e:
-                print(e)
+                # print(e)
                 return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
     else:
         return render(request, 'create_sales_order.html')
@@ -1555,7 +1563,7 @@ def unload(request):
                     quality=quality,
                     location='Weight2',
                     status='LoadedUnloaded',
-                    logs=shipment[0].logs + log_generator(forklift_driver, 'Unloaded')
+                    logs=shipment[0].logs + log_generator(forklift_driver, 'Unloaded') + append_log({'quality': quality}, 'unload')
                 )
                 # Dynamically get the model based on the anbar_name
                 AnbarModel = apps.get_model('myapp', unloading_location)
@@ -1932,7 +1940,7 @@ def used(request):
                         grade=record.grade,
                         comments=record.comments,
                         username=forklift_driver,
-                        logs=log_generator(forklift_driver, 'Used')
+                        logs=log_generator(forklift_driver, 'Used') + append_log({'comments': record.comments}, 'used')
                 )
                 consumption.save()
 
@@ -2117,7 +2125,7 @@ def moved(request):
                         comments=record.comments,
                         profile_name=record.profile_name,
                         username=forklift_driver,
-                        logs=log_generator(forklift_driver, 'Moved')
+                        logs=log_generator(forklift_driver, 'Moved') + append_log({'comments': record.comments}, 'Moved')
                     )
                     record.save()
                     new_item.save()
@@ -2234,7 +2242,7 @@ def retuned(request):
                         unit=unit,
                         username=forklift_driver,
                         comments=reason,
-                        logs=log_generator(forklift_driver, 'Returned')
+                        logs=log_generator(forklift_driver, 'Returned') + append_log({'comments': reason}, 'Returned')
                     )
                     # Save the updated record
                     record.save()
@@ -2243,11 +2251,11 @@ def retuned(request):
                 return JsonResponse(
                     {'status': 'success', 'message': f'ok'})
             except ValidationError as e:
-                print(e)
+                # print(e)
                 # Return a validation error response
                 return JsonResponse({'error': str(e)}, status=400)
             except Exception as e:
-                print(e)
+                # print(e)
                 # Return a general error response
                 return JsonResponse({'error': str(e)}, status=500)
     else:
@@ -2525,7 +2533,6 @@ def add_consumption_profile(request):
                 logs=log_generator(username, 'Created')
             )
             new_consumption.save()
-
         # Save the new Customer object to the database
         try:
             # new_consumption.save()
@@ -2630,7 +2637,7 @@ def cancel(request):
                         status='In-stock',
                         location=anbar_location,
                         receive_date=timezone.now(),
-                        logs=log_generator(username, 'Cancelled and Added')
+                        logs=log_generator(username, 'Cancelled and Added') + append_log({'comments': product.comments}, 'Cancel')
                     )
                     anbar_a.save()
                     if shipment.unload_location:
