@@ -229,6 +229,7 @@ export default {
               :disabled="val.disabled"
               @update="val.value = $event"
               :value="val.value"
+              @InputError="error = $event"
             />
         </template>
             <template v-if="val.type=='dropdown'">
@@ -247,7 +248,7 @@ export default {
         </template>
 
         </template>
-        <modal type="confirm">
+        <modal type="confirm" :disabled="error">
           <template v-slot:button>اضافه کردن</template>
           <template v-slot:text>
             <div class="flex flex-col gap-2 font-bold">

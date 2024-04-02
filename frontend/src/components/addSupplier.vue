@@ -19,7 +19,7 @@ export default {
   data(){
     return{
       forms: {
-        supplier_name: {type: 'input', name: 'فروشتده',title: 'فروشتده', data: '', value: '', lable:'text'},
+        supplier_name: {type: 'input', name: 'فروشتده (مثال: مهدی حسینی)',title: 'فروشتده (مثال: مهدی حسینی)', data: '', value: '', lable:'text'},
         address: {type: 'input', name: 'آدرس',title: 'آدرس', data: '', value: '', lable:'text'},
         phone: {type: 'input', name: 'شماره همراه',title: 'شماره همراه', data: '', value: '', lable:'phone'},
         comment: {type: 'input', name: 'توضیحات',title: 'توضیحات', data: '', value: '', lable:'comment'},
@@ -122,10 +122,11 @@ export default {
                 :type="val.lable"
                 :disabled="val.disabled"
                 @update="val.value = $event"
+                @InputError="error = $event"
               />
         </template>
       </template>
-      <modal type="confirm">
+      <modal type="confirm" :disabled="error">
         <template v-slot:button>اضافه کردن</template>
         <template v-slot:text>
           <div class="flex flex-col gap-2 font-bold">
