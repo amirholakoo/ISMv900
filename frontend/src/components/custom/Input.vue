@@ -78,6 +78,7 @@ export default {
         }
       }
       this.$emit('update', newValue);
+      this.$emit('InputError', this.error);
     },
   },
   watch: {
