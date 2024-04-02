@@ -1431,17 +1431,21 @@ def create_sales_order(request):
                 list_of_reels = list(map(int, list_of_reels.split(',')))
                 print(list_of_reels)
                 for reel in list_of_reels:
-                    Products.objects.filter(reel_number=reel).update(
+                    products = Products.objects.filter(reel_number=reel)
+                    products.update(
                         status='Delivered',
                         location=customer_name,
                         last_date=timezone.now(),
+                        logs=products[0].logs + log_generator(username, 'Created SO')
                     )
                     # Dynamically get the model based on the anbar_name
                     AnbarModel = apps.get_model('myapp', loading_location)
-                    AnbarModel.objects.filter(reel_number=reel).update(
+                    anbar = AnbarModel.objects.filter(reel_number=reel)
+                    anbar.update(
                         status='Delivered',
                         location=customer_name,
                         last_date=timezone.now(),
+                        logs=anbar[0].logs + log_generator(username, 'Created SO')
                     )
                 # Return a success response
                 return JsonResponse({'status': 'success', 'message': 'Sales Order created successfully.'})
