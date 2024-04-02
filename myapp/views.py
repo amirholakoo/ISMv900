@@ -2602,11 +2602,13 @@ def cancel(request):
                     logs=sales[0].logs + log_generator(username, action)
                 )
             if shipment.list_of_reels:
+                # print(shipment.list_of_reels)
                 list_of_reel = shipment.list_of_reels.split(',')
                 for reel in list_of_reel:
+                    # print(reel)
                     # reel = int(reel)
                     product = Products.objects.get(reel_number=reel)
-                    print(product)
+                    # print(product)
                     product.location = anbar_location
                     product.status = 'In-stock'
                     product.last_date = None
@@ -2660,7 +2662,7 @@ def load_shipments_baesd_license_number_for_canceling(request):
         license_number = request.GET.get('license_number')
 
         shipments = Shipments.objects.filter(license_number=license_number).exclude(status='Cancelled')
-        shipments = shipments.order_by('receive_date')[:10]
+        shipments = shipments.order_by('-id')[:2]
         if shipments.exists():
             shipment_list = shipments.values(
                 'id',
@@ -2668,7 +2670,8 @@ def load_shipments_baesd_license_number_for_canceling(request):
                 'supplier_name',
                 'customer_name',
                 'net_weight',
-                'shipment_type'
+                'shipment_type',
+                'unload_location'
             )
             # Convert the queryset to a list of dictionaries
             shipment_list = list(shipment_list)

@@ -267,7 +267,9 @@ export default {
             />
         </template>
         <template v-if="val.type=='dropdown'">
-          <Dropdown :formName="form_name">
+          <Dropdown
+              :formName="form_name"
+              :btnclass="[forms.shipment_list.value.shipment_type == 'Outgoing' && forms.shipment_list.value.unload_location ?'':'hidden']">
             <template v-slot:btnName>
               {{val.name}}
             </template>
