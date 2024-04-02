@@ -4,12 +4,12 @@ import Card from './Card'
 import Alert from "@/components/Alert.vue";
 import modal from "@/components/Modal.vue";
 import Input from "@/components/custom/Input.vue";
-import Button from "@/components/custom/ModalButton.vue";
+import ModalButton from "@/components/custom/ModalButton.vue";
 
 export default {
   name: "addCustomer",
   components: {
-    Button,
+    ModalButton,
     Input,
     modal, Alert,
     Card
@@ -20,7 +20,7 @@ export default {
   data(){
     return{
       forms: {
-        customer_name: {type: 'input', name: 'اسم مشتری',title: ' اسم مشتری', data: '', value: '', lable:'text'},
+        customer_name: {type: 'input', name: 'اسم مشتری (مثال: مهدی حسینی)',title: 'اسم مشتری (مثال: مهدی حسینی)', data: '', value: '', lable:'text'},
         address: {type: 'input', name: 'آدرس',title: 'آدرس', data: '', value: '', lable:'text'},
         phone: {type: 'input', name: 'شماره همراه',title: 'شماره همراه', data: '', value: '', lable:'phone'},
         comment: {type: 'input', name: 'توضیحات',title: 'توضیحات', data: '', value: '', lable:'comment'},
@@ -118,11 +118,12 @@ export default {
             :type="val.lable"
             :disabled="val.disabled"
             @update="val.value = $event"
+            @InputError="error = $event"
           />
         </template>
 
       </template>
-      <modal type="confirm">
+      <modal type="confirm" :disabled="error">
         <template v-slot:button>اضافه کردن</template>
         <template v-slot:text>
           <div class="flex flex-col gap-2 font-bold">
