@@ -49,6 +49,7 @@ urlpatterns = [
 
     # Following paths are related to Pages:
 
+    path("", all_pages),
     path("addCustomer/", add_customer),
     path("addSupplier/", add_supplier),
     path("addMaterialType/", add_material_type),

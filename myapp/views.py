@@ -3120,3 +3120,7 @@ def report_Consumption(request):
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
 
+
+def all_pages(request):
+    if request.method == 'GET':
+        return render(request, 'all_pages.html')
