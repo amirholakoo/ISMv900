@@ -6,6 +6,10 @@ export default {
         type: String,
         required: true
       },
+     btnclass:{
+        type: String,
+        required: false
+     }
    },
 };
 </script>
@@ -15,6 +19,7 @@ export default {
     <button
         :id="formName + 'Button1'"
         :data-dropdown-toggle="formName+'dropdown1'"
+        :class="btnclass"
         class="justify-between w-44 text-white bg-green-500 hover:bg-green-600 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
         type="button"
     >
