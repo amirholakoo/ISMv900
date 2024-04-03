@@ -2225,7 +2225,7 @@ def retuned(request):
                     supplier_name=supplier_name,
                     material_name=material_name,
                     unit=unit,
-                    status='Used'
+                    profile_name=None
                 ).order_by('receive_date')[:int(quantity)]
                 isEnough = len(consumption) < int(quantity)
 
@@ -2245,6 +2245,7 @@ def retuned(request):
                         log_message = record.logs + log_generator(forklift_driver, 'Returned') + not_enough_log_generator(to_anbar)
                     else:
                         log_message = record.logs + log_generator(forklift_driver, 'Returned')
+
                     record.logs = log_message
                     # Create new entries in the destination AnbarGeneric location
                     new_item = AnbarModel(
@@ -2684,7 +2685,7 @@ def load_shipments_baesd_license_number_for_canceling(request):
         license_number = request.GET.get('license_number')
 
         shipments = Shipments.objects.filter(license_number=license_number).exclude(status='Cancelled')
-        shipments = shipments.order_by('-id')[:2]
+        shipments = shipments.order_by('-id')
         if shipments.exists():
             shipment_list = shipments.values(
                 'id',
