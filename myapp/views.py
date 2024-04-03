@@ -247,7 +247,7 @@ def add_customer(request):
 
         # Load existing customer names from DB Check for duplicate name
         if Customer.objects.filter(customer_name=customer_name).exists():
-            error_message = f"در حال حاضر یک مشتری با نام {customer_name} در دیتابیس وجود دارد."
+            error_message = f"در حال حاضر یک مشتری با نام {customer_name} در سیستم وجود دارد."
             errors.append({'status': 'error', 'message': error_message})
 
         # If there are any errors, return them in the response
@@ -367,6 +367,11 @@ def add_rawMaterial(request):
             errors.append({'status': 'error', 'message': 'اسم ماده را وارد کنید'})
         if not username:
             errors.append({'status': 'error', 'message': 'نام کاربری را وارد کنید'})
+        isExist = RawMaterial.objects.filter(supplier_name=supplier_name,material_type=material_type,material_name=material_name).exists()
+        # Load existing customer names from DB Check for duplicate name
+        if isExist:
+            error_message = f"در حال حاضر یک مشتری با نام {supplier_name} و نوع ماده {material_type} و ماده {material_name} در سیستم وجود دارد."
+            errors.append({'status': 'error', 'message': error_message})
 
         # If there are any errors, return them in the response
         if errors:
@@ -2389,6 +2394,11 @@ def add_material_type(request):
                 errors.append({'status': 'error', 'message': 'نوع ماده را وارد کنید'})
             if not username:
                 errors.append({'status': 'error', 'message': 'نام کاربری را وارد کنید.'})
+            isExist = MaterialType.objects.filter(supplier_name=supplier_name,material_type=material_type,).exists()
+            # Load existing customer names from DB Check for duplicate name
+            if isExist:
+                error_message = f"در حال حاضر یک مشتری با نام {supplier_name} و نوع ماده {material_type} در سیستم وجود دارد."
+                errors.append({'status': 'error', 'message': error_message})
 
             # If there are any errors, return them in the response
             if errors:
@@ -2457,6 +2467,11 @@ def add_unit(request):
         if not username:
             errors.append({'status': 'error', 'message': 'username are required.'})
 
+        isExist = Unit.objects.filter(supplier_name=supplier_name,material_type=material_type,unit_name=unit_name).exists()
+        # Load existing customer names from DB Check for duplicate name
+        if isExist:
+            error_message = f"در حال حاضر یک مشتری با نام {supplier_name} و نوع ماده {material_type} و واحد {unit_name} در سیستم وجود دارد."
+            errors.append({'status': 'error', 'message': error_message})
 
         # If there are any errors, return them in the response
         if errors:
