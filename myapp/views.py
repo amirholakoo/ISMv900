@@ -594,13 +594,16 @@ def add_new_reel(request):
             all_table_names = connection.introspection.table_names()
             anbar_table_names = [name for name in all_table_names if name.startswith('Anbar_')]
             profile_list = ConsumptionProfile.objects.filter(profile_name=profile_name)
+            isExist = False
+
             for each_line in profile_list:
 
                 for anbar_name in anbar_table_names:
                     AnbarModel = apps.get_model('myapp', anbar_name)
-                    anbar_records = AnbarModel.objects.filter(supplier_name=each_line.supplier_name,
-                                              material_name=each_line.material_name,
-                                              status='In-stock').order_by('receive_date')[:each_line.quantity]
+                    anbar_records = AnbarModel.objects.filter(
+                        supplier_name=each_line.supplier_name,
+                        material_name=each_line.material_name,
+                        status='In-stock').order_by('receive_date')[:each_line.quantity]
                     # Iterate over the source records and create new instances of the target model
                     for record in anbar_records:
                         record.status = 'Used'
@@ -624,11 +627,17 @@ def add_new_reel(request):
                         )
                         c.save()
 
-                    # if len(anbar_records) < int(quantity):
-                    #     msg = 'با این حال' + ' مواد کمتری دارد' + str(quantity) + 'انبار شما از مقدار'
-                    #     msg = msg + 'تای ان استفاده شد' + str(len(anbar_records))
-                    #     errors.append({'status': 'error', 'message': msg})
-                    #     return JsonResponse({'status': 'error', 'errors': errors})
+                    if len(anbar_records) < int(each_line.quantity):
+                        msg = 'با این حال' + ' مواد کمتری دارد' + str(each_line.quantity) + 'انبار شما از مقدار'
+                        msg = msg + 'تای ان استفاده شد' + str(len(anbar_records))
+                        errors.append({'status': 'error', 'message': msg})
+                        return JsonResponse({'status': 'error', 'errors': errors})
+                    elif len(anbar_records) == 0:
+                        isExist = True
+            if isExist:
+                msg = 'در هیچ یک از انبار ها چیزی یافت نشد.'
+                errors.append({'status': 'error', 'message': msg})
+                return JsonResponse({'status': 'error', 'errors': errors})
 
             # Return a success response
             return JsonResponse({'status': 'success', 'message': 'Reel number has been added'}, status=200)
