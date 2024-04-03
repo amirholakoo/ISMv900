@@ -454,7 +454,7 @@ class AnbarGeneric(models.Model):
 
     # Additional comments about the material
     comments = models.TextField(null=True, blank=True)
-
+    shipment_id = models.ForeignKey(Shipments, on_delete=models.SET_NULL, blank=True, null=True)
     # QR code associated with the material
     qr_code = models.TextField(null=True, blank=True)
     unit = models.CharField(max_length=255, null=True, blank=True)
