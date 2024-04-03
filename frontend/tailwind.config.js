@@ -7,6 +7,14 @@ module.exports = {
         sans: ['Inter', 'sans-serif'],
         mono: ['Fira Code', 'monospace'],
       },
+      colors: {
+        'main-bg': '#C3AF91',
+         green: {
+          '500': '#4CAF50',
+          '600': '#3C9F40', // Example darker shade
+          '300': '#66C160', // Example lighter shade
+         },
+      },
     },
   },
   plugins: [
