@@ -1559,6 +1559,7 @@ def unload(request):
                 material_name = shipment[0].material_name
                 material_type = shipment[0].material_type
                 supplier_name = shipment[0].supplier_name
+                shipment_id = shipment[0].id
 
                 shipment.update(
                     unload_location=unloading_location,
@@ -1582,6 +1583,7 @@ def unload(request):
                         supplier_name=supplier_name,
                         material_name=material_name,
                         material_type=material_type,
+                        shipment_id=shipment_id,
                         unit=unit,
                         grade=quality,
                         status='In-stock',
@@ -2604,9 +2606,10 @@ def cancel(request):
             if shipment.unload_location:
                 AnbarModel = apps.get_model('myapp', shipment.unload_location)
                 anbar = AnbarModel.objects.filter(
-                    supplier_name=shipment.supplier_name,
-                    material_name=shipment.material_name,
-                    status="In-stock"
+                    # supplier_name=shipment.supplier_name,
+                    # material_name=shipment.material_name,
+                    # status="In-stock",
+                    shipment_id=shipment
                 )
                 if anbar.exists():
                     anbar = anbar.order_by('receive_date')[:int(shipment.quantity)]
