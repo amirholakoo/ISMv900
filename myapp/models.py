@@ -165,6 +165,9 @@ class Products(models.Model):
 
     # Profile name for the product
     profile_name = models.CharField(max_length=255, null=True, blank=True)
+
+    shipment_id = models.ForeignKey(Shipments, on_delete=models.SET_NULL, blank=True, null=True)
+
     username = models.CharField(max_length=255, null=False, blank=True)
     logs = models.TextField(blank=True)
 
@@ -586,6 +589,7 @@ class Consumption(models.Model):
 
     # Foreign key to the Supplier model (assuming it exists)
     # supplier_id = models.ForeignKey('Supplier', on_delete=models.SET_NULL, null=True, blank=True)
+    shipment_id = models.ForeignKey(Shipments, on_delete=models.SET_NULL, blank=True, null=True)
 
     # Name of the supplier
     supplier_name = models.CharField(max_length=255, null=True, blank=True)
