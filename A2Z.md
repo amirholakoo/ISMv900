@@ -231,6 +231,10 @@ Clone: git clone https://github.com/amirholakoo/ISMv900.git
 
 `pip install -r requirements.txt`
 
+`sudo apt-get install libpq-dev'
+
+`pip install psycopg2'
+
 `mkdir static/dist`
 
 `python manage.py makemigrations`
