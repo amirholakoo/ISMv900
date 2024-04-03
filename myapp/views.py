@@ -609,12 +609,19 @@ def add_new_reel(request):
                         supplier_name=each_line.supplier_name,
                         material_name=each_line.material_name,
                         status='In-stock').order_by('receive_date')[:each_line.quantity]
+                    isEnough = len(anbar_records) < int(each_line.quantity)
+
                     # Iterate over the source records and create new instances of the target model
                     for record in anbar_records:
                         record.status = 'Used'
                         record.location = 'Consumption DB'
                         record.last_date = timezone.now()
                         record.save()
+                        if isEnough:
+                            log_message = log_generator(record.profile_name, 'Used') + not_enough_log_generator('Consumption DB')
+                        else:
+                            log_message = log_generator(record.profile_name, 'Used')
+
                         c = Consumption(
                             status='Used',
                             location='Consumption DB',
@@ -628,11 +635,11 @@ def add_new_reel(request):
                             grade=record.grade,
                             username=username,
                             comments=commnet,
-                            logs=log_generator(record.profile_name, 'Used') + append_log({'comments': commnet}, 'add New Reel')
+                            logs=log_message + append_log({'comments': commnet}, 'add New Reel')
                         )
                         c.save()
 
-                    if len(anbar_records) < int(each_line.quantity):
+                    if isEnough:
                         msg = 'با این حال' + ' مواد کمتری دارد' + str(each_line.quantity) + 'انبار شما از مقدار'
                         msg = msg + 'تای ان استفاده شد' + str(len(anbar_records))
                         errors.append({'status': 'error', 'message': msg})
@@ -1941,12 +1948,18 @@ def used(request):
                 material_name=material_name,
             )
             material_type = raw[0].material_type
+            isEnough = len(anbar) < quantity_to_unload
 
             for record in anbar:
                 # update anbar:
                 record.status='Used'
                 record.location='Consumption DB'
                 record.logs=record.logs+log_generator(forklift_driver, 'Used')
+                if isEnough:
+                    log_message = log_generator(forklift_driver, 'Used') + not_enough_log_generator('Consumption DB')
+                else:
+                    log_message = log_generator(forklift_driver, 'Used')
+
                 record.last_date=timezone.now()
                 record.save()
                 consumption = Consumption(
@@ -1960,9 +1973,16 @@ def used(request):
                         grade=record.grade,
                         comments=record.comments,
                         username=forklift_driver,
-                        logs=log_generator(forklift_driver, 'Used') + append_log({'comments': record.comments}, 'used')
+                        logs=log_message + append_log({'comments': record.comments}, 'used')
                 )
                 consumption.save()
+
+            if isEnough:
+                # Alert here
+                msg = 'انبار' + 'Consumption DB' + f'از مقدار که شما انتخاب کردید ( {quantity_to_unload} ) ' + 'مقدار کمتری دارد' + str(
+                    len(anbar)) + 'تا منتقل شد'
+                errors = [{'status': 'error', 'message': msg}]
+                return JsonResponse({'status': 'error', 'errors': errors})
 
             # Return a success response
 
@@ -2076,13 +2096,18 @@ def moved(request):
                     supplier_name=supplier_name,
                     material_name=material_name,
                 ).order_by('receive_date')[:int(Quantity)]
+                isEnough = len(sourse) < int(Quantity)
+                if isEnough:
+                    log_message = log_generator(forklift_driver, 'Moved') + not_enough_log_generator(to_anbar)
+                else:
+                    log_message = log_generator(forklift_driver, 'Moved')
+
                 # Iterate over the records and update each one
                 for record in sourse:
                     record.status = 'Moved'
                     record.location = to_anbar
                     record.last_date = timezone.now()
                     record.logs = record.logs + log_generator(forklift_driver, 'Moved')
-
                     # Create new entries in the destination AnbarGeneric location
                     new_item = AnbarModel2(
                         receive_date=timezone.now(),
@@ -2093,14 +2118,14 @@ def moved(request):
                         material_type=record.material_type,
                         unit=unit,
                         username=forklift_driver,
-                        logs=log_generator(forklift_driver, 'Moved')
+                        logs=log_message
                     )
                     # Save the updated record
                     record.save()
                     new_item.save()
 
 
-                if len(sourse) < int(Quantity):
+                if isEnough:
                     msg = 'انبار' + str(to_anbar) + f'از مقدار که شما انتخاب کردید ( {Quantity} ) ' + 'مقدار کمتری دارد' + str(len(sourse)) +'تا منتقل شد'
                     errors.append({'status': 'error', 'message': msg})
                     return JsonResponse({'status': 'error', 'errors': errors})
@@ -2256,13 +2281,12 @@ def retuned(request):
                     record.status = 'Returned'
                     record.location = to_anbar
                     record.last_date = timezone.now()
-                    # record.logs =record.logs + log_generator(forklift_driver, 'Returned')
+                    record.logs =record.logs + log_generator(forklift_driver, 'Returned')
                     if isEnough:
-                        log_message = record.logs + log_generator(forklift_driver, 'Returned') + not_enough_log_generator(to_anbar)
+                        log_message = log_generator(forklift_driver, 'Returned') + not_enough_log_generator(to_anbar)
                     else:
-                        log_message = record.logs + log_generator(forklift_driver, 'Returned')
+                        log_message =log_generator(forklift_driver, 'Returned')
 
-                    record.logs = log_message
                     # Create new entries in the destination AnbarGeneric location
                     new_item = AnbarModel(
                         receive_date=timezone.now(),
@@ -2274,7 +2298,7 @@ def retuned(request):
                         unit=unit,
                         username=forklift_driver,
                         comments=reason,
-                        logs=log_generator(forklift_driver, 'Returned') + append_log({'comments': reason}, 'Returned')
+                        logs=log_message + append_log({'comments': reason}, 'Returned')
                     )
                     # Save the updated record
                     record.save()
