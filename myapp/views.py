@@ -2227,14 +2227,25 @@ def retuned(request):
                     unit=unit,
                     status='Used'
                 ).order_by('receive_date')[:int(quantity)]
+                isEnough = len(consumption) < int(quantity)
+
+                if isEnough:
+                    # Alert here
+                    print('not enough', len(consumption), int(quantity))
+                    errors.append({'status': 'error', 'message': 'supplier name is required.'})
+                    return JsonResponse({'status': 'error', 'errors': errors})
 
                 for record in consumption:
                     record.comments = reason
                     record.status = 'Returned'
                     record.location = to_anbar
                     record.last_date = timezone.now()
-                    record.logs =record.logs + log_generator(forklift_driver, 'Returned')
-
+                    # record.logs =record.logs + log_generator(forklift_driver, 'Returned')
+                    if isEnough:
+                        log_message = record.logs + log_generator(forklift_driver, 'Returned') + not_enough_log_generator(to_anbar)
+                    else:
+                        log_message = record.logs + log_generator(forklift_driver, 'Returned')
+                    record.logs = log_message
                     # Create new entries in the destination AnbarGeneric location
                     new_item = AnbarModel(
                         receive_date=timezone.now(),
