@@ -9,13 +9,17 @@ export default {
      btnclass:{
         type: String,
         required: false
+     },
+     Hide:{
+        type: Boolean,
+        required: false
      }
    },
 };
 </script>
 
 <template>
-  <div>
+  <div :class="[Hide ? '': 'hidden']">
     <button
         :id="formName + 'Button1'"
         :data-dropdown-toggle="formName+'dropdown1'"
