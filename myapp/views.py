@@ -2170,6 +2170,7 @@ def moved(request):
                         qr_code=record.qr_code,
                         comments=record.comments,
                         profile_name=record.profile_name,
+                        shipment_id=record.shipment_id,
                         username=forklift_driver,
                         logs=log_generator(forklift_driver, 'Moved') + append_log({'comments': record.comments}, 'Moved')
                     )
