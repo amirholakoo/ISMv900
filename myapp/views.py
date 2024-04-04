@@ -2126,7 +2126,7 @@ def moved(request):
 
 
                 if isEnough:
-                    msg = 'انبار' + str(to_anbar) + f'از مقدار که شما انتخاب کردید ( {Quantity} ) ' + 'مقدار کمتری دارد' + str(len(sourse)) +'تا منتقل شد'
+                    msg = 'انبار' + str(to_anbar) + f'از مقدار که شما انتخاب کردید ( {Quantity} ) ' + 'مقدار کمتری دارد' + str(len(sourse)) +' تا منتقل شد'
                     errors.append({'status': 'error', 'message': msg})
                     return JsonResponse({'status': 'error', 'errors': errors})
 
