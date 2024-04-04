@@ -1580,7 +1580,7 @@ def unload(request):
                 material_name = shipment[0].material_name
                 material_type = shipment[0].material_type
                 supplier_name = shipment[0].supplier_name
-                shipment_id = shipment[0].id
+                shipment_id = shipment[0]
 
                 shipment.update(
                     unload_location=unloading_location,
