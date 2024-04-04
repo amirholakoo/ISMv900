@@ -440,9 +440,8 @@ def get_consumption_profile_names(request):
 def get_reel_number(request):
     if request.method == 'GET':
         # Load the last reel number from the Products DB
-        try:
-            last_product = Products.objects.last()
-
+        last_product = Products.objects.last()
+        if last_product:
             last_reel_number = last_product.reel_number
             width = last_product.width
             GSM = last_product.gsm
@@ -450,8 +449,7 @@ def get_reel_number(request):
             breaks = last_product.breaks
             grade = last_product.grade
             profile_name = last_product.profile_name
-
-        except Products.DoesNotExist:
+        else:
             last_reel_number = 0
             width = 0
             GSM = 0
@@ -609,42 +607,45 @@ def add_new_reel(request):
                         supplier_name=each_line.supplier_name,
                         material_name=each_line.material_name,
                         status='In-stock').order_by('receive_date')[:each_line.quantity]
-                    isEnough = len(anbar_records) < int(each_line.quantity)
+                    if anbar_records.exists():
+                        isExist = False
+                        isEnough = len(anbar_records) < int(each_line.quantity)
+                        # Iterate over the source records and create new instances of the target model
+                        for record in anbar_records:
+                            record.status = 'Used'
+                            record.location = 'Consumption DB'
+                            record.last_date = timezone.now()
+                            if isEnough:
+                                log_message = log_generator(record.profile_name, 'Used') + not_enough_log_generator('Consumption DB')
+                            else:
+                                log_message = log_generator(record.profile_name, 'Used')
+                            # record.logs = record.logs + log_message
+                            record.save()
+                            c = Consumption(
+                                status='Used',
+                                location='Consumption DB',
+                                reel_number=reel_number,
+                                profile_name=profile_name,
+                                unit=record.unit,
+                                supplier_name=record.supplier_name,
+                                material_name=record.material_name,
+                                material_type=record.material_type,
+                                receive_date=timezone.now(),
+                                grade=record.grade,
+                                username=username,
+                                comments=commnet,
+                                logs=log_message + append_log({'comments': commnet}, 'add New Reel')
+                            )
+                            c.save()
 
-                    # Iterate over the source records and create new instances of the target model
-                    for record in anbar_records:
-                        record.status = 'Used'
-                        record.location = 'Consumption DB'
-                        record.last_date = timezone.now()
-                        record.save()
                         if isEnough:
-                            log_message = log_generator(record.profile_name, 'Used') + not_enough_log_generator('Consumption DB')
-                        else:
-                            log_message = log_generator(record.profile_name, 'Used')
-
-                        c = Consumption(
-                            status='Used',
-                            location='Consumption DB',
-                            reel_number=reel_number,
-                            profile_name=profile_name,
-                            unit=record.unit,
-                            supplier_name=record.supplier_name,
-                            material_name=record.material_name,
-                            material_type=record.material_type,
-                            receive_date=timezone.now(),
-                            grade=record.grade,
-                            username=username,
-                            comments=commnet,
-                            logs=log_message + append_log({'comments': commnet}, 'add New Reel')
-                        )
-                        c.save()
-
-                    if isEnough:
-                        msg = 'با این حال' + ' مواد کمتری دارد' + str(each_line.quantity) + 'انبار شما از مقدار'
-                        msg = msg + 'تای ان استفاده شد' + str(len(anbar_records))
-                        errors.append({'status': 'error', 'message': msg})
-                        return JsonResponse({'status': 'error', 'errors': errors})
-                    elif len(anbar_records) == 0:
+                            # msg = 'با این حال' + ' مواد کمتری دارد' + str(each_line.quantity) + 'انبار شما از مقدار'
+                            # msg = msg + 'تای ان استفاده شد' + str(len(anbar_records))
+                            msg = f'not enough (in anbar {anbar_name}:{len(anbar_records)}) (quantity: {str(each_line.quantity)})'
+                            msg = f"انبار {anbar_name} مقدار کمتری از {str(each_line.quantity)} دارد با این حال {len(anbar_records)} مقدار مصرف شد"
+                            errors.append({'status': 'error', 'message': msg})
+                            return JsonResponse({'status': 'error', 'errors': errors})
+                    else:
                         isExist = True
             if isExist:
                 msg = 'در هیچ یک از انبار ها چیزی یافت نشد.'

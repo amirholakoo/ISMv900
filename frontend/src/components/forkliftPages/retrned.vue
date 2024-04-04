@@ -76,6 +76,7 @@ export default {
         "reason": this.forms.reason.value,
         "forklift_driver": this.forms.forklift_driver.value,
       };
+      console.log(params)
       this.errors = []
       for (const key in this.forms) {
         if (this.forms[key].value == ''){
@@ -153,7 +154,9 @@ export default {
 <!--              {{val.name}}-->
 <!--            </label>-->
 <!--          </div>-->
+
 <!--        </template>-->
+
 <!--        <template v-if="val.type=='dropdown'">-->
 <!--          <button :id="form_name + 'Button'" :data-dropdown-toggle="form_name+'dropdown'" class="justify-between w-44 text-white bg-green-500 hover:bg-green-600 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="button">-->
 <!--            {{val.name}}-->
@@ -177,7 +180,6 @@ export default {
               :formName="form_name"
               :label="val.name"
               :type="val.lable"
-              :disabled="val.disabled"
               @update="val.value = $event"
               :value="val.value"
               @InputError="error = $event"
