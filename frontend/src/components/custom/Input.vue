@@ -35,16 +35,16 @@ export default {
       return value.replace(/\D/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     },
     updateValue(newValue) {
-      if (this.type == 'text'){
-        let pattern = /^[\u0600-\u06FF\s]*$/
-        if (pattern.test(newValue) == false){
-          this.error = true;
-          this.message = 'لطفا از حروف فارسی استفاده کنید.'
-        } else {
-          this.error = false
-          this.message = ''
-        }
-      }
+      // if (this.type == 'text'){
+      //   let pattern = /^[\u0600-\u06FF\s]*$/
+      //   if (pattern.test(newValue) == false){
+      //     this.error = true;
+      //     this.message = 'لطفا از حروف فارسی استفاده کنید.'
+      //   } else {
+      //     this.error = false
+      //     this.message = ''
+      //   }
+      // }
       if (this.type == 'number'){
         if (!Number.isInteger(parseInt(newValue))){
           this.error = true;
@@ -56,27 +56,27 @@ export default {
         newValue = this.formatNumber(newValue)
         this.inputValue = newValue
       }
-      if (this.type == 'phone'){
-        let pattern =  /^((0?9)|(\+?989))\d{9}$/g
-
-        if (pattern.test(newValue) == false){
-          this.error = true;
-          this.message = 'فرمت شماره وارد شده صحیح نیست'
-        } else {
-          this.error = false
-          this.message = ''
-        }
-      }
-      if (this.type == 'comment'){
-        let pattern =  /^(?!.*,)[\u0600-\u06FF\s]*$/;
-        if (pattern.test(newValue) == false){
-          this.error = true;
-          this.message = 'لطفا از حروف فارسی بدون کاما استفاده کنید.'
-        } else {
-          this.error = false
-          this.message = ''
-        }
-      }
+      // if (this.type == 'phone'){
+      //   let pattern =  /^((0?9)|(\+?989))\d{9}$/g
+      //
+      //   if (pattern.test(newValue) == false){
+      //     this.error = true;
+      //     this.message = 'فرمت شماره وارد شده صحیح نیست'
+      //   } else {
+      //     this.error = false
+      //     this.message = ''
+      //   }
+      // }
+      // if (this.type == 'comment'){
+      //   let pattern =  /^(?!.*,)[\u0600-\u06FF\s]*$/;
+      //   if (pattern.test(newValue) == false){
+      //     this.error = true;
+      //     this.message = 'لطفا از حروف فارسی بدون کاما استفاده کنید.'
+      //   } else {
+      //     this.error = false
+      //     this.message = ''
+      //   }
+      // }
       this.$emit('update', newValue);
       this.$emit('InputError', this.error);
     },
