@@ -10,16 +10,16 @@ export default {
         type: String,
         required: false
      },
-     Hide:{
+      hidden:{
         type: Boolean,
-        required: false
-     }
+        default: false,
+     },
    },
 };
 </script>
 
 <template>
-  <div :class="[Hide ? '': 'hidden']">
+  <div :class="[hidden ? 'hidden':'']">
     <button
         :id="formName + 'Button1'"
         :data-dropdown-toggle="formName+'dropdown1'"

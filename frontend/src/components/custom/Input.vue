@@ -23,9 +23,9 @@ export default {
       default: false,
     },
     hidden:{
-        type: Boolean,
-        required: false
-     }
+      type: Boolean,
+      default: false,
+   },
   },
   data(){
     return {
@@ -95,7 +95,7 @@ export default {
 </script>
 
 <template>
- <div class="relative" :class="[hidden ? '': 'hidden']">
+ <div class="relative" :class="[hidden ? 'hidden':'']">
     <input
       v-model="inputValue"
       @input="updateValue($event.target.value)"
