@@ -302,7 +302,7 @@ async report_shipment(filter) {
                 </thead>
                 <tbody>
                     <template v-for="(v, index) in val.data">
-                          <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-green-50 dark:hover:bg-gray-600">
+                          <tr class="truncate bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-green-50 dark:hover:bg-gray-600">
                             <template v-for="(i ,k) in v">
                               <td class="w-4 p-4">
                                 {{ i }}
