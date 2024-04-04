@@ -223,6 +223,8 @@ Import Data to PostgreSQL: Load the data you exported from SQLite into PostgreSQ
 
 ### Windows SETUP:
 
+Clone: git clone https://github.com/amirholakoo/ISMv900.git
+
 `python -m venv venv`
 
 `venv\Scripts\activate`
