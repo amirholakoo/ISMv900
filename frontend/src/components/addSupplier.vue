@@ -4,10 +4,12 @@ import Card from './Card'
 import modal from "@/components/Modal.vue";
 import Alert from "@/components/Alert.vue";
 import Input from "@/components/custom/Input.vue";
+import ModalButton from "@/components/custom/ModalButton.vue";
 
 export default {
   name: "addSupplier",
   components: {
+    ModalButton,
     Input,
     Alert,
     modal,
