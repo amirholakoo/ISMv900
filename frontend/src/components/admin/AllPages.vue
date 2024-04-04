@@ -63,14 +63,6 @@ export default {
           name: 'createPurchaseOrder',
         },
         {
-          path: '/myapp/updateWeight1/',
-          name: 'updateWeight1',
-        },
-        {
-          path: '/myapp/updateWeight2/',
-          name: 'updateWeight2',
-        },
-        {
           path: '/myapp/weightStationPanel/',
           name: 'weightStationPanel',
         },
