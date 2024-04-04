@@ -90,8 +90,10 @@ export default {
               this.errors.push({'message': `${this.forms[key].name} مورد نیاز است`})
             }
           }else {
-              this.forms[key].error = true
-              this.errors.push({'message': `${this.forms[key].name} مورد نیاز است`})
+              if (key!='unloading_location'){
+                this.forms[key].error = true
+                this.errors.push({'message': `${this.forms[key].name} مورد نیاز است`})
+              }
           }
         }else {
            this.forms[key].error = false
@@ -289,7 +291,7 @@ export default {
         </button>
       </template>
       <template v-if="val.type=='list'">
-        <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
+        <div class="flex flex-col gap-2 font-bold max-w-full relative overflow-x-auto shadow-md sm:rounded-lg">
           <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
               <thead class="text-md text-gray-100 uppercase bg-green-500 dark:bg-gray-700 dark:text-gray-400">
                   <tr>
@@ -312,6 +314,9 @@ export default {
                         نوع بارنامه
                       </th>
                       <th scope="col" class="px-6 py-3">
+                        محل تخلیه/بار شده
+                      </th>
+                      <th scope="col" class="px-3 py-3">
                           <span class="sr-only">افزودن</span>
                       </th>
                   </tr>
