@@ -13,16 +13,16 @@ export default {
   data(){
     return {
       forms: {
-        from_anbar: {status:true, type: 'dropdown', name: 'از انبار',title: 'از انبار', data: '', value: ''},
-        real_or_raw: {status:true, type: 'dropdown', name: 'Reel/Raw',title: 'Reel/Raw', data: ['Raw', 'Reel'], value: 'Raw'},
-        supplier_name: {status:true, type: 'dropdown', name: 'اسم تامین کننده',title: 'اسم تامین کننده', data: '', value: ''},
-        material_name: {status:true, type: 'dropdown', name: 'اسم ماده',title: 'اسم ماده', data: '', value: ''},
-        unit: {status:true, type: 'dropdown', name: 'واحد',title: 'واحد', data: '', value: ''},
-        Quantity: {status:true, type:'input', name: 'مقدار', title: 'مقدار', value: '', lable:'number'},
-        width: {status:false, type: 'dropdown', name: 'عرض',title: 'عرض', data: '', value: '', lable:'number'},
-        reel: {status:false, type: 'dropdown', name: 'رول',title: 'رول', data: '', value: ''},
-        to_anbar: {status:true, type: 'dropdown', name: 'به انبار',title: 'به انبار', data: '', value: ''},
-        forklift_driver: {status:true, type:'input', name: 'اسم راننده لیفت تراک',title: 'اسم راننده لیفت تراک', value: ''},
+        from_anbar: {disabled:true, type: 'dropdown', name: 'از انبار',title: 'از انبار', data: '', value: ''},
+        real_or_raw: {disabled:true, type: 'dropdown', name: 'Reel/Raw',title: 'Reel/Raw', data: ['Raw', 'Reel'], value: 'Raw'},
+        supplier_name: {disabled:true, type: 'dropdown', name: 'اسم تامین کننده',title: 'اسم تامین کننده', data: '', value: ''},
+        material_name: {disabled:true, type: 'dropdown', name: 'اسم ماده',title: 'اسم ماده', data: '', value: ''},
+        unit: {disabled:true, type: 'dropdown', name: 'واحد',title: 'واحد', data: '', value: ''},
+        Quantity: {disabled:true, type:'input', name: 'مقدار', title: 'مقدار', value: '', lable:'number'},
+        width: {disabled:false, type: 'dropdown', name: 'عرض',title: 'عرض', data: '', value: '', lable:'number'},
+        reel: {disabled:false, type: 'dropdown', name: 'رول',title: 'رول', data: '', value: ''},
+        to_anbar: {disabled:true, type: 'dropdown', name: 'به انبار',title: 'به انبار', data: '', value: ''},
+        forklift_driver: {disabled:true, type:'input', name: 'اسم راننده لیفت تراک',title: 'اسم راننده لیفت تراک', value: ''},
       },
       success: false,
       error: false,
@@ -59,12 +59,12 @@ export default {
         this.forms.real_or_raw.name = name
         this.forms.real_or_raw.value = name
         if (name == 'Reel') {
-          this.forms.supplier_name.status = false
-          this.forms.material_name.status = false
-          this.forms.unit.status = false
-          this.forms.Quantity.status = false
-          this.forms.width.status = true
-          this.forms.reel.status = true
+          this.forms.supplier_name.disabled = false
+          this.forms.material_name.disabled = false
+          this.forms.unit.disabled = false
+          this.forms.Quantity.disabled = false
+          this.forms.width.disabled = true
+          this.forms.reel.disabled = true
           const params = {
             "anbar_location": this.forms.from_anbar.value,
             "real_or_raw": 'Reel'
@@ -77,12 +77,12 @@ export default {
         }
 
         if (name == 'Raw') {
-          this.forms.supplier_name.status = true
-          this.forms.material_name.status = true
-          this.forms.unit.status = true
-          this.forms.Quantity.status = true
-          this.forms.width.status = false
-          this.forms.reel.status = false
+          this.forms.supplier_name.disabled = true
+          this.forms.material_name.disabled = true
+          this.forms.unit.disabled = true
+          this.forms.Quantity.disabled = true
+          this.forms.width.disabled = false
+          this.forms.reel.disabled = false
           const params = {
             "anbar_location": this.forms.from_anbar.value,
             "real_or_raw": 'Raw'
@@ -196,7 +196,7 @@ export default {
         </div>
         <template v-for="(val, form_name) in forms">
 <!--          <template v-if="val.type=='input'">-->
-<!--            <div class="relative" :class="[val.status ? '': 'hidden']">-->
+<!--            <div class="relative" :class="[val.disabled ? '': 'hidden']">-->
 <!--              <input v-model="val.value" type="text" :id="form_name" :class="[val.error ? 'text-red-900 border-red-500 focus:border-red-500' : 'text-gray-900 focus:border-green-500 border-gray-300']" class="block px-2.5 pb-2.5 pt-4 w-full text-sm  bg-transparent rounded-lg border-1 appearance-none focus:outline-none focus:ring-0 peer" placeholder="" />-->
 <!--              <label :for="form_name" :class="[val.error ? 'peer-focus:text-red-500 text-red-500' : 'peer-focus:text-green-500 text-gray-500']" class="absolute text-sm dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white dark:bg-gray-900 px-2 peer-focus:px-2  peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1">-->
 <!--                {{val.name}}-->
@@ -204,7 +204,7 @@ export default {
 <!--            </div>-->
 <!--          </template>-->
 <!--          <template v-if="val.type=='dropdown'">-->
-<!--            <button :id="form_name + 'Button'" :data-dropdown-toggle="form_name+'dropdown'"  :class="[val.status ? '': 'hidden']" class="justify-between w-44 text-white bg-green-500 hover:bg-green-600 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="button">-->
+<!--            <button :id="form_name + 'Button'" :data-dropdown-toggle="form_name+'dropdown'"  :class="[val.disabled ? '': 'hidden']" class="justify-between w-44 text-white bg-green-500 hover:bg-green-600 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="button">-->
 <!--              {{val.name}}-->
 <!--              <svg class="w-2.5 h-2.5 ms-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">-->
 <!--                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>-->
@@ -226,14 +226,14 @@ export default {
               :formName="form_name"
               :label="val.name"
               :type="val.lable"
-              :disabled="val.disabled"
+              :hidden="val.disabled"
               @update="val.value = $event"
               :value="val.value"
               @InputError="error = $event"
             />
         </template>
-            <template v-if="val.type=='dropdown'">
-          <Dropdown :formName="form_name">
+        <template v-if="val.type=='dropdown'">
+          <Dropdown :formName="form_name" :Hide="val.disabled">
             <template v-slot:btnName>
               {{val.name}}
             </template>
