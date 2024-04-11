@@ -17,12 +17,15 @@ class Truck(models.Model):
         location (str, optional): Current location of the truck (max length 255).
         username (str, optional): username.
     """
+    date = models.DateTimeField(default=timezone.now, blank=True)
+    status = models.CharField(max_length=10, choices=[('Free', 'Free'), ('Busy', 'Busy')], default='Free')
+    location = models.CharField(max_length=255, blank=True, default='Entrance')
+
     license_number = models.CharField(max_length=255, unique=True)
     driver_name = models.CharField(max_length=255, blank=True)
     driver_doc = models.CharField(max_length=255, blank=True)
     phone = models.CharField(max_length=20, blank=True)
-    status = models.CharField(max_length=10, choices=[('Free', 'Free'), ('Busy', 'Busy')], default='Free')
-    location = models.CharField(max_length=255, blank=True, default='Entrance')
+
     username = models.CharField(max_length=255, null=False, blank=True)
     logs = models.TextField(blank=True)
 
@@ -44,24 +47,27 @@ class Shipments(models.Model):
     Model representing a shipment record.
     """
     # Fields
-    shipment_type = models.CharField(max_length=255, choices=[('Incoming', 'Incoming'), ('Outgoing', 'Outgoing')], null=True)
+    date = models.DateTimeField(default=timezone.now, blank=True)
     status = models.CharField(max_length=255, choices=[('Registered', 'Registered'), ('LoadingUnloading', 'LoadingUnloading'), ('LoadedUnloaded', 'LoadedUnloaded'), ('Office', 'Office'), ('Delivered', 'Delivered'), ('Cancelled', 'Cancelled')], null=True)
     location = models.CharField(max_length=255, null=True)
-    # truck_id = models.ForeignKey(Truck, on_delete=models.SET_NULL, blank=True, null=True)
-    license_number = models.CharField(max_length=255,null=True)
     receive_date = models.DateTimeField(blank=True, null=True)
     entry_time = models.DateTimeField(blank=True, null=True, default=timezone.now)
+    weight1_time = models.DateTimeField(blank=True, null=True)
+    weight2_time = models.DateTimeField(blank=True, null=True)
+    exit_time = models.DateTimeField(blank=True, null=True)
+
+    shipment_type = models.CharField(max_length=255, choices=[('Incoming', 'Incoming'), ('Outgoing', 'Outgoing')], null=True)
+    # truck_id = models.ForeignKey(Truck, on_delete=models.SET_NULL, blank=True, null=True)
+    license_number = models.CharField(max_length=255,null=True)
     customer_name = models.CharField(max_length=255, null=True)
     supplier_name = models.CharField(max_length=255, null=True)
     weight1 = models.IntegerField(null=True)
-    weight1_time = models.DateTimeField(blank=True, null=True)
     unload_location = models.CharField(max_length=255, null=True)
     unit = models.CharField(max_length=255, null=True)
     quantity = models.IntegerField(null=True)
     quality = models.CharField(max_length=255, null=True)
     penalty = models.CharField(max_length=255, null=True)
     weight2 = models.IntegerField(null=True)
-    weight2_time = models.DateTimeField(blank=True, null=True)
     net_weight = models.CharField(max_length=10, null=True)
     list_of_reels = models.TextField(null=True)
     profile_name = models.CharField(max_length=255, null=True)
@@ -78,10 +84,10 @@ class Shipments(models.Model):
     vat = models.IntegerField(null=True)
     invoice_status = models.CharField(max_length=255, choices=[('NA', 'NA'), ('Sent', 'Sent'), ('Received', 'Received')], null=True)
     payment_status = models.CharField(max_length=255, choices=[('Terms', 'Terms'), ('Paid', 'Paid')], null=True)
-    exit_time = models.DateTimeField(blank=True, null=True)
     document_info = models.TextField(null=True)
     comments = models.TextField(null=True)
     cancellation_reason = models.TextField(null=True)
+
     username = models.CharField(max_length=255, null=False, blank=True)
     logs = models.TextField(blank=True)
 
@@ -98,10 +104,11 @@ class Shipments(models.Model):
 
 
 class Supplier(models.Model):
+    date = models.DateTimeField(default=timezone.now, blank=True)
+    status = models.CharField(max_length=255, blank=True, default='Active')
     supplier_name = models.CharField(max_length=255, null=False)
     address = models.TextField(blank=True)
     phone = models.CharField(max_length=20, blank=True)
-    status = models.CharField(max_length=255, blank=True, default='Active')
     comments = models.TextField(blank=True)
     username = models.CharField(max_length=255, null=False, blank=True)
     logs = models.TextField(blank=True)
@@ -120,6 +127,25 @@ class Products(models.Model):
     Each record includes details about a product, such as its dimensions, grade,
     and various attributes related to its physical properties and status.
     """
+    date = models.DateTimeField(default=timezone.now, blank=True)
+
+
+    # Default location of the product
+    location = models.CharField(max_length=255, default='Anbar_Salon_Tolid')
+
+    # Status of the product
+    STATUS_CHOICES = [
+        ('In-stock', 'In-stock'),
+        ('Sold', 'Sold'),
+        ('Moved', 'Moved'),
+        ('Delivered', 'Delivered'),
+    ]
+    status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='In-stock')
+    # Date and time when the product was received
+    receive_date = models.DateTimeField(blank=True, null=True)
+
+    # Last date the product was updated
+    last_date = models.DateTimeField(blank=True, null=True)
 
     # Reel number for the product
     reel_number = models.CharField(max_length=255, unique=True)
@@ -145,23 +171,6 @@ class Products(models.Model):
     # QR code associated with the product
     qr_code = models.TextField(null=True, blank=True)
 
-    # Default location of the product
-    location = models.CharField(max_length=255, default='Anbar_Salon_Tolid')
-
-    # Status of the product
-    STATUS_CHOICES = [
-        ('In-stock', 'In-stock'),
-        ('Sold', 'Sold'),
-        ('Moved', 'Moved'),
-        ('Delivered', 'Delivered'),
-    ]
-    status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='In-stock')
-
-    # Date and time when the product was received
-    receive_date = models.DateTimeField(blank=True, null=True)
-
-    # Last date the product was updated
-    last_date = models.DateTimeField(blank=True, null=True)
 
     # Profile name for the product
     profile_name = models.CharField(max_length=255, null=True, blank=True)
@@ -184,10 +193,11 @@ class Products(models.Model):
 
 
 class Customer(models.Model):
+    date = models.DateTimeField(default=timezone.now, blank=True)
+    status = models.CharField(max_length=255, blank=True, default='Active')
     customer_name = models.CharField(max_length=255, null=False)
     address = models.TextField(blank=True)
     phone = models.CharField(max_length=20, blank=True)
-    status = models.CharField(max_length=255, blank=True, default='Active')
     comments = models.TextField(blank=True)
     username = models.CharField(max_length=255, null=False, blank=True)
     logs = models.TextField(blank=True)
@@ -212,12 +222,12 @@ class RawMaterial(models.Model):
         status (str): Current status of the raw material (e.g., available, low stock, discontinued).
         comments (str, optional): Additional comments or notes about the raw material.
     """
-
+    date = models.DateTimeField(default=timezone.now, blank=True)
+    status = models.CharField(max_length=255, default='Active')
     supplier_name = models.CharField(max_length=255, null=True, blank=True)
     material_type = models.CharField(max_length=255)
     material_name = models.CharField(max_length=255)
     description = models.CharField(max_length=255, blank=True)
-    status = models.CharField(max_length=255, default='Active')
     comments = models.TextField(blank=True)
     username = models.CharField(max_length=255, null=False, blank=True)
     logs = models.TextField(blank=True)
@@ -273,8 +283,9 @@ class Purchases(models.Model):
     # Fields
 
     date = models.DateTimeField(default=timezone.now, blank=True)
+    status = models.CharField(max_length=225, choices=[('Paid', 'Paid'), ('Terms', 'Terms'), ('Cancelled', 'Cancelled')], blank=True, null=True)
     receive_date = models.DateTimeField(blank=True, null=True)
-
+    payment_date = models.DateTimeField(blank=True, null=True)
     # supplier_id = models.ForeignKey('Supplier', on_delete=models.SET_NULL, blank=True, null=True)
     license_number = models.CharField(max_length=255, null=True)
     material_id = models.ForeignKey('MaterialType', on_delete=models.SET_NULL, blank=True, null=True)
@@ -284,28 +295,18 @@ class Purchases(models.Model):
     supplier_name = models.CharField(max_length=255, blank=True, null=True)
     unit = models.CharField(max_length=255, blank=True, null=True)
     quantity = models.IntegerField(blank=True, null=True)
-
     quality = models.CharField(max_length=255, blank=True, null=True)
     penalty = models.CharField(max_length=255, blank=True, null=True)
-
     weight1 = models.IntegerField(null=True)
     weight2 = models.IntegerField(null=True)
     net_weight = models.IntegerField(null=True)
-
     price_per_kg = models.BigIntegerField(null=True)
-
     # VAT field needs further information on data type
     vat = models.IntegerField(null=True)
-
     total_price = models.BigIntegerField(null=True)
     extra_cost = models.BigIntegerField(null=True)
-
     invoice_status = models.CharField(max_length=255, choices=[('Received', 'Received'), ('NA', 'NA')], blank=True, null=True)
-    status = models.CharField(max_length=225, choices=[('Paid', 'Paid'), ('Terms', 'Terms'), ('Cancelled', 'Cancelled')], blank=True, null=True)
-
     payment_details = models.CharField(max_length=255, blank=True, null=True)
-    payment_date = models.DateTimeField(blank=True, null=True)
-
     invoice_number = models.CharField(max_length=255, blank=True, null=True)
     document_info = models.TextField(blank=True, null=True)
     comments = models.TextField(blank=True, null=True)
@@ -361,7 +362,9 @@ class Sales(models.Model):
     """
     # Fields
 
+    status = models.CharField(max_length=255, choices=[('Paid', 'Paid'), ('Terms', 'Terms'), ('Cancelled', 'Cancelled')], null=True)
     date = models.DateTimeField(default=timezone.now, null=True)
+    payment_date = models.DateTimeField(null=True)
     customer = models.ForeignKey('Customer', on_delete=models.CASCADE, null=True)
     truck = models.ForeignKey('Truck', on_delete=models.CASCADE, null=True)
     license_number = models.CharField(max_length=255, null=True)
@@ -377,13 +380,13 @@ class Sales(models.Model):
     width = models.IntegerField(null=True, blank=True)
     invoice_status = models.CharField(max_length=255, choices=[('Sent', 'Sent'), ('NA', 'NA')], null=True)
     invoice_number = models.CharField(max_length=255, null=True)
-    status = models.CharField(max_length=255, choices=[('Paid', 'Paid'), ('Terms', 'Terms'), ('Cancelled', 'Cancelled')], null=True)
+
     payment_details = models.CharField(max_length=255, null=True)
-    payment_date = models.DateTimeField(null=True)
     document_info = models.TextField(null=True)
     comments = models.TextField(null=True)
     cancellation_reason = models.TextField(null=True)
     shipment = models.ForeignKey('Shipments', on_delete=models.CASCADE, null=True)
+
     username = models.CharField(max_length=255, null=False, blank=True)
     logs = models.TextField(blank=True)
     # Meta
@@ -403,8 +406,25 @@ class AnbarGeneric(models.Model):
     This model provides common fields and behaviors for all anbar items.
     """
 
+    # Status of the material
+    STATUS_CHOICES = [
+        ('In-stock', 'In-stock'),
+        ('Sold', 'Sold'),
+        ('Moved', 'Moved'),
+        ('Used', 'Used'),
+        ('Cancelled', 'Cancelled'),
+    ]
+    status = models.CharField(max_length=50, choices=STATUS_CHOICES, null=True, blank=True)
+
+    # Location of the material
+    location = models.CharField(max_length=255, null=True, blank=True)
+
+    date = models.DateTimeField(default=timezone.now, blank=True)
     # Date and time when the record was received
     receive_date = models.DateTimeField(null=True, blank=True)
+
+    # Last date the material was updated
+    last_date = models.DateTimeField(null=True, blank=True)
 
     # Reel number for the material
     reel_number = models.CharField(max_length=255, null=True, blank=True)
@@ -423,22 +443,6 @@ class AnbarGeneric(models.Model):
 
     # Description of the material
     description = models.TextField(null=True, blank=True)
-
-    # Status of the material
-    STATUS_CHOICES = [
-        ('In-stock', 'In-stock'),
-        ('Sold', 'Sold'),
-        ('Moved', 'Moved'),
-        ('Used', 'Used'),
-        ('Cancelled', 'Cancelled'),
-    ]
-    status = models.CharField(max_length=50, choices=STATUS_CHOICES, null=True, blank=True)
-
-    # Location of the material
-    location = models.CharField(max_length=255, null=True, blank=True)
-
-    # Last date the material was updated
-    last_date = models.DateTimeField(null=True, blank=True)
 
     # Width of the material
     width = models.IntegerField(null=True, blank=True)
@@ -463,6 +467,7 @@ class AnbarGeneric(models.Model):
     unit = models.CharField(max_length=255, null=True, blank=True)
     # Profile name for the material
     profile_name = models.CharField(max_length=255, null=True, blank=True)
+
     username = models.CharField(max_length=255, null=False, blank=True)
     logs = models.TextField(blank=True)
 
@@ -584,6 +589,11 @@ class Consumption(models.Model):
     such as the supplier, material type, and quantity.
     """
 
+    # Status of the consumption
+    status = models.CharField(max_length=50, null=True, blank=True)
+    location = models.CharField(max_length=255, null=True, blank=True)
+
+    date = models.DateTimeField(default=timezone.now, blank=True)
     # Date and time when the consumption was recorded
     receive_date = models.DateTimeField(null=True, blank=True)
 
@@ -615,10 +625,7 @@ class Consumption(models.Model):
     # Additional comments about the consumption
     comments = models.TextField(null=True, blank=True)
     cancelling_reason = models.TextField(null=True, blank=True)
-    location = models.CharField(max_length=255, null=True, blank=True)
 
-    # Status of the consumption
-    status = models.CharField(max_length=50, null=True, blank=True)
     username = models.CharField(max_length=255, null=False, blank=True)
     logs = models.TextField(blank=True)
 
@@ -634,14 +641,16 @@ class Consumption(models.Model):
 
 
 class ConsumptionProfile(models.Model):
+    status = models.CharField(max_length=255, blank=True, default="Active")
+    date = models.DateTimeField(default=timezone.now, blank=True)
+    receive_date = models.DateTimeField(blank=True, null=True)
     profile_name = models.CharField(max_length=255, null=True, blank=True)
     supplier_name = models.CharField(max_length=255)
     material_type = models.CharField(max_length=255)
     material_name = models.CharField(max_length=255)
     unit = models.CharField(max_length=100)
     quantity = models.DecimalField(max_digits=10, decimal_places=2)
-    receive_date = models.DateTimeField(blank=True, null=True)
-    status = models.CharField(max_length=255, blank=True, default="Active")
+
     username = models.CharField(max_length=255, null=False, blank=True)
     logs = models.TextField(blank=True)
     # Meta
@@ -662,13 +671,12 @@ class MaterialType(models.Model):
     - material_type: Type of material. Required field.
     - username: Username associated with the material type. Can be null or blank.
     """
-
+    status = models.CharField(max_length=50, null=True, blank=True, default='Active')
+    date = models.DateTimeField(default=timezone.now, blank=True)
     supplier_name = models.CharField(max_length=255, null=True, blank=True)
     # Ensure material_type is always provided to avoid empty entries
     material_type = models.CharField(max_length=255)
     username = models.CharField(max_length=255, null=False, blank=True)
-    status = models.CharField(max_length=50, null=True, blank=True, default='Active')
-    date = models.DateTimeField(default=timezone.now, blank=True)
     logs = models.TextField(blank=True)
 
     # Meta
@@ -697,14 +705,14 @@ class Unit(models.Model):
         date (datetime): Date and time the unit was created, defaults to the current time.
         logs (str, blank=True): Text field for storing logs or additional information about the unit.
     """
-
+    status = models.CharField(max_length=255, blank=True, default='Active')
+    date = models.DateTimeField(default=timezone.now, blank=True)
     supplier_name = models.CharField(max_length=255, null=True, blank=True)
     material_type = models.CharField(max_length=255)
     unit_name = models.CharField(max_length=255, null=True, blank=True)
     count = models.FloatField(blank=True, null=True)
     username = models.CharField(max_length=255, null=False, blank=True)
-    date = models.DateTimeField(default=timezone.now, blank=True)
-    status = models.CharField(max_length=255, blank=True, default='Active')
+
     logs = models.TextField(blank=True)
 
     # Meta
