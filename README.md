@@ -8,6 +8,7 @@ pip install pandas
 pip install openpyxl
 pip install jdatetime
 pip install qrcode
+pip install channels
 ### Step 1: Create a Virtual Environment
 
 To create a virtual environment, open your terminal or command prompt and navigate to the directory where you want to create the virtual environment. Then, run the following command:
