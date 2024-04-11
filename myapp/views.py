@@ -597,8 +597,9 @@ def add_new_reel(request):
             all_table_names = connection.introspection.table_names()
             anbar_table_names = [name for name in all_table_names if name.startswith('Anbar_')]
             profile_list = ConsumptionProfile.objects.filter(profile_name=profile_name)
-            isExist = False
-
+            isExist = True # Initialize isExist as True, assuming no records are found initially
+            # print(anbar_table_names)
+            # print(len(anbar_table_names))
             for each_line in profile_list:
 
                 for anbar_name in anbar_table_names:
@@ -607,8 +608,10 @@ def add_new_reel(request):
                         supplier_name=each_line.supplier_name,
                         material_name=each_line.material_name,
                         status='In-stock').order_by('receive_date')[:each_line.quantity]
+
+
                     if anbar_records.exists():
-                        isExist = False
+                        isExist = False # Set isExist to False if records are found
                         isEnough = len(anbar_records) < int(each_line.quantity)
                         # Iterate over the source records and create new instances of the target model
                         for record in anbar_records:
@@ -645,8 +648,7 @@ def add_new_reel(request):
                             msg = f"انبار {anbar_name} مقدار کمتری از {str(each_line.quantity)} دارد با این حال {len(anbar_records)} مقدار مصرف شد"
                             errors.append({'status': 'error', 'message': msg})
                             return JsonResponse({'status': 'error', 'errors': errors})
-                    else:
-                        isExist = True
+
             if isExist:
                 msg = 'در هیچ یک از انبار ها چیزی یافت نشد.'
                 errors.append({'status': 'error', 'message': msg})
@@ -1451,7 +1453,7 @@ def create_sales_order(request):
                     location=customer_name
                 )
                 list_of_reels = list(map(int, list_of_reels.split(',')))
-                print(list_of_reels)
+                # print(list_of_reels)
                 for reel in list_of_reels:
                     products = Products.objects.filter(reel_number=reel)
                     products.update(
@@ -1476,7 +1478,9 @@ def create_sales_order(request):
                 return JsonResponse({'status': 'error', 'message': 'Shipments not found.'}, status=404)
             except Exception as e:
                 # print(e)
-                return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+                errors.append({'status': 'error', 'message': str(e)})
+                return JsonResponse({'status': 'error', 'errors': errors})
+                # return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
     else:
         return render(request, 'create_sales_order.html')
 
@@ -1741,7 +1745,7 @@ def loaded(request):
                 shipment = Shipments.objects.filter(license_number=license_number, status='LoadingUnloading',location='Weight1', shipment_type='Outgoing')
                 # material_name = shipment[0].material_name
                 # supplier_name = shipment[0].supplier_name
-
+                print(shipment)
                 # Dynamically import the model class
                 AnbarModel = apps.get_model('myapp', loading_location)
                 for reel_number in reel_numbers:
@@ -1749,6 +1753,7 @@ def loaded(request):
                     logs = anbar[0].logs + log_generator(forklift_driver, 'Loaded')
 
                     anbar.update(
+                        shipment_id=shipment[0],
                         status='Sold',
                         location=license_number,
                         # supplier_name=supplier_name,
@@ -1761,6 +1766,7 @@ def loaded(request):
                     product = Products.objects.filter(reel_number=reel_number, width=width,)
                     logs = product[0].logs + log_generator(forklift_driver, 'Loaded')
                     product.update(
+                        shipment_id=shipment[0],
                         status='Sold',
                         location=license_number,
                         # receive_date=timezone.now(),
