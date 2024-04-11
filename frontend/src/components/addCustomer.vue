@@ -20,7 +20,7 @@ export default {
   data(){
     return{
       forms: {
-        customer_name: {type: 'input', name: 'اسم مشتری (مثال: مهدی حسینی)',title: 'اسم مشتری (مثال: مهدی حسینی)', data: '', value: '', lable:'text'},
+        customer_name: {type: 'input', name: 'اسم مشتری (مثال: مهدی حسینی  یا شرکت مشتری)',title: 'اسم مشتری (مثال: مهدی حسینی  یا شرکت مشتری)', data: '', value: '', lable:'text'},
         address: {type: 'input', name: 'آدرس',title: 'آدرس', data: '', value: '', lable:'text'},
         phone: {type: 'input', name: 'شماره همراه',title: 'شماره همراه', data: '', value: '', lable:'phone'},
         comment: {type: 'input', name: 'توضیحات',title: 'توضیحات', data: '', value: '', lable:'comment'},
