@@ -32,7 +32,7 @@ export default {
         invoice_status: {type: 'dropdown', name: 'وضعیت فاکتور',title: 'وضعیت فاکتور', data: ['Received', 'NA'], value: ''},
         supplier_invoice: {type:'input', name: 'شماره فاکتور تامین کننده', title: 'شماره فاکتور تامین کننده', value: '', lable:'number'},
         payment_status:{type:'dropdown', name: 'وضعیت پرداخت',title: 'وضعیت پرداخت', data: ['Terms', 'Paid'], value: ''},
-        document_info: {type:'input', name: 'اظلاعات سند', title: 'اظلاعات سند', value: ''},
+        document_info: {type:'input', name: 'اظلاعات سند', title: 'اظلاعات سند', value: '', lable:''},
         commnet: {type:'input', name: 'توضیحات', title: 'توضیحات', value: '', lable:'comment'},
         username: {type:'input', name: 'نام کاربر', title: 'نام کاربر', value: ''},
       },
