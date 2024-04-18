@@ -2720,6 +2720,7 @@ def cancel(request):
                         AnbarModel = apps.get_model('myapp', shipment.unload_location)
                         anbar = AnbarModel.objects.filter(
                             reel_number=reel,
+                            shipment_id=shipment
                         )
                         if anbar.exists():
                             # anbar = anbar.order_by('receive_date')[:int(shipment.quantity)]
