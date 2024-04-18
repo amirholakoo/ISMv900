@@ -1616,7 +1616,7 @@ def unload(request):
                         location=unloading_location,
                         receive_date=timezone.now(),
                         username=forklift_driver,
-                        logs=log_generator(forklift_driver, 'Unloaded')
+                        logs=shipment[0].logs + log_generator(forklift_driver, 'Unloaded') + append_log({'quality': quality}, 'unload')
                     )
 
 
