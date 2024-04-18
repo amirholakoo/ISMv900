@@ -34,7 +34,8 @@ export default {
     initFlowbite();
     const params = {
       "status": 'LoadingUnloading',
-      "location": 'Weight1'
+      "location": 'Weight1',
+      "shipment_type": 'Incoming',
     }
     this.axios.post('/myapp/api/getShipmentLicenseNumbers', {}, {params: params}).then((response) => {
       console.log('lics:',response.data)
