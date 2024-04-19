@@ -2124,6 +2124,7 @@ def moved(request):
                         material_name=material_name,
                         material_type=record.material_type,
                         unit=unit,
+                        grade=record.grade,
                         shipment_id=record.shipment_id,
                         username=forklift_driver,
                         logs=log_message
