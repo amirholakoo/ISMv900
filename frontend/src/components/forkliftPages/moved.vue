@@ -85,14 +85,13 @@ export default {
           this.forms.reel.disabled = false
           const params = {
             "anbar_location": this.forms.from_anbar.value,
-            "real_or_raw": 'Raw',
-            "supplier_name": this.forms.supplier_name.value,
+            "real_or_raw": 'Raw'
           }
           this.axios.post('/myapp/api/loadDataForMoved', {}, {params: params}).then((response) => {
             console.log(response.data)
             this.forms.supplier_name.data = response.data['supplier_names']
-            this.forms.material_name.data = response.data['material_names']
-            this.forms.unit.data = response.data['units']
+            // this.forms.material_name.data = response.data['material_names']
+            // this.forms.unit.data = response.data['units']
           })
         }
       }
@@ -103,6 +102,14 @@ export default {
       if (k == 'supplier_name'){
         this.forms.supplier_name.name = name
         this.forms.supplier_name.value = name
+        const params = {
+            "anbar_location": this.forms.from_anbar.value,
+            "supplier_name": this.forms.supplier_name.value
+        }
+        this.axios.get('/myapp/api/getUnitAndMaterialNameBasedSupplierNmaeAndbar',{params: params}).then((response) => {
+          this.forms.material_name.data = response.data['material_names']
+          this.forms.unit.data = response.data['units']
+        })
       }
       if (k == 'material_name'){
         this.forms.material_name.name = name
