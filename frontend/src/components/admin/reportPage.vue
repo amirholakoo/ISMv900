@@ -294,9 +294,11 @@ async report_shipment(filter) {
                 <thead class="text-xs text-gray-100 uppercase bg-green-500 dark:bg-gray-700 dark:text-gray-400">
                     <tr>
                          <template v-for="(i ,k) in val.fields">
-                            <th scope="col" class="px-2 py-3">
-                                {{i}}
-                            </th>
+                           <template v-if="i !='id'">
+                              <th scope="col" class="px-2 py-3">
+                                  {{i}}
+                              </th>
+                           </template>
                       </template>
                     </tr>
                 </thead>
@@ -304,9 +306,11 @@ async report_shipment(filter) {
                     <template v-for="(v, index) in val.data">
                           <tr class="truncate bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-green-50 dark:hover:bg-gray-600">
                             <template v-for="(i ,k) in v">
-                              <td class="w-4 p-4">
-                                {{ i }}
-                              </td>
+                              <template v-if="k !='id'">
+                                <td class="w-4 p-4">
+                                  {{ i }}
+                                </td>
+                              </template>
                             </template>
                           </tr>
                     </template>
