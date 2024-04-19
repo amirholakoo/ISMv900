@@ -288,7 +288,7 @@ class Purchases(models.Model):
     payment_date = models.DateTimeField(blank=True, null=True)
     # supplier_id = models.ForeignKey('Supplier', on_delete=models.SET_NULL, blank=True, null=True)
     license_number = models.CharField(max_length=255, null=True)
-    material_id = models.ForeignKey('MaterialType', on_delete=models.SET_NULL, blank=True, null=True)
+    # material_id = models.ForeignKey('MaterialType', on_delete=models.SET_NULL, blank=True, null=True)
 
     material_type = models.CharField(max_length=255, blank=True, null=True)
     material_name = models.CharField(max_length=255, blank=True, null=True)
