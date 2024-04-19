@@ -65,11 +65,11 @@ class RawMaterialAdmin(admin.ModelAdmin):
 @admin.register(Purchases)
 class PurchasesAdmin(admin.ModelAdmin):
 
-    list_display = ('date', 'receive_date', 'material_id', 'material_type', 'material_name','supplier_name', 'unit', 'quantity', 'quality', 'penalty', 'weight1', 'weight2', 'net_weight', 'price_per_kg', 'vat', 'total_price', 'extra_cost', 'invoice_status', 'status', 'payment_details', 'payment_date', 'invoice_number', 'document_info', 'comments', 'cancellation_reason', 'shipment_id', 'username', 'logs',)
+    list_display = ('date', 'receive_date', 'material_type', 'material_name','supplier_name', 'unit', 'quantity', 'quality', 'penalty', 'weight1', 'weight2', 'net_weight', 'price_per_kg', 'vat', 'total_price', 'extra_cost', 'invoice_status', 'status', 'payment_details', 'payment_date', 'invoice_number', 'document_info', 'comments', 'cancellation_reason', 'shipment_id', 'username', 'logs',)
 
     search_fields = ('material_name', 'supplier_id')
 
-    list_filter = ('date', 'receive_date', 'material_id', 'material_type', 'material_name','supplier_name', 'unit', 'quantity', 'quality', 'penalty', 'weight1', 'weight2', 'net_weight', 'price_per_kg', 'vat', 'total_price', 'extra_cost', 'invoice_status', 'status', 'payment_details', 'payment_date', 'invoice_number', 'document_info', 'comments', 'cancellation_reason', 'shipment_id', 'username', 'logs',)
+    list_filter = ('date', 'receive_date', 'material_type', 'material_name','supplier_name', 'unit', 'quantity', 'quality', 'penalty', 'weight1', 'weight2', 'net_weight', 'price_per_kg', 'vat', 'total_price', 'extra_cost', 'invoice_status', 'status', 'payment_details', 'payment_date', 'invoice_number', 'document_info', 'comments', 'cancellation_reason', 'shipment_id', 'username', 'logs',)
 
 
 @admin.register(Sales)
