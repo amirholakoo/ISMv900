@@ -2030,7 +2030,7 @@ def load_data_for_moved(request):
 
             data = {
                 "width": [item['width'] for item in widths],
-                "reel_number": [item['reel_number'] for item in reel_numbers],
+                # "reel_number": [item['reel_number'] for item in reel_numbers],
             }
 
         # Return the widths as a JSON response
