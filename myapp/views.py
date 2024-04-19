@@ -617,6 +617,7 @@ def add_new_reel(request):
                         for record in anbar_records:
                             record.status = 'Used'
                             record.location = 'Consumption DB'
+                            record.profile_name = profile_name
                             record.last_date = timezone.now()
                             if isEnough:
                                 log_message = log_generator(record.profile_name, 'Used') + not_enough_log_generator('Consumption DB')
