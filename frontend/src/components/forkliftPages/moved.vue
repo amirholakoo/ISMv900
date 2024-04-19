@@ -85,7 +85,8 @@ export default {
           this.forms.reel.disabled = false
           const params = {
             "anbar_location": this.forms.from_anbar.value,
-            "real_or_raw": 'Raw'
+            "real_or_raw": 'Raw',
+            "supplier_name": this.forms.supplier_name.value,
           }
           this.axios.post('/myapp/api/loadDataForMoved', {}, {params: params}).then((response) => {
             console.log(response.data)
