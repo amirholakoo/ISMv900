@@ -72,7 +72,7 @@ export default {
           this.axios.post('/myapp/api/loadDataForMoved', {}, {params: params}).then((response) => {
             console.log(response.data)
             this.forms.width.data = response.data['width']
-            this.forms.reel.data = response.data['reel_number']
+            // this.forms.reel.data = response.data['reel_number']
           })
         }
 
@@ -118,6 +118,15 @@ export default {
       if (k == 'width'){
         this.forms.width.name = name
         this.forms.width.value = name
+        const params = {
+          "anbar_location": this.forms.from_anbar.value,
+          "width": this.forms.width.value,
+        }
+        this.axios.post('/myapp/api/getReelNumbersByWidthAndStatus', {}, {params: params}).then((response) => {
+          console.log(response.data)
+          // this.forms.width.data = response.data['width']
+          this.forms.reel.data = response.data['reel_numbers']
+        })
       }
       if (k == 'reel'){
         this.forms.reel.name = name
