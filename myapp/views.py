@@ -41,6 +41,8 @@ def append_log(fields, page):
         logs += f" {current_time} {message} by {page} FOR {filed},"
     return logs
 
+def get_time():
+    return timezone.now().strftime('%Y-%m-%d %H:%M')
 # Incoming process:
 # Add Truck
 # Add Shipments
@@ -569,7 +571,7 @@ def add_new_reel(request):
                 username=username,
                 comments=commnet,
                 profile_name=profile_name,
-                receive_date=timezone.now(),
+                receive_date=get_time(),
                 logs=log_generator(username, 'Created') + append_log({'comments': commnet}, 'add New Reel')
             )
             new_product.save()
@@ -588,7 +590,7 @@ def add_new_reel(request):
                 username=username,
                 comments=commnet,
                 profile_name=profile_name,
-                receive_date=timezone.now(),
+                receive_date=get_time(),
                 logs=log_generator(username, 'Created') + append_log({'comments': commnet}, 'add New Reel')
             )
             new_anbar_record.save()
@@ -618,7 +620,7 @@ def add_new_reel(request):
                             record.status = 'Used'
                             record.location = 'Consumption DB'
                             record.profile_name = profile_name
-                            record.last_date = timezone.now()
+                            record.last_date = get_time()
                             if isEnough:
                                 log_message = log_generator(record.profile_name, 'Used') + not_enough_log_generator('Consumption DB')
                             else:
@@ -634,7 +636,7 @@ def add_new_reel(request):
                                 supplier_name=record.supplier_name,
                                 material_name=record.material_name,
                                 material_type=record.material_type,
-                                receive_date=timezone.now(),
+                                receive_date=get_time(),
                                 grade=record.grade,
                                 username=username,
                                 comments=commnet,
@@ -813,8 +815,8 @@ def add_shipment(request):
                     status='Registered',
                     location='Entrance',
                     username=username,
-                    entry_time=timezone.now(),
-                    receive_date=timezone.now(),
+                    entry_time=get_time(),
+                    receive_date=get_time(),
                     logs=log_generator(username, 'Created')
                 )
             else:
@@ -825,8 +827,8 @@ def add_shipment(request):
                     status='Registered',
                     location='Entrance',
                     username=username,
-                    entry_time=timezone.now(),
-                    receive_date=timezone.now(),
+                    entry_time=get_time(),
+                    receive_date=get_time(),
                     logs=log_generator(username, 'Created')
                 )
 
@@ -1078,7 +1080,7 @@ def update_weight1(request):
                 ship = Shipments.objects.filter(license_number=license_number, status='Registered', location='Entrance').first()
                 Shipments.objects.filter(license_number=license_number, status='Registered', location='Entrance').update(
                     weight1=weight1,
-                    weight1_time=timezone.now(),
+                    weight1_time=get_time(),
                     status='LoadingUnloading',
                     location='Weight1',
                     logs=ship.logs + log_generator(username, 'Weight1')
@@ -1173,7 +1175,7 @@ def update_weight2(request):
                     weight1=weight1,
                     weight2=weight2,
                     net_weight=net_weight,
-                    weight2_time=timezone.now(),
+                    weight2_time=get_time(),
                     status='Office',
                     location='Office',
                     logs=ship[0].logs+log_generator(username, 'Weight2')
@@ -1273,8 +1275,8 @@ def create_purchase_order(request):
                     )
                     ship = Shipments.objects.filter(license_number=license_number, status='Office', location='Office')
                     purchase = Purchases(
-                        date=timezone.now(),
-                        receive_date=timezone.now(),  # Assuming you want to set the current date/time
+                        date=get_time(),
+                        receive_date=get_time(),  # Assuming you want to set the current date/time
                         # supplier_id=Supplier.objects.get(supplier_name=supplier_name),
                         license_number=license_number,
                         # material_id=MaterialType.objects.get(material_type=material_type),
@@ -1313,7 +1315,7 @@ def create_purchase_order(request):
                         invoice_status=invoice_status,
                         payment_status=payment_status,
                         document_info=document_info,
-                        exit_time=timezone.now(),
+                        exit_time=get_time(),
                         status='Delivered',
                         location='Delivered',
                         comments=commnet,
@@ -1425,7 +1427,7 @@ def create_sales_order(request):
                     comments=comments,
                     username=username,
                     shipment=ship[0],
-                    date=timezone.now(),  # Assuming you want to set the current date and time
+                    date=get_time(),  # Assuming you want to set the current date and time
                     logs=log_generator(username, 'Created SO') + append_log({'comments': comments}, 'SO')
                 )
                 # Save the instance
@@ -1444,7 +1446,7 @@ def create_sales_order(request):
                     invoice_status=invoice_status,
                     payment_status=payment_status,
                     document_info=document_info,
-                    exit_time=timezone.now(),
+                    exit_time=get_time(),
                     comments=comments,
                     logs=ship[0].logs + log_generator(username, 'Created SO') + append_log({'comments': comments}, 'SO')
                 )
@@ -1460,7 +1462,7 @@ def create_sales_order(request):
                     products.update(
                         status='Delivered',
                         location=customer_name,
-                        last_date=timezone.now(),
+                        last_date=get_time(),
                         logs=products[0].logs + log_generator(username, 'Created SO')
                     )
                     # Dynamically get the model based on the anbar_name
@@ -1469,7 +1471,7 @@ def create_sales_order(request):
                     anbar.update(
                         status='Delivered',
                         location=customer_name,
-                        last_date=timezone.now(),
+                        last_date=get_time(),
                         logs=anbar[0].logs + log_generator(username, 'Created SO')
                     )
                 # Return a success response
@@ -1615,7 +1617,7 @@ def unload(request):
                         grade=quality,
                         status='In-stock',
                         location=unloading_location,
-                        receive_date=timezone.now(),
+                        receive_date=get_time(),
                         username=forklift_driver,
                         logs=shipment[0].logs + log_generator(forklift_driver, 'Unloaded') + append_log({'quality': quality}, 'unload')
                     )
@@ -1759,8 +1761,8 @@ def loaded(request):
                         location=license_number,
                         # supplier_name=supplier_name,
                         # material_name=material_name,
-                        # receive_date=timezone.now(),
-                        # last_date=timezone.now(),
+                        # receive_date=get_time(),
+                        # last_date=get_time(),
                         logs=logs,
                     )
 
@@ -1770,8 +1772,8 @@ def loaded(request):
                         shipment_id=shipment[0],
                         status='Sold',
                         location=license_number,
-                        # receive_date=timezone.now(),
-                        # last_date=timezone.now(),
+                        # receive_date=get_time(),
+                        # last_date=get_time(),
                         logs=logs,
                     )
                 profile_name = product[0].profile_name
@@ -1968,10 +1970,11 @@ def used(request):
                 else:
                     log_message = log_generator(forklift_driver, 'Used')
 
-                record.last_date=timezone.now()
+                record.last_date=get_time()
                 record.save()
                 consumption = Consumption(
-                        receive_date=timezone.now(),
+                        shipment_id=record.shipment_id,
+                        receive_date=get_time(),
                         supplier_name=supplier_name,
                         material_name=material_name,
                         material_type=material_type,
@@ -2114,11 +2117,11 @@ def moved(request):
                 for record in sourse:
                     record.status = 'Moved'
                     record.location = to_anbar
-                    record.last_date = timezone.now()
+                    record.last_date = get_time()
                     record.logs = record.logs + log_generator(forklift_driver, 'Moved')
                     # Create new entries in the destination AnbarGeneric location
                     new_item = AnbarModel2(
-                        receive_date=timezone.now(),
+                        receive_date=get_time(),
                         location=to_anbar,
                         status='In-stock',
                         supplier_name=supplier_name,
@@ -2160,13 +2163,13 @@ def moved(request):
 
                 for record in sourse:
                     # update anbar a
-                    record.last_date = timezone.now()
+                    record.last_date = get_time()
                     record.status = 'Moved'
                     record.location = to_anbar
                     record.logs =record.logs + log_generator(forklift_driver, 'Moved')
                     # insert to anbar 2
                     new_item = AnbarModel2(
-                        receive_date=timezone.now(),
+                        receive_date=get_time(),
                         location=to_anbar,
                         status='In-stock',
                         width=width,
@@ -2291,7 +2294,7 @@ def retuned(request):
                     record.comments = reason
                     record.status = 'Returned'
                     record.location = to_anbar
-                    record.last_date = timezone.now()
+                    record.last_date = get_time()
                     record.logs =record.logs + log_generator(forklift_driver, 'Returned')
                     if isEnough:
                         log_message = log_generator(forklift_driver, 'Returned') + not_enough_log_generator(to_anbar)
@@ -2300,7 +2303,7 @@ def retuned(request):
 
                     # Create new entries in the destination AnbarGeneric location
                     new_item = AnbarModel(
-                        receive_date=timezone.now(),
+                        receive_date=get_time(),
                         location=to_anbar,
                         status='In-stock',
                         supplier_name=supplier_name,
@@ -2519,7 +2522,7 @@ def add_unit(request):
                 unit_name=unit_name,
                 count=count,
                 username=username,
-                date=timezone.now(),
+                date=get_time(),
                 status='Active',
                 logs=log_generator(username, 'Created')
             )
@@ -2604,7 +2607,7 @@ def add_consumption_profile(request):
                 material_type=material_type,
                 unit=unit,
                 quantity=int(quantity),
-                receive_date=timezone.now(),
+                receive_date=get_time(),
                 status="Active",
                 username=username,
                 logs=log_generator(username, 'Created')
@@ -2675,7 +2678,7 @@ def cancel(request):
                     for record in anbar:
                         record.status = status
                         record.location = location
-                        record.last_date = timezone.now()
+                        record.last_date = get_time()
                         record.logs = record.logs + log_generator(username, action)
                         record.save()
         else:
@@ -2714,7 +2717,7 @@ def cancel(request):
                         username=product.username,
                         status='In-stock',
                         location=anbar_location,
-                        receive_date=timezone.now(),
+                        receive_date=get_time(),
                         logs=log_generator(username, 'Cancelled and Added') + append_log({'comments': product.comments}, 'Cancel')
                     )
                     anbar_a.save()
@@ -2729,7 +2732,7 @@ def cancel(request):
                             for record in anbar:
                                 record.status = status
                                 record.location = location
-                                # record.last_date = timezone.now()
+                                # record.last_date = get_time()
                                 record.logs = record.logs + log_generator(username, action)
                                 record.save()
 
