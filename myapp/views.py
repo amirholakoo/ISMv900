@@ -1402,13 +1402,10 @@ def create_sales_order(request):
             return JsonResponse({'status': 'error', 'errors': errors})
         else:
             try:
-                customer = Customer.objects.get(customer_name=customer_name)
-                truck = Truck.objects.get(license_number=license_number)
                 ship = Shipments.objects.filter(license_number=license_number, status='Office', location='Office', shipment_type='Outgoing')
                 # Create a new instance of the Sales model
                 sale = Sales(
-                    customer=customer,
-                    truck=truck,
+                    customer_name=customer_name,
                     license_number=license_number,
                     list_of_reels=list_of_reels,
                     profile_name=consuption_profile_name,
