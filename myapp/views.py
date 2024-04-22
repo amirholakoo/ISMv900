@@ -3,6 +3,7 @@ import pandas as pd
 import logging
 from django.shortcuts import render, redirect
 from .models import *
+from django.db.models import Count
 from django.http import JsonResponse
 from django.core.exceptions import ValidationError
 from django.views.decorators.csrf import csrf_exempt
@@ -3038,6 +3039,7 @@ def report_Sales(request):
         else:
             return JsonResponse({'status': 'error', 'message': 'Invalid request method'}, status=405)
     except Exception as e:
+        print(e)
         return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
 
 
@@ -3129,16 +3131,16 @@ def report_Products(request):
             current_time = timezone.now()
 
             if filter_type == 'year':
-                products = Products.objects.filter(receive_date__year=current_time.year).order_by('width').values()
+                products = Products.objects.filter(receive_date__year=current_time.year, status='In-stock').order_by('-width').values()
             elif filter_type == 'month':
-                products = Products.objects.filter(receive_date__month=current_time.month).order_by('width').values()
+                products = Products.objects.filter(receive_date__month=current_time.month, status='In-stock').order_by('-width').values()
             elif filter_type == 'week':
                 start_of_last_week = current_time - timedelta(days=6)
                 end_of_last_week = current_time
-                products = Products.objects.filter(receive_date__range=(start_of_last_week, end_of_last_week)).order_by('width').values()
+                products = Products.objects.filter(receive_date__range=(start_of_last_week, end_of_last_week), status='In-stock').order_by('-width').values()
             elif filter_type == 'day':
                 hours_ago = current_time - timedelta(hours=24)
-                products = Products.objects.filter(receive_date__gte=hours_ago, receive_date__lt=current_time).order_by('width').values()
+                products = Products.objects.filter(receive_date__gte=hours_ago, receive_date__lt=current_time, status='In-stock').order_by('-width').values()
             else:
                 return JsonResponse({'status': 'error', 'message': 'Invalid filter type'}, status=400)
 
