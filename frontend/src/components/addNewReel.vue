@@ -41,18 +41,18 @@ export default {
     initFlowbite();
     this.axios.get('/myapp/api/getReelNumber').then((response) => {
       console.log(response.data)
-      this.forms.reel_number.value = response.data['next_reel_number']
-      this.forms.width.value = response.data['width']
-      this.forms.GSM.value = response.data['GSM']
-      this.forms.length.value = response.data['length']
-      this.forms.breaks.value = response.data['breaks']
+      this.forms.reel_number.value = response.data['next_reel_number'].toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+      this.forms.width.value = response.data['width'].toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+      this.forms.GSM.value = response.data['GSM'].toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+      this.forms.length.value = response.data['length'].toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+      this.forms.breaks.value = response.data['breaks'].toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
       this.forms.grade.value = response.data['grade']
       this.forms.consumption_profile_name.value = response.data['profile_name']
       this.forms.consumption_profile_name.name = this.forms.consumption_profile_name.name +': '+response.data['profile_name']
 
     })
     this.axios.get('/myapp/api/getConsumptionProfileNames').then((response) => {
-      console.log(response.data)
+      // console.log(response.data)
       this.forms.consumption_profile_name.data = response.data['profile_names']
     })
   },
@@ -65,38 +65,41 @@ export default {
   },
   methods: {
     clicked(k, name){
-      console.log(k, name)
+      // console.log(k, name)
       if (k == 'consumption_profile_name'){
         this.forms.consumption_profile_name.value = name
         this.forms.consumption_profile_name.name = name
       }
     },
+    formatNumber(value) {
+      return value.replace(/\D/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    },
     async addNewReel() {
       this.loading = true
       let params = {
-        "reel_number": this.forms.reel_number.value,
-        "width": this.forms.width.value,
-        "gsm": this.forms.GSM.value,
-        "length": this.forms.length.value,
-        "breaks": this.forms.breaks.value,
-        "grade": this.forms.grade.value,
+        "reel_number": parseInt(this.forms.reel_number.value.toString().replace(/,/g, '')),
+        "width": parseInt(this.forms.width.value.toString().replace(/,/g, '')),
+        "gsm": parseInt(this.forms.GSM.value.toString().replace(/,/g, '')),
+        "length": parseInt(this.forms.length.value.toString().replace(/,/g, '')),
+        "breaks": parseInt(this.forms.breaks.value.toString().replace(/,/g, '')),
+        "grade": parseInt(this.forms.grade.value.toString().replace(/,/g, '')),
         "commnet": this.forms.commnet.value,
         "consumption_profile_name": this.forms.consumption_profile_name.value,
         "username": this.forms.username.value,
       };
       const response = await this.axios.post('/myapp/api/generateQrCode', {}, {params: {'data':JSON.stringify(params)}})
-      console.log(response.data)
+      // console.log(response.data)
       let filename = response.data.filename
-      console.log(filename)
+      // console.log(filename)
       // this.qrcode = await QRCode.toDataURL(JSON.stringify(params), {
       //   width: 256,
       //   height: 256,
       // })
       params['qr_code']=filename
-      console.log('params is:',params)
+      // console.log('params is:',params)
       this.errors = []
       for (const key in this.forms) {
-        console.log(key ,':', this.forms[key].value,typeof this.forms[key].value, this.forms[key].value === 0)
+        // console.log(key ,':', this.forms[key].value,typeof this.forms[key].value, this.forms[key].value === 0)
         if ((this.forms[key].value == '')){
           if (key!='commnet'){
             if ((this.forms[key].value !== 0)){
@@ -109,7 +112,7 @@ export default {
            this.forms[key].error = false
           if (key == 'breaks'){
             let breaks = parseInt(this.forms.breaks.value.toString().replace(/,/g, ''))
-            console.log(breaks)
+            // console.log(breaks)
             if ((breaks <= -1) || (breaks >=21)){
                 this.error = true
                 this.errors.push({'message': 'مقدار پارگی باید بین 0 تا 20 باشد'})
@@ -120,12 +123,13 @@ export default {
       }
       if (this.errors.length == 0){
         this.error = false
+        console.log(params)
         const response = await this.axios.post('/myapp/addNewReel/', {}, {params: params})
-        console.log(response.data); // Access response data
+        // console.log(response.data); // Access response data
         if (response.data['status'] == 'success'){
           this.success = true
           let params = {
-            "reel_number": parseInt(this.forms.width.value.toString().replace(/,/g, '')),
+            "reel_number": parseInt(this.forms.reel_number.value.toString().replace(/,/g, '')),
             "width": parseInt(this.forms.width.value.toString().replace(/,/g, '')),
             "gsm": parseInt(this.forms.GSM.value.toString().replace(/,/g, '')),
             "length": parseInt(this.forms.length.value.toString().replace(/,/g, '')),
