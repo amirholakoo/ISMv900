@@ -75,9 +75,9 @@ class PurchasesAdmin(admin.ModelAdmin):
 @admin.register(Sales)
 class SaleAdmin(admin.ModelAdmin):
 
-    list_display = ('date','customer','truck','license_number','list_of_reels','profile_name','weight1','weight2','net_weight','price_per_kg','vat','total_price','extra_cost','invoice_status','invoice_number','status','payment_details','payment_date','document_info','comments','cancellation_reason','shipment','username','logs')
+    list_display = ('date','customer_name','license_number','list_of_reels','profile_name','weight1','weight2','net_weight','price_per_kg','vat','total_price','extra_cost','invoice_status','invoice_number','status','payment_details','payment_date','document_info','comments','cancellation_reason','shipment','username','logs')
 
-    list_filter = ('customer', 'truck')
+    list_filter = ('customer_name', 'license_number')
 
 
 
