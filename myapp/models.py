@@ -362,8 +362,8 @@ class Sales(models.Model):
     """
     # Fields
 
-    status = models.CharField(max_length=255, choices=[('Paid', 'Paid'), ('Terms', 'Terms'), ('Cancelled', 'Cancelled')], null=True)
     date = models.DateTimeField(default=timezone.now, null=True)
+    status = models.CharField(max_length=255, choices=[('Paid', 'Paid'), ('Terms', 'Terms'), ('Cancelled', 'Cancelled')], null=True)
     payment_date = models.DateTimeField(null=True)
     customer_name = models.CharField(max_length=255, null=False)
     license_number = models.CharField(max_length=255, null=True)
@@ -587,12 +587,11 @@ class Consumption(models.Model):
     Each record includes details about the material consumed,
     such as the supplier, material type, and quantity.
     """
-
+    date = models.DateTimeField(default=timezone.now, blank=True)
     # Status of the consumption
     status = models.CharField(max_length=50, null=True, blank=True)
     location = models.CharField(max_length=255, null=True, blank=True)
 
-    date = models.DateTimeField(default=timezone.now, blank=True)
     # Date and time when the consumption was recorded
     receive_date = models.DateTimeField(null=True, blank=True)
 
