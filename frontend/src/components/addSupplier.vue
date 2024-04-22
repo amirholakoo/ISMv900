@@ -21,7 +21,7 @@ export default {
   data(){
     return{
       forms: {
-        supplier_name: {type: 'input', name: 'نام و نام فامیل فروشنده یا شرکت فروشنده',title: 'نام و نام فامیل فروشنده یا شرکت فروشنده', data: '', value: '', lable:'text'},
+        supplier_name: {type: 'input', name: 'نام و نام خانوادگی فروشنده/شرکت',title: 'نام و نام خانوادگی فروشنده/شرکت', data: '', value: '', lable:'text'},
         address: {type: 'input', name: 'آدرس',title: 'آدرس', data: '', value: '', lable:'text'},
         phone: {type: 'input', name: 'شماره همراه',title: 'شماره همراه', data: '', value: '', lable:'phone'},
         comment: {type: 'input', name: 'توضیحات',title: 'توضیحات', data: '', value: '', lable:'comment'},
