@@ -69,7 +69,7 @@ export default {
       link.href = url;
 
       // Suggest a filename for the downloaded file
-      const filename = response.headers['content-disposition'].split('filename=')[1];
+      const filename = response.headers['content-disposition'];
       link.setAttribute('download', filename);
 
       // Append the link to the body

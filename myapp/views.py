@@ -2915,7 +2915,7 @@ def generate_excel_report(request):
     response = FileResponse(file)
 
     # Set the Content-Disposition header to signal the browser to download the file
-    response['Content-Disposition'] = f'attachment; filename="{filename}"'
+    response['Content-Disposition'] = f'{filename}'
 
     return response
 
