@@ -181,6 +181,8 @@ Create a PostgreSQL User and Database:
 
 `sudo apt-get install libpq-dev`
 
+`pip install django-environ`
+
 `pip install psycopg2`
 
 ### Configure Your Django
