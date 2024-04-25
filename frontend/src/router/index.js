@@ -19,6 +19,7 @@ import consumptionProfile from "@/components/admin/consumptionProfile.vue";
 import cancel from "@/components/admin/cancel.vue";
 import reportPage from "@/components/admin/reportPage.vue";
 import AllPages from "@/components/admin/AllPages.vue";
+import Products from "@/components/admin/Products.vue";
 
 const routes = [
   {
@@ -128,6 +129,11 @@ const routes = [
     path: '/myapp/',
     name: 'AllPages',
     component: AllPages
+  },
+  {
+    path: '/myapp/ProductsPage',
+    name: 'Products',
+    component: Products
   },
 ]
 
