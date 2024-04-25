@@ -626,7 +626,7 @@ def add_new_reel(request):
                                 log_message = log_generator(record.profile_name, 'Used') + not_enough_log_generator('Consumption DB')
                             else:
                                 log_message = log_generator(record.profile_name, 'Used')
-                            # record.logs = record.logs + log_message
+                            record.logs = record.logs + log_message
                             record.save()
                             c = Consumption(
                                 status='Used',
@@ -816,6 +816,7 @@ def add_shipment(request):
                     status='Registered',
                     location='Entrance',
                     username=username,
+                    date=get_time(),
                     entry_time=get_time(),
                     receive_date=get_time(),
                     logs=log_generator(username, 'Created')
@@ -1582,11 +1583,17 @@ def unload(request):
         else:
             try:
                 shipment = Shipments.objects.filter(license_number=license_number, status='LoadingUnloading', location='Weight1', shipment_type='Incoming')
+                # Check if the queryset is empty
+                if not shipment.exists():
+                    return JsonResponse({'status': 'error', 'message': 'Shipments not found.'}, status=404)
 
-                material_name = shipment[0].material_name
-                material_type = shipment[0].material_type
-                supplier_name = shipment[0].supplier_name
-                shipment_id = shipment[0]
+                # Now it's safe to access the first element
+                material_name = shipment.first().material_name
+                material_type = shipment.first().material_type
+                supplier_name = shipment.first().supplier_name
+                shipment_id = shipment.first()
+                shipment_log = shipment.first().logs
+                
 
                 shipment.update(
                     unload_location=unloading_location,
@@ -1595,7 +1602,7 @@ def unload(request):
                     quality=quality,
                     location='Weight2',
                     status='LoadedUnloaded',
-                    logs=shipment[0].logs + log_generator(forklift_driver, 'Unloaded') + append_log({'quality': quality}, 'unload')
+                    logs=shipment_log + log_generator(forklift_driver, 'Unloaded') + append_log({'quality': quality}, 'unload')
                 )
                 # Dynamically get the model based on the anbar_name
                 AnbarModel = apps.get_model('myapp', unloading_location)
@@ -1604,7 +1611,6 @@ def unload(request):
                 quantity_to_unload = int(quantity)
                 # Update AnbarGeneric (Anbar_Akhal in this case)
                 for _ in range(quantity_to_unload):
-
                     # Insert data into the specific Anbar table
                     anbar_instance = AnbarModel.objects.create(
                         supplier_name=supplier_name,
@@ -1617,13 +1623,12 @@ def unload(request):
                         location=unloading_location,
                         receive_date=get_time(),
                         username=forklift_driver,
-                        logs=shipment[0].logs + log_generator(forklift_driver, 'Unloaded') + append_log({'quality': quality}, 'unload')
+                        logs=shipment_log + log_generator(forklift_driver, 'Unloaded') + append_log({'grade': quality}, 'unload')
                     )
 
 
                 # Return a success response
-                return JsonResponse({'status': 'success',
-                                     'message': f' {quantity_to_unload}واحد به {license_number} اضافه شد.'})
+                return JsonResponse({'status': 'success','message': f' {quantity_to_unload}واحد به {license_number} اضافه شد.'})
 
             except Shipments.DoesNotExist:
                 return JsonResponse({'status': 'error', 'message': 'Shipments not found.'}, status=404)
