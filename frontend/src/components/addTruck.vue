@@ -36,10 +36,11 @@ export default {
       username: '',
       forms: {
         driver_name: {type: 'input', name: 'اسم راننده',title: 'راننده', data: '', value: ''},
-        driver_doc: {type: 'input', name: 'شماره گواهی نامه',title: 'شماره گواهی نامه', data: '', value: '', lable:'number'},
+        driver_doc: {type: 'input', name: 'شماره ملی',title: 'شماره ملی', data: '', value: '', lable:'number'},
         phone: {type: 'input', name: 'شماره همراه',title: 'شماره همراه', data: '', value: '', lable:'phone'},
         username: {type: 'input', name: 'نام کاربر',title: 'نام کاربر', data: '', value: ''},
       },
+      statusOfTruck: '',
       success: false,
       error: false,
       errors: [],
@@ -63,7 +64,14 @@ export default {
         this.form = JSON.parse(response.data['isExists'])
         if (JSON.parse(response.data['isExists'])){
           this.isExists = true
+          this.statusOfTruck = response.data['status']
         }
+      }
+    },
+    goToAddShipmentPage() {
+      if (this.statusOfTruck == 'Free'){
+        const licenseNumber = this.first.val + this.letter.val + this.second.val +'ایران'+ this.year.val;
+        this.$router.push({ name: 'addShipment', query: { license_number: licenseNumber } });
       }
     },
     async addTruck() {
@@ -261,10 +269,17 @@ export default {
             }"></lic_numer>
         <p class="text-red-600"> در سیستم وجود دارد.</p>
       </div>
+      <button
+          v-if="this.statusOfTruck == 'Free'"
+          type="button"
+          class="w-44 block text-white bg-green-500 hover:bg-green-600 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+          @click="goToAddShipmentPage">
+              رفتن به صفحه بارنامه
+      </button>
     </template>
     <p id="helper-text-explanation" class="text-sm text-gray-500 dark:text-gray-400">لطفا پلاک مورد نطر را وارد کرده و سپس بر روی دکمه چک کردن کلیک کنید.</p>
 <!--    <button @click="form = !form" class="block text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="submit"> چک کردن </button>-->
-    <button @click="check_license_number" class="block text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="button"> چک کردن </button>
+    <button @click="check_license_number" class="w-44 block text-white bg-green-500 hover:bg-green-600 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="button"> چک کردن </button>
   </form>
   <form v-else class="flex flex-col items-center mt-5 gap-4">
     <div v-if="error" class="flex p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400" role="alert">

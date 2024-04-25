@@ -41,6 +41,11 @@ export default {
     },
   },
   mounted() {
+    console.log(this.$route.query.license_number)
+    if (this.$route.query.license_number){
+      this.forms.lic_number.name = this.$route.query.license_number
+      this.forms.lic_number.value = this.$route.query.license_number
+    }
     initFlowbite();
     this.axios.get('/myapp/api/getLicenseNumbers').then((response) => {
       console.log(response.data)
