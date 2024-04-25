@@ -80,10 +80,10 @@ def check_license_number(request):
         # Check if a license number was provided
         if license_number:
             # Attempt to retrieve a Truck object with the provided license number
-            # truck = Truck.objects.get(license_number=license_number)
-            if Truck.objects.filter(license_number=license_number).exists():
+            truck = Truck.objects.filter(license_number=license_number)
+            if truck.exists():
                 # If the truck exists, return a success response
-                return JsonResponse({'isExists': 'true', 'message': 'License number exists.'})
+                return JsonResponse({'isExists': 'true', 'message': 'License number exists.', 'status': truck.first().status})
             else:
                 # If the truck does not exist, return an error response
                 return JsonResponse({'isExists': 'false', 'message': 'License number does not exist.'})
