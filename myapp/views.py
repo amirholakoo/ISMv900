@@ -14,6 +14,8 @@ from django.db import models
 from django.apps import apps
 from django.db.models.base import ModelBase
 import jdatetime
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
 
 
 # Create your views here.
@@ -34,6 +36,13 @@ def not_enough_log_generator(location):
     log = f' {current_time} ERROR:NOT ENOUGH IN {location} by SYSERR,'
 
     return log
+
+def not_enough_alert(msg):
+    # Broadcast the message to all connected clients
+    channel_layer = get_channel_layer()
+    async_to_sync(channel_layer.group_send)(
+        "alert", {"type": "alert.message", "message": msg}
+    )
 
 def append_log(fields, page):
     current_time = timezone.now().strftime('%Y-%m-%d %H:%M')
@@ -650,11 +659,13 @@ def add_new_reel(request):
                             # msg = msg + 'تای ان استفاده شد' + str(len(anbar_records))
                             msg = f'not enough (in anbar {anbar_name}:{len(anbar_records)}) (quantity: {str(each_line.quantity)})'
                             msg = f"انبار {anbar_name} مقدار کمتری از {str(each_line.quantity)} دارد با این حال {len(anbar_records)} مقدار مصرف شد"
+                            not_enough_alert(msg)
                             errors.append({'status': 'error', 'message': msg})
                             return JsonResponse({'status': 'error', 'errors': errors})
 
             if isExist:
                 msg = 'در هیچ یک از انبار ها چیزی یافت نشد.'
+                not_enough_alert(msg)
                 errors.append({'status': 'error', 'message': msg})
                 return JsonResponse({'status': 'error', 'errors': errors})
 
@@ -1995,6 +2006,7 @@ def used(request):
                 # Alert here
                 msg = 'انبار' + 'Consumption DB' + f'از مقدار که شما انتخاب کردید ( {quantity_to_unload} ) ' + 'مقدار کمتری دارد' + str(
                     len(anbar)) + 'تا منتقل شد'
+                not_enough_alert(msg)
                 errors = [{'status': 'error', 'message': msg}]
                 return JsonResponse({'status': 'error', 'errors': errors})
 
@@ -2143,6 +2155,7 @@ def moved(request):
 
                 if isEnough:
                     msg = 'انبار' + str(to_anbar) + f'از مقدار که شما انتخاب کردید ( {Quantity} ) ' + 'مقدار کمتری دارد' + str(len(sourse)) +' تا منتقل شد'
+                    not_enough_alert(msg)
                     errors.append({'status': 'error', 'message': msg})
                     return JsonResponse({'status': 'error', 'errors': errors})
 
@@ -2290,7 +2303,9 @@ def retuned(request):
                 if isEnough:
                     # Alert here
                     print('not enough', len(consumption), int(quantity))
-                    errors.append({'status': 'error', 'message': 'supplier name is required.'})
+                    msg = 'انبار' + str(to_anbar) + f'از مقدار که شما انتخاب کردید ( {int(quantity)} ) ' + 'مقدار کمتری دارد' + str(len(consumption)) + ' تا منتقل شد'
+                    not_enough_alert(msg)
+                    errors.append({'status': 'error', 'message': msg})
                     return JsonResponse({'status': 'error', 'errors': errors})
 
                 for record in consumption:
