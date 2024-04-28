@@ -36,6 +36,8 @@ export default {
       errors: [],
       countdownTime: 900000, // 15 milisecond
       timeLeft: 900000,
+      alerts: [], // Reactive property to store messages
+      alertSocket: null, // WebSocket connection
     }
   },
   computed: {
@@ -55,6 +57,27 @@ export default {
     this.report_RawMaterial('year')
     this.report_Products('year')
     this.report_Consumption('year')
+    // Initialize WebSocket connection
+    this.alertSocket = new WebSocket('/ws/alert/');
+
+    // Set up message handler
+    this.alertSocket.onmessage = (e) => {
+      const data = JSON.parse(e.data);
+      // console.log(data.message);
+      this.alerts.push({ message: data.message });
+    };
+
+    // Handle WebSocket errors
+    this.alertSocket.onerror = (error) => {
+      console.error('WebSocket Error: ', error);
+    };
+
+  },
+  beforeDestroy() {
+    // Close WebSocket connection when component is destroyed
+    if (this.alertSocket) {
+      this.alertSocket.close();
+    }
   },
   methods: {
     async generate_excel_report(model_name){
@@ -250,6 +273,11 @@ async report_shipment(filter) {
 
 <!--<Card title="گزارش">-->
   <div class="w-screen p-5 container">
+    <div class="flex flex-col fixed top-0 right-0 left-0 z-50 justify-end items-start w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+      <template v-for="(alert, index) in alerts" :key="index">
+        <Alert :msg="alert.message"></Alert>
+      </template>
+    </div>
   <p class="flex flex-row gap-2 items-center">
     <button @click="reload" class="w-auto block text-white bg-green-500 hover:bg-green-600 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="button">
       بارگیری مجدد
