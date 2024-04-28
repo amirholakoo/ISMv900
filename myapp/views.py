@@ -561,10 +561,7 @@ def add_new_reel(request):
             #     errors.append({'status': 'error', 'message': 'consumption profile name is required.'})
             # if not username:
             #     errors.append({'status': 'error', 'message': 'username is required.'})
-            #
-            # # If there are any errors, return them in the response
-            # if errors:
-            #     return JsonResponse({'status': 'error', 'errors': errors})
+
 
 
             # Create a new Products record
@@ -610,8 +607,7 @@ def add_new_reel(request):
             anbar_table_names = [name for name in all_table_names if name.startswith('Anbar_')]
             profile_list = ConsumptionProfile.objects.filter(profile_name=profile_name)
             isExist = True # Initialize isExist as True, assuming no records are found initially
-            # print(anbar_table_names)
-            # print(len(anbar_table_names))
+
             for each_line in profile_list:
 
                 for anbar_name in anbar_table_names:
@@ -657,11 +653,14 @@ def add_new_reel(request):
                         if isEnough:
                             # msg = 'با این حال' + ' مواد کمتری دارد' + str(each_line.quantity) + 'انبار شما از مقدار'
                             # msg = msg + 'تای ان استفاده شد' + str(len(anbar_records))
-                            msg = f'not enough (in anbar {anbar_name}:{len(anbar_records)}) (quantity: {str(each_line.quantity)})'
+                            # msg = f'not enough (in anbar {anbar_name}:{len(anbar_records)}) (quantity: {str(each_line.quantity)})'
                             msg = f"انبار {anbar_name} مقدار کمتری از {str(each_line.quantity)} دارد با این حال {len(anbar_records)} مقدار مصرف شد"
                             not_enough_alert(msg)
                             errors.append({'status': 'error', 'message': msg})
-                            return JsonResponse({'status': 'error', 'errors': errors})
+
+            # If there are any errors, return them in the response
+            if errors:
+                return JsonResponse({'status': 'error', 'errors': errors})
 
             if isExist:
                 msg = 'در هیچ یک از انبار ها چیزی یافت نشد.'
