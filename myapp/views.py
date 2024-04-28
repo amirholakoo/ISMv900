@@ -561,6 +561,9 @@ def add_new_reel(request):
             #     errors.append({'status': 'error', 'message': 'consumption profile name is required.'})
             # if not username:
             #     errors.append({'status': 'error', 'message': 'username is required.'})
+            # If there are any errors, return them in the response
+            # if errors:
+            #     return JsonResponse({'status': 'error', 'errors': errors})
 
 
 
