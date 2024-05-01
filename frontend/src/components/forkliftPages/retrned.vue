@@ -32,7 +32,10 @@ export default {
       console.log(response.data)
       this.forms.to_anbar.data = response.data['data']
     })
-    this.axios.get('/myapp/api/getSupplierNamesBasedConsumtioon').then((response) => {
+    const params = {
+      profile_name: 'desired_profile_name'
+    };
+    this.axios.get('/myapp/api/getSupplierNamesBasedConsumtioon', {params:params}).then((response) => {
       console.log(response.data)
       this.forms.supplier_name.data = response.data['supplier_names']
     })
