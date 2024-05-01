@@ -2375,6 +2375,7 @@ def retuned(request):
 
                     # Create new entries in the destination AnbarGeneric location
                     new_item = AnbarModel(
+                        shipment_id=record.shipment_id,
                         receive_date=get_time(),
                         location=to_anbar,
                         status='In-stock',
