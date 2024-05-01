@@ -1875,9 +1875,14 @@ def get_unit_and_materialName_based_supplierNmae_andbar(request):
 
 def get_supplierNames_based_consumtioon(request):
     if request.method == 'GET':
+        profile_name = request.GET.get('profile_name')
         try:
-            # Fetch all Consumption records with status 'In-stock'
-            used_records = Consumption.objects.filter(status='Used')
+            # Further filter by profile_name if provided
+            if profile_name:
+                used_records = Consumption.objects.filter(profile_name='')
+            else:
+                used_records = Consumption.objects.filter(status='Used').exclude(profile_name__isnull=True).exclude(
+                    profile_name='')
 
             # If you want to get all unique supplier_names from these records
             supplier_names = used_records.values_list('supplier_name', flat=True).distinct()
