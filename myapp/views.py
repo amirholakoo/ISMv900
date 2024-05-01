@@ -56,14 +56,14 @@ def get_time():
     return timezone.now().strftime('%Y-%m-%d %H:%M')
 
 
-def not_enough_message(inventory, amount, required, transferred, location):
+def not_enough_message(inventory, amount, required, transferred, location, action):
     msg = f"""
         عدم موجودی کافی در انبار {location}!
         موجودی: {inventory},
         درخواست شده: {amount},
         مقدار مورد نیاز: {required},
         انتقال یافته: {transferred},
-        متاسفیم! درحال حاضر موجودی در انبار {location} کافی نیست. حداکثر {transferred} از این کالا انتقال یافت.
+        متاسفیم! درحال حاضر موجودی در انبار {location} کافی نیست. حداکثر {transferred} از این کالا {action}.
     """
     return msg
 # Incoming process:
@@ -667,10 +667,16 @@ def add_new_reel(request):
                             c.save()
 
                         if isEnough:
-                            # msg = 'با این حال' + ' مواد کمتری دارد' + str(each_line.quantity) + 'انبار شما از مقدار'
-                            # msg = msg + 'تای ان استفاده شد' + str(len(anbar_records))
-                            # msg = f'not enough (in anbar {anbar_name}:{len(anbar_records)}) (quantity: {str(each_line.quantity)})'
-                            msg = f"انبار {anbar_name} مقدار کمتری از {str(each_line.quantity)} دارد با این حال {len(anbar_records)} مقدار مصرف شد"
+                            required = abs(len(anbar_records) - int(each_line.quantity))
+                            msg = not_enough_message(
+                                location=anbar_name,
+                                inventory=len(anbar_records),
+                                amount=str(each_line.quantity),
+                                required=required,
+                                transferred=len(anbar_records),
+                                action='مصرف شد'
+                            )
+                            # msg = f"انبار {anbar_name} مقدار کمتری از {str(each_line.quantity)} دارد با این حال {len(anbar_records)} مقدار مصرف شد"
                             not_enough_alert(msg)
                             errors.append({'status': 'error', 'message': msg})
 
@@ -2019,8 +2025,17 @@ def used(request):
 
             if isEnough:
                 # Alert here
-                msg = 'انبار' + 'Consumption DB' + f'از مقدار که شما انتخاب کردید ( {quantity_to_unload} ) ' + 'مقدار کمتری دارد' + str(
-                    len(anbar)) + 'تا منتقل شد'
+                required = abs(len(anbar) - quantity_to_unload)
+                msg = not_enough_message(
+                    location=unloading_location,
+                    inventory=len(anbar),
+                    amount=quantity_to_unload,
+                    required=required,
+                    transferred=len(anbar),
+                    action='مصرف شد'
+                )
+                # msg = 'انبار' + 'Consumption DB' + f'از مقدار که شما انتخاب کردید ( {quantity_to_unload} ) ' + 'مقدار کمتری دارد' + str(
+                #     len(anbar)) + 'تا منتقل شد'
                 not_enough_alert(msg)
                 errors = [{'status': 'error', 'message': msg}]
                 return JsonResponse({'status': 'error', 'errors': errors})
@@ -2169,7 +2184,16 @@ def moved(request):
 
 
                 if isEnough:
-                    msg = 'انبار' + str(to_anbar) + f'از مقدار که شما انتخاب کردید ( {Quantity} ) ' + 'مقدار کمتری دارد' + str(len(sourse)) +' تا منتقل شد'
+                    required = abs(len(sourse) - int(Quantity))
+                    msg = not_enough_message(
+                        location=from_anbar,
+                        inventory=len(sourse),
+                        amount=int(Quantity),
+                        required=required,
+                        transferred=len(sourse),
+                        action=f'به {str(to_anbar)} انتقال یافت'
+                    )
+                    # msg = 'انبار' + str(to_anbar) + f'از مقدار که شما انتخاب کردید ( {Quantity} ) ' + 'مقدار کمتری دارد' + str(len(sourse)) +' تا منتقل شد'
                     not_enough_alert(msg)
                     errors.append({'status': 'error', 'message': msg})
                     return JsonResponse({'status': 'error', 'errors': errors})
@@ -2305,7 +2329,7 @@ def retuned(request):
             return JsonResponse({'status': 'error', 'errors': errors})
         else:
             try:
-                print(supplier_name, material_name, unit)
+                # print(supplier_name, material_name, unit)
                 AnbarModel = apps.get_model('myapp', to_anbar)
                 consumption = Consumption.objects.filter(
                     supplier_name=supplier_name,
@@ -2317,8 +2341,17 @@ def retuned(request):
 
                 if isEnough:
                     # Alert here
-                    print('not enough', len(consumption), int(quantity))
-                    msg = 'انبار' + str(to_anbar) + f'از مقدار که شما انتخاب کردید ( {int(quantity)} ) ' + 'مقدار کمتری دارد' + str(len(consumption)) + ' تا منتقل شد'
+                    # print('not enough', len(consumption), int(quantity))
+                    required = abs(len(consumption) - int(quantity))
+                    msg = not_enough_message(
+                        location='(Consumption DB)',
+                        inventory=len(consumption),
+                        amount=int(quantity),
+                        required=required,
+                        transferred=len(consumption),
+                        action=f'به {str(to_anbar)} انتقال یافت'
+                    )
+                    # msg = 'انبار' + str(to_anbar) + f'از مقدار که شما انتخاب کردید ( {int(quantity)} ) ' + 'مقدار کمتری دارد' + str(len(consumption)) + ' تا منتقل شد'
                     not_enough_alert(msg)
                     errors.append({'status': 'error', 'message': msg})
                     return JsonResponse({'status': 'error', 'errors': errors})
