@@ -37,6 +37,7 @@ def not_enough_log_generator(location):
 
     return log
 
+
 def not_enough_alert(msg):
     # Broadcast the message to all connected clients
     channel_layer = get_channel_layer()
@@ -53,6 +54,18 @@ def append_log(fields, page):
 
 def get_time():
     return timezone.now().strftime('%Y-%m-%d %H:%M')
+
+
+def not_enough_message(inventory, amount, required, transferred, location):
+    msg = f"""
+        عدم موجودی کافی در انبار {location}!
+        موجودی: {inventory},
+        درخواست شده: {amount},
+        مقدار مورد نیاز: {required},
+        انتقال یافته: {transferred},
+        متاسفیم! درحال حاضر موجودی در انبار {location} کافی نیست. حداکثر {transferred} از این کالا انتقال یافت.
+    """
+    return msg
 # Incoming process:
 # Add Truck
 # Add Shipments
