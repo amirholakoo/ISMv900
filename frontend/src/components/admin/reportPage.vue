@@ -34,6 +34,9 @@ export default {
       success: false,
       error: false,
       errors: [],
+
+      // Initialize the countdown to 15 minutes (15 * 60 seconds)
+      totalSeconds: 15 * 60,
       countdownTime: 900000, // 15 milisecond
       timeLeft: 900000,
       alerts: [], // Reactive property to store messages
@@ -41,11 +44,18 @@ export default {
     }
   },
   computed: {
+    // formattedTime() {
+    //   const minutes = Math.floor(this.timeLeft / 60000);
+    //   const seconds = this.timeLeft % 60;
+    //   return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    // },
+
+    // Format the time for display
     formattedTime() {
-      const minutes = Math.floor(this.timeLeft / 60000);
-      const seconds = this.timeLeft % 60;
+      const minutes = Math.floor(this.totalSeconds / 60);
+      const seconds = this.totalSeconds % 60;
       return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-    },
+    }
   },
   mounted() {
     initFlowbite();
@@ -106,17 +116,32 @@ export default {
 
       console.log(response.data)
     },
-    reload(){location.reload();},
-    startCountdown() {
-      this.interval = setInterval(() => {
-        this.timeLeft--;
-        if (this.timeLeft <= 0) {
-          clearInterval(this.interval);
-          this.timeLeft = 0;
-          location.reload();
-        }
-      }, 1000);
+    reload(){
+      window.location.reload();
     },
+    countdown() {
+      if (this.totalSeconds > 0) {
+        // Decrement the total seconds by one
+        this.totalSeconds -= 1;
+      } else {
+        // If the countdown has finished, refresh the page
+        window.location.reload();
+      }
+    },
+    startCountdown() {
+        // Call the countdown function every second
+        this.interval = setInterval(this.countdown, 1000);
+    },
+    // startCountdown() {
+    //   this.interval = setInterval(() => {
+    //     this.timeLeft--;
+    //     if (this.timeLeft <= 0) {
+    //       clearInterval(this.interval);
+    //       this.timeLeft = 0;
+    //       location.reload();
+    //     }
+    //   }, 1000);
+    // },
     select(obj){
       this.forms.shipment_list.value = obj
     },
@@ -167,102 +192,102 @@ export default {
             doc.save('table.pdf');
         });
     },
- async report_Sales(filter) {
- try {
-    const params = {
-      'filter': filter,
-    }
-    const response = await this.axios.post('/myapp/api/reportSales', {}, {params:params})
-    console.log(response.data);
-    this.forms['sales'].data = response.data['values']
-    this.forms['sales'].fields = response.data['fields']
- } catch (error) {
-    console.error("Error fetching sales report:", error);
-    // Optionally, display an error message to the user
-    // this.errorMessage = "Failed to fetch sales report. Please try again.";
- }
-},
+    async report_Sales(filter) {
+   try {
+      const params = {
+        'filter': filter,
+      }
+      const response = await this.axios.post('/myapp/api/reportSales', {}, {params:params})
+      console.log(response.data);
+      this.forms['sales'].data = response.data['values']
+      this.forms['sales'].fields = response.data['fields']
+   } catch (error) {
+      console.error("Error fetching sales report:", error);
+      // Optionally, display an error message to the user
+      // this.errorMessage = "Failed to fetch sales report. Please try again.";
+   }
+  },
 
-async report_Purchases(filter) {
- try {
-    const params = {
-      'filter': filter,
-    }
-    const response = await this.axios.post('/myapp/api/reportPurchases', {}, {params:params})
-    console.log(response.data);
-    this.forms['purchases'].data = response.data['values']
-    this.forms['purchases'].fields = response.data['fields']
- } catch (error) {
-    console.error("Error fetching purchases report:", error);
-    // Optionally, display an error message to the user
-    // this.errorMessage = "Failed to fetch purchases report. Please try again.";
- }
-},
+    async report_Purchases(filter) {
+     try {
+        const params = {
+          'filter': filter,
+        }
+        const response = await this.axios.post('/myapp/api/reportPurchases', {}, {params:params})
+        console.log(response.data);
+        this.forms['purchases'].data = response.data['values']
+        this.forms['purchases'].fields = response.data['fields']
+     } catch (error) {
+        console.error("Error fetching purchases report:", error);
+        // Optionally, display an error message to the user
+        // this.errorMessage = "Failed to fetch purchases report. Please try again.";
+     }
+    },
 
-async report_RawMaterial(filter) {
- try {
-    const params = {
-      'filter': filter,
-    }
-    const response = await this.axios.post('/myapp/api/reportRawMaterial', {}, {params:params})
-    console.log(response.data);
-    this.forms['rawMaterial'].data = response.data['values']
-    this.forms['rawMaterial'].fields = response.data['fields']
- } catch (error) {
-    console.error("Error fetching raw material report:", error);
-    // Optionally, display an error message to the user
-    // this.errorMessage = "Failed to fetch raw material report. Please try again.";
- }
-},
+    async report_RawMaterial(filter) {
+     try {
+        const params = {
+          'filter': filter,
+        }
+        const response = await this.axios.post('/myapp/api/reportRawMaterial', {}, {params:params})
+        console.log(response.data);
+        this.forms['rawMaterial'].data = response.data['values']
+        this.forms['rawMaterial'].fields = response.data['fields']
+     } catch (error) {
+        console.error("Error fetching raw material report:", error);
+        // Optionally, display an error message to the user
+        // this.errorMessage = "Failed to fetch raw material report. Please try again.";
+     }
+    },
 
-async report_Products(filter) {
- try {
-    const params = {
-      'filter': filter,
-    }
-    const response = await this.axios.post('/myapp/api/reportProducts', {}, {params:params})
-    console.log(response.data);
-    this.forms['products'].data = response.data['values']
-    this.forms['products'].fields = response.data['fields']
- } catch (error) {
-    console.error("Error fetching products report:", error);
-    // Optionally, display an error message to the user
-    // this.errorMessage = "Failed to fetch products report. Please try again.";
- }
-},
+    async report_Products(filter) {
+     try {
+        const params = {
+          'filter': filter,
+        }
+        const response = await this.axios.post('/myapp/api/reportProducts', {}, {params:params})
+        console.log(response.data);
+        this.forms['products'].data = response.data['values']
+        this.forms['products'].fields = response.data['fields']
+     } catch (error) {
+        console.error("Error fetching products report:", error);
+        // Optionally, display an error message to the user
+        // this.errorMessage = "Failed to fetch products report. Please try again.";
+     }
+    },
 
-async report_Consumption(filter) {
- try {
-    const params = {
-      'filter': filter,
-    }
-    const response = await this.axios.post('/myapp/api/reportConsumption', {}, {params:params})
-    console.log(response.data);
-    this.forms['consumption'].data = response.data['values']
-    this.forms['consumption'].fields = response.data['fields']
- } catch (error) {
-    console.error("Error fetching consumption report:", error);
-    // Optionally, display an error message to the user
-    // this.errorMessage = "Failed to fetch consumption report. Please try again.";
- }
-},
+    async report_Consumption(filter) {
+     try {
+        const params = {
+          'filter': filter,
+        }
+        const response = await this.axios.post('/myapp/api/reportConsumption', {}, {params:params})
+        console.log(response.data);
+        this.forms['consumption'].data = response.data['values']
+        this.forms['consumption'].fields = response.data['fields']
+     } catch (error) {
+        console.error("Error fetching consumption report:", error);
+        // Optionally, display an error message to the user
+        // this.errorMessage = "Failed to fetch consumption report. Please try again.";
+     }
+    },
 
-async report_shipment(filter) {
- try {
-    const params = {
-      'filter': filter,
-    }
-    const response = await this.axios.post('/myapp/api/reportShipment', {}, {params:params})
-    console.log(response.data);
-    this.forms['shipments'].data = response.data['values']
-    this.forms['shipments'].fields = response.data['fields']
-    console.log(this.forms.shipments)
- } catch (error) {
-    console.error("Error fetching shipment report:", error);
-    // Optionally, display an error message to the user
-    // this.errorMessage = "Failed to fetch shipment report. Please try again.";
- }
-},
+    async report_shipment(filter) {
+     try {
+        const params = {
+          'filter': filter,
+        }
+        const response = await this.axios.post('/myapp/api/reportShipment', {}, {params:params})
+        console.log(response.data);
+        this.forms['shipments'].data = response.data['values']
+        this.forms['shipments'].fields = response.data['fields']
+        console.log(this.forms.shipments)
+     } catch (error) {
+        console.error("Error fetching shipment report:", error);
+        // Optionally, display an error message to the user
+        // this.errorMessage = "Failed to fetch shipment report. Please try again.";
+     }
+    },
 
   },
 }
