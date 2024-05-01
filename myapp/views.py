@@ -650,6 +650,7 @@ def add_new_reel(request):
                             record.logs = record.logs + log_message
                             record.save()
                             c = Consumption(
+                                shipment_id=record.shipment_id,
                                 status='Used',
                                 location='Consumption DB',
                                 reel_number=reel_number,
