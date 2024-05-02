@@ -46,6 +46,7 @@ urlpatterns = [
     path("api/reportRawMaterial", report_RawMaterial),
     path("api/reportProducts", report_Products),
     path("api/reportConsumption", report_Consumption),
+    path("api/reportAlert", report_Alert),
 
     # Following paths are related to Pages:
 
