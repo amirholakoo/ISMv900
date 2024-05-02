@@ -44,12 +44,6 @@ export default {
     }
   },
   computed: {
-    // formattedTime() {
-    //   const minutes = Math.floor(this.timeLeft / 60000);
-    //   const seconds = this.timeLeft % 60;
-    //   return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-    // },
-
     // Format the time for display
     formattedTime() {
       const minutes = Math.floor(this.totalSeconds / 60);
@@ -132,16 +126,6 @@ export default {
         // Call the countdown function every second
         this.interval = setInterval(this.countdown, 1000);
     },
-    // startCountdown() {
-    //   this.interval = setInterval(() => {
-    //     this.timeLeft--;
-    //     if (this.timeLeft <= 0) {
-    //       clearInterval(this.interval);
-    //       this.timeLeft = 0;
-    //       location.reload();
-    //     }
-    //   }, 1000);
-    // },
     select(obj){
       this.forms.shipment_list.value = obj
     },
