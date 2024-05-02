@@ -3147,7 +3147,37 @@ def report_Purchases(request):
                             shamsi_date = jdatetime.datetime.fromgregorian(datetime=purchase[field])
                             # Update the field in the dictionary
                             purchase[field] = shamsi_date.strftime('%Y-%m-%d %H:%M')
-                field_names = [k for k in list(purchases)[0]]
+                # field_names = [k for k in list(purchases)[0]]
+                field_names = [
+                     'date',
+                     'status',
+                     'payment_date',
+                     'supplier_name',
+                     'material_type',
+                     'material_name',
+                     'unit',
+                     'license_number',
+                     'receive_date',
+                     'quantity',
+                     'quality',
+                     'penalty',
+                     'weight1',
+                     'weight2',
+                     'net_weight',
+                     'price_per_kg',
+                     'vat',
+                     'total_price',
+                     'extra_cost',
+                     'invoice_status',
+                     'payment_details',
+                     'invoice_number',
+                     'document_info',
+                     'comments',
+                     'cancellation_reason',
+                     'shipment_id_id',
+                     'username',
+                     'logs'
+                ]
                 data = {'values': list(purchases), 'fields': field_names, 'title': 'لیست خرید',}
                 return JsonResponse(data=data, status=200)
             else:
@@ -3178,24 +3208,58 @@ def report_RawMaterial(request):
             #     rawMaterial = RawMaterial.objects.filter(receive_date__gte=hours_ago, receive_date__lt=current_time).exclude(status='Cancelled').values()
             # else:
             #     return JsonResponse({'status': 'error', 'message': 'Invalid filter type'}, status=400)
+            field_names = [
+                 'status',
+                 'location',
+                 'date',
+                 'receive_date',
+                 'last_date',
+                 'reel_number',
+                 'supplier_name',
+                 'material_type',
+                 'material_name',
+                 'description',
+                 'width',
+                 'gsm',
+                 'length',
+                 'grade',
+                 'breaks',
+                 'comments',
+                 'shipment_id_id',
+                 'qr_code',
+                 'unit',
+                 'profile_name',
+                 'username',
+                 'logs'
+            ]
+            # Get all table names from the database
+            all_table_names = connection.introspection.table_names()
+            anbar_table_names = [name for name in all_table_names if name.startswith('Anbar_')]
+            mavad = []
+            for anbar_name in anbar_table_names:
+                AnbarModel = apps.get_model('myapp', anbar_name)
+                anbar_records = AnbarModel.objects.filter(status='In-stock').order_by('location').values()
 
-            rawMaterial = RawMaterial.objects.all().values()
-            if rawMaterial.exists():
-                for raw in rawMaterial:
-                    for field in datetime_fields:
-                        if field in raw and raw[field] is not None:
-                            # Convert to Shamsi date
-                            shamsi_date = jdatetime.datetime.fromgregorian(datetime=raw[field])
-                            # Update the field in the dictionary
-                            raw[field] = shamsi_date.strftime('%Y-%m-%d %H:%M')
-                field_names = [k for k in list(rawMaterial)[0]]
-                data = {'values': list(rawMaterial), 'fields': field_names, 'title': 'لیست مواد',}
+                if anbar_records.exists():
+                    for raw in anbar_records:
+                        for field in datetime_fields:
+                            if field in raw and raw[field] is not None:
+                                # Convert to Shamsi date
+                                shamsi_date = jdatetime.datetime.fromgregorian(datetime=raw[field])
+                                # Update the field in the dictionary
+                                raw[field] = shamsi_date.strftime('%Y-%m-%d %H:%M')
+
+                        mavad.append(raw)
+
+            if mavad:
+                data = {'values': mavad, 'fields': field_names, 'title': 'لیست مواد',}
                 return JsonResponse(data=data, status=200)
             else:
                 return JsonResponse({'status': 'error', 'message': 'No raw material records found'}, status=404)
         else:
             return JsonResponse({'status': 'error', 'message': 'Invalid request method'}, status=405)
     except Exception as e:
+        print(e)
         return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
 
 
@@ -3227,7 +3291,27 @@ def report_Products(request):
                             shamsi_date = jdatetime.datetime.fromgregorian(datetime=product[field])
                             # Update the field in the dictionary
                             product[field] = shamsi_date.strftime('%Y-%m-%d %H:%M')
-                field_names = [k for k in list(products)[0]]
+                # field_names = [k for k in list(products)[0]]
+                field_names =[
+                     'date',
+                     'location',
+                     'width',
+                     'reel_number',
+                     'gsm',
+                     'length',
+                     'grade',
+                     'breaks',
+                     'status',
+                     'receive_date',
+                     'last_date',
+                     'comments',
+                     'qr_code',
+                     'profile_name',
+                     'shipment_id_id',
+                     'username',
+                     'logs'
+                 ]
+
                 data = {'values': list(products), 'fields': field_names, 'title': 'لیست محصولات',}
                 return JsonResponse(data=data, status=200)
             else:
@@ -3266,7 +3350,26 @@ def report_Consumption(request):
                             shamsi_date = jdatetime.datetime.fromgregorian(datetime=con[field])
                             # Update the field in the dictionary
                             con[field] = shamsi_date.strftime('%Y-%m-%d %H:%M')
-                field_names = [k for k in list(consumption)[0]]
+                # field_names = [k for k in list(consumption)[0]]
+                field_names =[
+                     'date',
+                     'supplier_name',
+                     'status',
+                     'location',
+                     'receive_date',
+                     'shipment_id_id',
+                     'material_type',
+                     'material_name',
+                     'unit',
+                     'reel_number',
+                     'profile_name',
+                     'grade',
+                     'comments',
+                     'cancelling_reason',
+                     'username',
+                     'logs'
+                ]
+
                 data = {'values': list(consumption), 'fields': field_names, 'title': 'لیست مصرف',}
                 return JsonResponse(data=data, status=200)
             else:
