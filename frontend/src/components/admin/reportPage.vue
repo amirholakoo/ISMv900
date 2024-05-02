@@ -24,6 +24,7 @@ export default {
         rawMaterial:{type:'input', title: 'لیست مواد',filter:'فیلتر', data:'', value:'', fields: []},
         products:{type:'input', title: 'لیست محصولات',filter:'فیلتر', data:'', value:'', fields: []},
         consumption:{type:'input', title: 'لیست مصرف',filter:'فیلتر', data:'', value:'', fields: []},
+        alerts:{type:'input', title: 'هشدار ها',filter:'فیلتر', data:'', value:'', fields: []},
       },
       filters: [
         {lable:'یک سال اخیر', value: 'year'},
@@ -59,15 +60,17 @@ export default {
     this.report_Purchases('year')
     this.report_Consumption('year')
     this.report_RawMaterial('year')
+    this.report_alerts('year')
     // Initialize WebSocket connection
-    console.log(window.location)
     this.alertSocket = new WebSocket('ws://'+window.location.host+'/ws/alert/');
 
     // Set up message handler
     this.alertSocket.onmessage = (e) => {
       const data = JSON.parse(e.data);
-      // console.log(data.message);
+      console.log(this.forms.alerts.data);
+      console.log(data.data);
       this.alerts.push({ message: data.message });
+      this.forms.alerts.data.push(data.data)
     };
 
     // Handle WebSocket errors
@@ -271,6 +274,20 @@ export default {
         // this.errorMessage = "Failed to fetch shipment report. Please try again.";
      }
     },
+    async report_alerts(filter) {
+     try {
+        const params = {
+          'filter': filter,
+        }
+        const response = await this.axios.post('/myapp/api/reportAlert', {}, {params:params})
+        console.log(response.data);
+        this.forms['alerts'].data = response.data['values']
+        this.forms['alerts'].fields = response.data['fields']
+        console.log(this.forms.alerts)
+     } catch (error) {
+        console.error("Error fetching alerts report:", error);
+     }
+    },
 
   },
 }
@@ -343,7 +360,7 @@ export default {
                     <template v-for="(v, index) in val.data">
                           <tr class="truncate bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-green-50 dark:hover:bg-gray-600">
                             <template v-for="(field ,k) in val.fields">
-                              <template v-if="k !='id'">
+                              <template v-if="field !='id'">
                                 <td class="w-4 p-4">
                                   {{ v[field] }}
                                 </td>
