@@ -54,13 +54,14 @@ export default {
     // this.load_data()
     this.startCountdown();
     this.report_shipment('year')
+    this.report_Products('year')
     this.report_Sales('year')
     this.report_Purchases('year')
-    this.report_RawMaterial('year')
-    this.report_Products('year')
     this.report_Consumption('year')
+    this.report_RawMaterial('year')
     // Initialize WebSocket connection
-    this.alertSocket = new WebSocket('/ws/alert/');
+    console.log(window.location)
+    this.alertSocket = new WebSocket('ws://'+window.location.host+'/ws/alert/');
 
     // Set up message handler
     this.alertSocket.onmessage = (e) => {
@@ -279,12 +280,13 @@ export default {
 
 
 <!--<Card title="گزارش">-->
-  <div class="w-screen p-5 container">
-    <div class="flex flex-col fixed top-0 right-0 left-0 z-50 justify-end items-start w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
-      <template v-for="(alert, index) in alerts" :key="index">
-        <Alert :msg="alert.message"></Alert>
-      </template>
-    </div>
+  <div class="w-screen p-5 container relative">
+  <!-- The div that should appear in front of all others -->
+  <div class="flex flex-col fixed top-0 right-0 left-0 z-10 w-1/2">
+    <template v-for="(alert, index) in alerts" :key="index">
+      <Alert :msg="alert.message"></Alert>
+    </template>
+  </div>
   <p class="flex flex-row gap-2 items-center">
     <button @click="reload" class="w-auto block text-white bg-green-500 hover:bg-green-600 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="button">
       بارگیری مجدد
@@ -340,10 +342,10 @@ export default {
                 <tbody>
                     <template v-for="(v, index) in val.data">
                           <tr class="truncate bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-green-50 dark:hover:bg-gray-600">
-                            <template v-for="(i ,k) in v">
+                            <template v-for="(field ,k) in val.fields">
                               <template v-if="k !='id'">
                                 <td class="w-4 p-4">
-                                  {{ i }}
+                                  {{ v[field] }}
                                 </td>
                               </template>
                             </template>
@@ -355,6 +357,5 @@ export default {
     </template>
   </form>
   </div>
-<!--</Card>-->
-</template>
 
+</template>
