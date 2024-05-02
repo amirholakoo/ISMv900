@@ -37,8 +37,6 @@ export default {
 
       // Initialize the countdown to 15 minutes (15 * 60 seconds)
       totalSeconds: 15 * 60,
-      countdownTime: 900000, // 15 milisecond
-      timeLeft: 900000,
       alerts: [], // Reactive property to store messages
       alertSocket: null, // WebSocket connection
     }
