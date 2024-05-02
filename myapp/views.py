@@ -16,9 +16,12 @@ from django.db.models.base import ModelBase
 import jdatetime
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
-
+from django.forms.models import model_to_dict
 
 # Create your views here.
+def get_time():
+    return timezone.now().strftime('%Y-%m-%d %H:%M')
+
 def log_generator(username, action):
     # Get the current timestamp
     current_time = timezone.now().strftime('%Y-%m-%d %H:%M')
@@ -39,10 +42,14 @@ def not_enough_log_generator(location):
 
 
 def not_enough_alert(msg):
+    # Create a new Alert instance with a message
+    new_alert = Alert(message=msg, date=get_time())
+    new_alert.save()  # Save the object to the database
+    alert_values = model_to_dict(new_alert)
     # Broadcast the message to all connected clients
     channel_layer = get_channel_layer()
     async_to_sync(channel_layer.group_send)(
-        "alert", {"type": "alert.message", "message": msg}
+        "alert", {"type": "alert.message", "message": msg, "data": alert_values}
     )
 
 def append_log(fields, page):
@@ -51,10 +58,6 @@ def append_log(fields, page):
     for filed, message in fields.items():
         logs += f" {current_time} {message} by {page} FOR {filed},"
     return logs
-
-def get_time():
-    return timezone.now().strftime('%Y-%m-%d %H:%M')
-
 
 def not_enough_message(inventory, amount, required, transferred, location, action):
     msg = f"""
@@ -66,6 +69,7 @@ def not_enough_message(inventory, amount, required, transferred, location, actio
         متاسفیم! درحال حاضر موجودی در انبار {location} کافی نیست. حداکثر {transferred} از این کالا {action}.
     """
     return msg
+
 # Incoming process:
 # Add Truck
 # Add Shipments
@@ -2961,7 +2965,8 @@ def generate_excel_report(request):
         'purchases': Purchases.objects.all().exclude(status='Cancelled').values(),
         'rawMaterial': RawMaterial.objects.all().values(),
         'products': Products.objects.all().values(),
-        'consumption': Consumption.objects.all().values()
+        'consumption': Consumption.objects.all().values(),
+        'alerts': Alert.objects.all().values()
     }
     model = models[model_name]
     # Creating DataFrames
@@ -3374,6 +3379,45 @@ def report_Consumption(request):
                 return JsonResponse(data=data, status=200)
             else:
                 return JsonResponse({'status': 'error', 'message': 'No consumption records found'}, status=404)
+        else:
+            return JsonResponse({'status': 'error', 'message': 'Invalid request method'}, status=405)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+
+
+
+def report_Alert(request):
+    try:
+        if request.method == 'POST':
+            filter_type = request.GET.get('filter')
+            current_time = timezone.now()
+
+            if filter_type == 'year':
+                alert = Alert.objects.filter(date__year=current_time.year).values()
+            elif filter_type == 'month':
+                alert = Alert.objects.filter(date__month=current_time.month).values()
+            elif filter_type == 'week':
+                start_of_last_week = current_time - timedelta(days=6)
+                end_of_last_week = current_time
+                alert = Alert.objects.filter(date__range=(start_of_last_week, end_of_last_week)).values()
+            elif filter_type == 'day':
+                hours_ago = current_time - timedelta(hours=24)
+                alert = Alert.objects.filter(date__gte=hours_ago, date__lt=current_time).values()
+            else:
+                return JsonResponse({'status': 'error', 'message': 'Invalid filter type'}, status=400)
+
+            if alert.exists():
+                for con in alert:
+
+                    # Convert to Shamsi date
+                    shamsi_date = jdatetime.datetime.fromgregorian(datetime=con['date'])
+                    # Update the field in the dictionary
+                    con['date'] = shamsi_date.strftime('%Y-%m-%d %H:%M')
+                field_names = ['date', 'message']
+                data = {'values': list(alert), 'fields': field_names, 'title': 'هشدار ها',}
+                return JsonResponse(data=data, status=200)
+            else:
+                return JsonResponse({'status': 'error', 'message': 'No alert records found'}, status=404)
         else:
             return JsonResponse({'status': 'error', 'message': 'Invalid request method'}, status=405)
     except Exception as e:
