@@ -724,3 +724,28 @@ class Unit(models.Model):
         """
         return f"{self.supplier_name} - {self.material_type} - {self.unit_name} - {self.count} - {self.status}"
 
+
+class Alert(models.Model):
+    """
+    Model representing an alert event within the system.
+
+    Attributes:
+    - message: Text field that stores the alert message.
+    - date: DateTime field that records the time of alert creation.
+    """
+
+    message = models.TextField()
+    date = models.DateTimeField(default=timezone.now, blank=True)
+
+    def __str__(self):
+        """
+        Return a string representation of the Alert, which includes
+        the creation timestamp and a snippet of the message.
+        """
+        # Format the created_at datetime for a cleaner string representation
+        formatted_time = self.date.strftime('%Y-%m-%d %H:%M')
+        # Return a formatted string with the timestamp and the first 30 characters of the message
+        return f"[{formatted_time}] Alert: {self.message[:30]}..."
+
+    class Meta:
+        db_table = 'Alert'
