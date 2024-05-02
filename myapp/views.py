@@ -2169,7 +2169,7 @@ def moved(request):
                     record.status = 'Moved'
                     record.location = to_anbar
                     record.last_date = get_time()
-                    record.logs = record.logs + log_generator(forklift_driver, 'Moved')
+                    record.logs = record.logs + log_message
                     # Create new entries in the destination AnbarGeneric location
                     new_item = AnbarModel2(
                         receive_date=get_time(),
