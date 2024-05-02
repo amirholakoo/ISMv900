@@ -14,6 +14,8 @@ class AlertConsumer(AsyncWebsocketConsumer):
 
     async def alert_message(self, event):
         message = event['message']
+        data = event['data']
         await self.send(text_data=json.dumps({
-            'message': message
+            'message': message,
+            'data': data
         }))
