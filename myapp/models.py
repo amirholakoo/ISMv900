@@ -730,12 +730,22 @@ class Alert(models.Model):
     Model representing an alert event within the system.
 
     Attributes:
-    - message: Text field that stores the alert message.
-    - date: DateTime field that records the time of alert creation.
-    """
+        - message: TextField that stores the alert message.
+        - date: DateTimeField that records the time of alert creation.
+        - status: CharField that indicates the current processing status of the alert.
+                  It uses predefined choices and defaults to 'Pending'.
 
-    message = models.TextField()
+    The status field can have the following values:
+        - 'Pending': The alert has been created but not yet addressed.
+        - 'Resolved': The alert has been addressed and is considered resolved.
+    """
+    STATUS_CHOICES = [
+        ('Pending', 'Pending'),
+        ('Resolved', 'Resolved'),
+    ]
     date = models.DateTimeField(default=timezone.now, blank=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending', null=True, blank=True)
+    message = models.TextField()
 
     def __str__(self):
         """
