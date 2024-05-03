@@ -35,7 +35,7 @@ export default {
       if (c == true) {
         setTimeout(() => {
           this.success = false
-          location.reload();
+          window.location.href = '/myapp/addShipment/';
         }, 5000)
       }
     },
