@@ -3413,7 +3413,7 @@ def report_Alert(request):
                     shamsi_date = jdatetime.datetime.fromgregorian(datetime=con['date'])
                     # Update the field in the dictionary
                     con['date'] = shamsi_date.strftime('%Y-%m-%d %H:%M')
-                field_names = ['date', 'message']
+                field_names = ['date', 'status', 'message']
                 data = {'values': list(alert), 'fields': field_names, 'title': 'هشدار ها',}
                 return JsonResponse(data=data, status=200)
             else:
