@@ -29,20 +29,10 @@ export default {
       success: false,
       error: false,
       errors: [],
-      countdownTime: 900000, // 15 milisecond
-      timeLeft: 900000,
     }
-  },
-  computed: {
-    formattedTime() {
-      const minutes = Math.floor(this.timeLeft / 60000);
-      const seconds = this.timeLeft % 60;
-      return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-    },
   },
   mounted() {
     initFlowbite();
-    this.startCountdown();
     this.report_Products('year')
   },
   methods: {
@@ -72,54 +62,14 @@ export default {
 
       console.log(response.data)
     },
-    reload(){location.reload();},
-    startCountdown() {
-      this.interval = setInterval(() => {
-        this.timeLeft--;
-        if (this.timeLeft <= 0) {
-          clearInterval(this.interval);
-          this.timeLeft = 0;
-          location.reload();
-        }
-      }, 1000);
-    },
     select(obj){
       this.forms.shipment_list.value = obj
     },
     clicked(k, data){
-      if (k == 'shipments'){
-        this.forms.shipments.filter = data.lable
-        this.report_shipment(data.value)
-      }
-      if (k == 'sales'){
-        this.forms.sales.filter = data.lable
-        this.report_Sales(data.value)
-      }
-      if (k == 'purchases'){
-        this.forms.purchases.filter = data.lable
-        this.report_Purchases(data.value)
-      }
-      if (k == 'rawMaterial'){
-        this.forms.rawMaterial.filter = data.lable
-        this.report_RawMaterial(data.value)
-      }
       if (k == 'products'){
         this.forms.products.filter = data.lable
         this.report_Products(data.value)
       }
-      if (k == 'consumption'){
-        this.forms.consumption.filter = data.lable
-        this.report_Consumption(data.value)
-      }
-    },
-    async load_data() {
-      const response = await this.axios.get('/myapp/api/loadReportData')
-      console.log(response.data['data']); // Access response data
-      // console.log(JSON.parse(response.data['isExists'])); // Access response data
-      this.forms = response.data['data']
-      // this.forms.shipment_list.data = response.data['data'].shipments.values
-      // this.forms.shipment_list.fields = response.data['data'].shipments.fields
-      // console.log(JSON.parse(response.data['shipment_list']))
     },
     printTable(id) {
         let table = document.getElementById(id); // Replace 'yourTableId' with your table's ID
@@ -139,7 +89,7 @@ export default {
         const params = {
           'filter': filter,
         }
-        const response = await this.axios.post('/myapp/api/reportProducts', {}, {params:params})
+        const response = await this.axios.post('/myapp/ProductsPage', {}, {params:params})
         console.log(response.data);
         this.forms['products'].data = response.data['values']
         this.forms['products'].fields = response.data['fields']
@@ -160,12 +110,12 @@ export default {
 
 <!--<Card title="گزارش">-->
   <div class="w-screen p-5 container">
-  <p class="flex flex-row gap-2 items-center">
-    <button @click="reload" class="w-auto block text-white bg-green-500 hover:bg-green-600 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="button">
-      بارگیری مجدد
-    </button>
-    {{ formattedTime }}
-  </p>
+<!--  <p class="flex flex-row gap-2 items-center">-->
+<!--    <button @click="reload" class="w-auto block text-white bg-green-500 hover:bg-green-600 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="button">-->
+<!--      بارگیری مجدد-->
+<!--    </button>-->
+<!--    {{ formattedTime }}-->
+<!--  </p>-->
   <form class="flex flex-col items-center mt-5 gap-4">
     <template v-for="(val, form_name) in forms">
         <div class="relative w-full h-auto max-h-[500px] overflow-y-scroll overflow-x-auto shadow-md sm:rounded-lg">
@@ -174,29 +124,28 @@ export default {
 
                     <div class="flex flex-row gap-2 items-center">
                       {{val.title}}
-                      <button @click="printTable(form_name)" class="w-auto block text-white bg-green-500 hover:bg-green-600 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="button">
-                        PDF
-                      </button>
-                      <button @click="generate_excel_report(form_name)"  class="w-auto block text-white bg-green-500 hover:bg-green-600 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="button">
-                      XLS
-                    </button>
-
-                      <button :id="form_name + 'Button1'" :data-dropdown-toggle="form_name+'dropdown1'" class="justify-between w-44 text-white bg-green-500 hover:bg-green-600 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="button">
-                        {{ val.filter }}
-                        <svg class="w-2.5 h-2.5 ms-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
-                          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>
-                        </svg>
-                      </button>
-                      <!-- Dropdown menu -->
-                      <div :id="form_name+'dropdown1'" class="z-50 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
-                        <ul class="overflow-y-auto h-auto max-h-48 py-2 text-sm text-gray-700 dark:text-gray-200" :aria-labelledby="form_name + 'Button1'">
-                          <li v-for="data in filters">
-                            <a @click='clicked(form_name ,data)' type="button" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
-                              {{ data.lable }}
-                            </a>
-                          </li>
-                        </ul>
-                      </div>
+<!--                      <button @click="printTable(form_name)" class="w-auto block text-white bg-green-500 hover:bg-green-600 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="button">-->
+<!--                        PDF-->
+<!--                      </button>-->
+<!--                      <button @click="generate_excel_report(form_name)"  class="w-auto block text-white bg-green-500 hover:bg-green-600 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="button">-->
+<!--                      XLS-->
+<!--                    </button>-->
+<!--                      <button :id="form_name + 'Button1'" :data-dropdown-toggle="form_name+'dropdown1'" class="justify-between w-44 text-white bg-green-500 hover:bg-green-600 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="button">-->
+<!--                        {{ val.filter }}-->
+<!--                        <svg class="w-2.5 h-2.5 ms-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">-->
+<!--                          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>-->
+<!--                        </svg>-->
+<!--                      </button>-->
+<!--                      &lt;!&ndash; Dropdown menu &ndash;&gt;-->
+<!--                      <div :id="form_name+'dropdown1'" class="z-50 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">-->
+<!--                        <ul class="overflow-y-auto h-auto max-h-48 py-2 text-sm text-gray-700 dark:text-gray-200" :aria-labelledby="form_name + 'Button1'">-->
+<!--                          <li v-for="data in filters">-->
+<!--                            <a @click='clicked(form_name ,data)' type="button" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">-->
+<!--                              {{ data.lable }}-->
+<!--                            </a>-->
+<!--                          </li>-->
+<!--                        </ul>-->
+<!--                      </div>-->
 
                     </div>
 

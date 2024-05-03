@@ -3446,3 +3446,44 @@ def report_Alert(request):
 def all_pages(request):
     if request.method == 'GET':
         return render(request, 'all_pages.html')
+
+def products_page(request):
+    try:
+        if request.method == 'POST':
+            filter_type = request.GET.get('filter')
+            current_time = timezone.now()
+
+            # Group by 'width', count the number of products in each group, and order by 'location'
+            if filter_type == 'year':
+                products = Products.objects.filter(receive_date__year=current_time.year, status='In-stock').order_by('-width').values('width','grade', 'location', 'status')
+            elif filter_type == 'month':
+                products = Products.objects.filter(receive_date__month=current_time.month, status='In-stock').order_by('-width').values('width','grade', 'location', 'status')
+            elif filter_type == 'week':
+                start_of_last_week = current_time - timedelta(days=6)
+                end_of_last_week = current_time
+                products = Products.objects.filter(receive_date__range=(start_of_last_week, end_of_last_week), status='In-stock').order_by('-width').values('width','grade', 'location', 'status')
+            elif filter_type == 'day':
+                hours_ago = current_time - timedelta(hours=24)
+                products = Products.objects.filter(receive_date__gte=hours_ago, receive_date__lt=current_time, status='In-stock').order_by('-width').values('width','grade', 'location', 'status')
+            else:
+                return JsonResponse({'status': 'error', 'message': 'Invalid filter type'}, status=400)
+
+            if products.exists():
+                # for product in products:
+                #     for field in datetime_fields:
+                #         if field in product and product[field] is not None:
+                #             # Convert to Shamsi date
+                #             shamsi_date = jdatetime.datetime.fromgregorian(datetime=product[field])
+                #             # Update the field in the dictionary
+                #             product[field] = shamsi_date.strftime('%Y-%m-%d %H:%M')
+                #
+                field_names =['width','grade', 'location', 'status']
+
+                data = {'values': list(products), 'fields': field_names, 'title': 'لیست محصولات',}
+                return JsonResponse(data=data, status=200)
+            else:
+                return JsonResponse({'status': 'error', 'message': 'No product records found'}, status=404)
+        else:
+            return render(request, 'products_page.html')
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)

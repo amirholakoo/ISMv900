@@ -317,7 +317,18 @@ export default {
                 <caption class="p-5 text-lg font-semibold text-left rtl:text-right text-gray-900 bg-white dark:text-white dark:bg-gray-800">
 
                     <div class="flex flex-row gap-2 items-center">
-                      {{val.title}}
+                      <template v-if="form_name == 'products'">
+                        <router-link
+                            to="/myapp/ProductsPage/"
+                            type="button"
+                            class="font-medium text-blue-600 dark:text-blue-500 hover:underline"
+                        >
+                          {{val.title}}
+                        </router-link>
+                      </template>
+                      <template v-else>
+                        {{val.title}}
+                      </template>
                       <button @click="printTable(form_name)" class="w-auto block text-white bg-green-500 hover:bg-green-600 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="button">
                         PDF
                       </button>

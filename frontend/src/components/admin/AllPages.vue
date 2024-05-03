@@ -90,6 +90,10 @@ export default {
           path: '/myapp/report/',
           name: 'report',
         },
+        {
+          path: '/myapp/ProductsPage/',
+          name: 'ProductsPage',
+        },
       ]
     }
   }
