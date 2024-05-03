@@ -560,6 +560,7 @@ def add_new_reel(request):
 
             # Initialize an empty list to collect error messages
             errors = []
+            warning = []
 
             # # Check if all required fields are provided
             # if not reel_number:
@@ -627,6 +628,9 @@ def add_new_reel(request):
             anbar_table_names = [name for name in all_table_names if name.startswith('Anbar_')]
             profile_list = ConsumptionProfile.objects.filter(profile_name=profile_name)
             isExist = True # Initialize isExist as True, assuming no records are found initially
+            # Initialize a dictionary to keep track of profile existence in 'Anbar_' tables.
+            # Each key will represent an Anbar table name, and the default value is False, indicating the profile is not found.
+            anbar_profile_found = {anbar_name: False for anbar_name in anbar_table_names}
 
             for each_line in profile_list:
 
@@ -639,6 +643,8 @@ def add_new_reel(request):
 
 
                     if anbar_records.exists():
+                        # If records are found in the AnbarModel, set the corresponding dictionary value to True.
+                        anbar_profile_found[anbar_name] = True
                         isExist = False # Set isExist to False if records are found
                         isEnough = len(anbar_records) < int(each_line.quantity)
                         # Iterate over the source records and create new instances of the target model
@@ -685,10 +691,23 @@ def add_new_reel(request):
                             not_enough_alert(msg)
                             errors.append({'status': 'error', 'message': msg})
 
+                # Check if the profile is not found in any Anbar table by examining the values in the dictionary.
+                if all(value == False for value in anbar_profile_found.values()):
+                    msg = f"""
+                    درهیچ انباری بروفایل مصرفی با اطلاعات ذکر شده یافت نشد!
+                    اسم پروفایل مصرف: {each_line.profile_name}, اسم فروشنده: {each_line.supplier_name}, اسم ماده: {each_line.material_name}, تعداد: {each_line.quantity} 
+                    """
+                    not_enough_alert(msg)
+                    warning.append({'status': 'warning', 'message': msg})
+
+
+                # Reset the dictionary for the next profile in the list.
+                anbar_profile_found = {anbar_name: False for anbar_name in anbar_table_names}
             # If there are any errors, return them in the response
             if errors:
                 return JsonResponse({'status': 'error', 'errors': errors})
-
+            # if warning:
+            #     return JsonResponse({'status': 'warning', 'warning': warning})
             if isExist:
                 msg = 'در هیچ یک از انبار ها چیزی یافت نشد.'
                 not_enough_alert(msg)
@@ -696,7 +715,7 @@ def add_new_reel(request):
                 return JsonResponse({'status': 'error', 'errors': errors})
 
             # Return a success response
-            return JsonResponse({'status': 'success', 'message': 'Reel number has been added'}, status=200)
+            return JsonResponse({'status': 'success', 'message': 'Reel number has been added', 'warning': warning}, status=200)
 
         except ValidationError as e:
             # Return a validation error response
@@ -3393,16 +3412,16 @@ def report_Alert(request):
             current_time = timezone.now()
 
             if filter_type == 'year':
-                alert = Alert.objects.filter(date__year=current_time.year).values()
+                alert = Alert.objects.filter(date__year=current_time.year).order_by('-id').values()
             elif filter_type == 'month':
-                alert = Alert.objects.filter(date__month=current_time.month).values()
+                alert = Alert.objects.filter(date__month=current_time.month).order_by('-id').values()
             elif filter_type == 'week':
                 start_of_last_week = current_time - timedelta(days=6)
                 end_of_last_week = current_time
-                alert = Alert.objects.filter(date__range=(start_of_last_week, end_of_last_week)).values()
+                alert = Alert.objects.filter(date__range=(start_of_last_week, end_of_last_week)).order_by('-id').values()
             elif filter_type == 'day':
                 hours_ago = current_time - timedelta(hours=24)
-                alert = Alert.objects.filter(date__gte=hours_ago, date__lt=current_time).values()
+                alert = Alert.objects.filter(date__gte=hours_ago, date__lt=current_time).order_by('-id').values()
             else:
                 return JsonResponse({'status': 'error', 'message': 'Invalid filter type'}, status=400)
 
