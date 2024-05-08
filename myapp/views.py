@@ -3459,30 +3459,40 @@ def products_page(request):
 
             for anbar_table_name in anbar_table_names:
                 model = apps.get_model('myapp', anbar_table_name)
-                queryset = model.objects.filter(status='In-stock')
-                result = queryset.values('width', 'location', 'status').annotate(quantity=Count('id')).order_by('width')
+
+                if filter_type == 'year':
+                    products = model.objects.filter(receive_date__year=current_time.year,status='In-stock')
+                elif filter_type == 'month':
+                    products = model.objects.filter(receive_date__month=current_time.month, status='In-stock')
+                elif filter_type == 'week':
+                    start_of_last_week = current_time - timedelta(days=6)
+                    end_of_last_week = current_time
+                    products = model.objects.filter(receive_date__range=(start_of_last_week, end_of_last_week), status='In-stock')
+                elif filter_type == 'day':
+                    hours_ago = current_time - timedelta(hours=24)
+                    products = model.objects.filter(receive_date__gte=hours_ago, receive_date__lt=current_time, status='In-stock')
+                else:
+                    return JsonResponse({'status': 'error', 'message': 'Invalid filter type'}, status=400)
+
+                result = products.values('width', 'location', 'status').annotate(quantity=Count('id')).order_by('-width')
                 all_results.extend(result)
-            # Now sort all_results by 'location' and then by 'width'
-            # all_results.sort(key=lambda x: (x['location'], x['width']))
 
             field_names = ['width', 'location', 'status', 'quantity']
+            # Now sort all_results by 'location' and then by 'width'
+            # Sorting function
+            def sorting_key(d):
+                # Handling None as the smallest possible value
+                width = d['width'] if d['width'] is not None else float('-inf')
+                return (d['location'], width)
 
-            data = {'values': all_results, 'fields': field_names, 'title': 'لیست محصولات', }
+            sorted_results = sorted(all_results, key=sorting_key)
+
+            print(sorted_results)
+            # all_results = sorted(all_results, key=lambda x: x['width'])
+            data = {'values': sorted_results, 'fields': field_names, 'title': 'لیست محصولات', }
             return JsonResponse(data=data, status=200)
             # Group by 'width', count the number of products in each group, and order by 'location'
-            # if filter_type == 'year':
-            #     products = Products.objects.filter(receive_date__year=current_time.year, status='In-stock').order_by('-width').values('width','grade', 'location', 'status')
-            # elif filter_type == 'month':
-            #     products = Products.objects.filter(receive_date__month=current_time.month, status='In-stock').order_by('-width').values('width','grade', 'location', 'status')
-            # elif filter_type == 'week':
-            #     start_of_last_week = current_time - timedelta(days=6)
-            #     end_of_last_week = current_time
-            #     products = Products.objects.filter(receive_date__range=(start_of_last_week, end_of_last_week), status='In-stock').order_by('-width').values('width','grade', 'location', 'status')
-            # elif filter_type == 'day':
-            #     hours_ago = current_time - timedelta(hours=24)
-            #     products = Products.objects.filter(receive_date__gte=hours_ago, receive_date__lt=current_time, status='In-stock').order_by('-width').values('width','grade', 'location', 'status')
-            # else:
-            #     return JsonResponse({'status': 'error', 'message': 'Invalid filter type'}, status=400)
+
             #
             # if products.exists():
             #     # for product in products:

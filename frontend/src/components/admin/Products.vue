@@ -18,7 +18,7 @@ export default {
   data(){
     return {
       forms: {
-        products:{type:'input', title: 'لیست محصولات',filter:'فیلتر', data:'', value:'', fields: []},
+        products:{type:'input', title: 'لیست محصولات',filter:'یک سال اخیر', data:'', value:'', fields: []},
       },
       filters: [
         {lable:'یک سال اخیر', value: 'year'},
@@ -130,22 +130,22 @@ export default {
 <!--                      <button @click="generate_excel_report(form_name)"  class="w-auto block text-white bg-green-500 hover:bg-green-600 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="button">-->
 <!--                      XLS-->
 <!--                    </button>-->
-<!--                      <button :id="form_name + 'Button1'" :data-dropdown-toggle="form_name+'dropdown1'" class="justify-between w-44 text-white bg-green-500 hover:bg-green-600 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="button">-->
-<!--                        {{ val.filter }}-->
-<!--                        <svg class="w-2.5 h-2.5 ms-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">-->
-<!--                          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>-->
-<!--                        </svg>-->
-<!--                      </button>-->
-<!--                      &lt;!&ndash; Dropdown menu &ndash;&gt;-->
-<!--                      <div :id="form_name+'dropdown1'" class="z-50 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">-->
-<!--                        <ul class="overflow-y-auto h-auto max-h-48 py-2 text-sm text-gray-700 dark:text-gray-200" :aria-labelledby="form_name + 'Button1'">-->
-<!--                          <li v-for="data in filters">-->
-<!--                            <a @click='clicked(form_name ,data)' type="button" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">-->
-<!--                              {{ data.lable }}-->
-<!--                            </a>-->
-<!--                          </li>-->
-<!--                        </ul>-->
-<!--                      </div>-->
+                      <button :id="form_name + 'Button1'" :data-dropdown-toggle="form_name+'dropdown1'" class="justify-between w-44 text-white bg-green-500 hover:bg-green-600 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="button">
+                        {{ val.filter }}
+                        <svg class="w-2.5 h-2.5 ms-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+                          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>
+                        </svg>
+                      </button>
+                      <!-- Dropdown menu -->
+                      <div :id="form_name+'dropdown1'" class="z-50 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
+                        <ul class="overflow-y-auto h-auto max-h-48 py-2 text-sm text-gray-700 dark:text-gray-200" :aria-labelledby="form_name + 'Button1'">
+                          <li v-for="data in filters">
+                            <a @click='clicked(form_name ,data)' type="button" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
+                              {{ data.lable }}
+                            </a>
+                          </li>
+                        </ul>
+                      </div>
 
                     </div>
 
