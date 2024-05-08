@@ -131,7 +131,7 @@ const routes = [
     component: AllPages
   },
   {
-    path: '/myapp/ProductsPage',
+    path: '/myapp/ProductsPage/',
     name: 'Products',
     component: Products
   },
