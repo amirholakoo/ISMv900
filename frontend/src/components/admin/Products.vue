@@ -89,7 +89,7 @@ export default {
         const params = {
           'filter': filter,
         }
-        const response = await this.axios.post('/myapp/ProductsPage', {}, {params:params})
+        const response = await this.axios.post('/myapp/ProductsPage/', {}, {params:params})
         console.log(response.data);
         this.forms['products'].data = response.data['values']
         this.forms['products'].fields = response.data['fields']
