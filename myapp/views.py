@@ -2850,7 +2850,7 @@ def load_shipments_baesd_license_number_for_canceling(request):
         shipments = shipments.order_by('-id')
         if shipments.exists():
             shipment_list = shipments.values(
-                'id',
+                # 'id',
                 'receive_date',
                 'supplier_name',
                 'customer_name',

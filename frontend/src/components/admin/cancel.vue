@@ -300,13 +300,10 @@ export default {
       <template v-if="val.type=='list'">
         <div class="flex flex-col gap-2 font-bold max-w-full relative overflow-x-auto shadow-md sm:rounded-lg">
           <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-              <thead class="text-md text-gray-100 uppercase bg-green-500 dark:bg-gray-700 dark:text-gray-400">
+              <thead class="truncate text-md text-gray-100 uppercase bg-green-500 dark:bg-gray-700 dark:text-gray-400">
                   <tr>
                       <th scope="col" class="px-3 py-3">
                           <span class="sr-only">افزودن</span>
-                      </th>
-                      <th scope="col" class="px-6 py-3">
-                          ID
                       </th>
                       <th scope="col" class="px-6 py-3">
                           تاریخ
@@ -330,7 +327,7 @@ export default {
               </thead>
               <tbody>
                   <template v-for="(obj, index) in forms.shipment_list.data">
-                     <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-green-50 dark:hover:bg-gray-600">
+                     <tr class="truncate bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-green-50 dark:hover:bg-gray-600">
                        <td class="px-6 py-4 text-right">
                           <div class="flex items-center rounded">
                               <input @click="select(obj)" :id="'bordered-radio-'+index" type="radio" value="" name="bordered-radio" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
