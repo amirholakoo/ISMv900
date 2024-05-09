@@ -70,7 +70,7 @@ export default {
       console.log(this.forms.alerts.data);
       console.log(data.data);
       this.alerts.push({ message: data.message });
-      this.forms.alerts.data.push(data.data)
+      this.forms.alerts.data.unshift(data.data)
     };
 
     // Handle WebSocket errors
