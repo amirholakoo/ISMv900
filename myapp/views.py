@@ -686,10 +686,7 @@ def add_new_reel(request):
 
                 # Check if the profile is not found in any Anbar table by examining the values in the dictionary.
                 if all(value == False for value in anbar_profile_found.values()):
-                    msg = f"""
-                    درهیچ انباری بروفایل مصرفی با اطلاعات ذکر شده یافت نشد!
-                    اسم پروفایل مصرف: {each_line.profile_name}, اسم فروشنده: {each_line.supplier_name}, اسم ماده: {each_line.material_name}, تعداد: {each_line.quantity} 
-                    """
+                    msg = f"درهیچ انباری بروفایل مصرفی با اطلاعات ذکر شده یافت نشد!اسم پروفایل مصرف: {each_line.profile_name}, اسم فروشنده: {each_line.supplier_name}, اسم ماده: {each_line.material_name}, تعداد: {each_line.quantity}"
                     not_enough_alert(msg)
                     warning.append({'status': 'warning', 'message': msg})
 
