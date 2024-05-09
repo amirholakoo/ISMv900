@@ -3223,26 +3223,20 @@ def report_RawMaterial(request):
             # else:
             #     return JsonResponse({'status': 'error', 'message': 'Invalid filter type'}, status=400)
             field_names = [
-                 'status',
-                 'location',
                  'date',
-                 'receive_date',
-                 'last_date',
-                 'reel_number',
+                 'location',
                  'supplier_name',
                  'material_type',
                  'material_name',
-                 'description',
-                 'width',
-                 'gsm',
-                 'length',
+                 'unit',
                  'grade',
-                 'breaks',
+                 'status',
+                 'receive_date',
+                 'last_date',
+                 'description',
                  'comments',
                  'shipment_id_id',
                  'qr_code',
-                 'unit',
-                 'profile_name',
                  'username',
                  'logs'
             ]
@@ -3252,7 +3246,7 @@ def report_RawMaterial(request):
             mavad = []
             for anbar_name in anbar_table_names:
                 AnbarModel = apps.get_model('myapp', anbar_name)
-                anbar_records = AnbarModel.objects.filter(status='In-stock').order_by('location').values()
+                anbar_records = AnbarModel.objects.filter(status='In-stock', reel_number__isnull=True, supplier_name__isnull=False).order_by('location').values(*field_names)
 
                 if anbar_records.exists():
                     for raw in anbar_records:
