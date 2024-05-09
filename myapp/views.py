@@ -682,7 +682,7 @@ def add_new_reel(request):
                             )
                             # msg = f"انبار {anbar_name} مقدار کمتری از {str(each_line.quantity)} دارد با این حال {len(anbar_records)} مقدار مصرف شد"
                             not_enough_alert(msg)
-                            errors.append({'status': 'error', 'message': msg})
+                            warning.append({'status': 'warning', 'message': msg})
 
                 # Check if the profile is not found in any Anbar table by examining the values in the dictionary.
                 if all(value == False for value in anbar_profile_found.values()):
@@ -696,13 +696,10 @@ def add_new_reel(request):
             # If there are any errors, return them in the response
             if errors:
                 return JsonResponse({'status': 'error', 'errors': errors})
-            # if warning:
-            #     return JsonResponse({'status': 'warning', 'warning': warning})
             if isExist:
                 msg = 'در هیچ یک از انبار ها چیزی یافت نشد.'
                 not_enough_alert(msg)
-                errors.append({'status': 'error', 'message': msg})
-                return JsonResponse({'status': 'error', 'errors': errors})
+                warning.insert(0, {'status': 'warning', 'message': msg})
 
             # Return a success response
             return JsonResponse({'status': 'success', 'message': 'Reel number has been added', 'warning': warning}, status=200)
