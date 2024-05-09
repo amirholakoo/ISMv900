@@ -60,14 +60,7 @@ def append_log(fields, page):
     return logs
 
 def not_enough_message(inventory, amount, required, transferred, location, action):
-    msg = f"""
-        عدم موجودی کافی در انبار {location}!
-        موجودی: {inventory},
-        درخواست شده: {amount},
-        مقدار مورد نیاز: {required},
-        انتقال یافته: {transferred},
-        متاسفیم! درحال حاضر موجودی در انبار {location} کافی نیست. حداکثر {transferred} از این کالا {action}.
-    """
+    msg = f"عدم موجودی کافی در انبار {location}! موجودی: {inventory}, درخواست شده: {amount}, مقدار مورد نیاز: {required}, انتقال یافته: {transferred}, متاسفیم! درحال حاضر موجودی در انبار {location} کافی نیست. حداکثر {transferred} از این کالا {action}."
     return msg
 
 # Incoming process:
