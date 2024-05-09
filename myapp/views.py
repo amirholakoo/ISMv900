@@ -828,26 +828,29 @@ def add_shipment(request):
 
         # Check required fields
         errors = []
-        # if not license_number:
-        #     errors.append('پلاک را انتخاب کنید')
-        # if not supplier_name:
-        #     errors.append('سام تامین کننده را انتخاب کنید')
-        # if not material_type:
-        #     errors.append('نوع ماده را انتخاب کنید')
-        # if not material_name:
-        #     errors.append('اسم ماده را انتخاب کنید')
-        # if not shipment_type:
-        #     errors.append('نوع بار نامه را انخاب کنید')
-        # if not customer_name:
-        #     errors.append('اسم مشتری را انخاب کنید')
-        # if not username:
-        #     errors.append('نام کاربری را وارد کنید')
+        if not license_number:
+            errors.append({'status': 'error', 'message': 'پلاک را انتخاب کنید'})
+        if not shipment_type:
+            errors.append({'status': 'error', 'message': 'نوع بار نامه را انخاب کنید'})
+        if shipment_type == "Incoming":
+            if not supplier_name:
+                errors.append({'status': 'error', 'message': 'سام تامین کننده را انتخاب کنید'})
+            if not material_type:
+                errors.append({'status': 'error', 'message': 'نوع ماده را انتخاب کنید'})
+            if not material_name:
+                errors.append({'status': 'error', 'message': 'اسم ماده را انتخاب کنید'})
+        else:
+            if not customer_name:
+                errors.append({'status': 'error', 'message': 'اسم مشتری را انخاب کنید'})
+        if not username:
+            errors.append({'status': 'error', 'message': 'نام کاربری را وارد کنید'})
 
         if errors:
+            print(errors)
             return JsonResponse({'status': 'error', 'errors': errors})
 
         else:
-
+            print('dooooooo')
             # Create new shipment
             if shipment_type == "Incoming":
                 shipment = Shipments(
@@ -882,7 +885,8 @@ def add_shipment(request):
                 # Use update to change the status atomically
                 Truck.objects.filter(license_number=license_number).update(status='Busy')
             except Truck.DoesNotExist:
-                return JsonResponse({'status': 'error', 'message': 'هیچ کامیونی با این پلاک وجود ندارد.'}, status=404)
+                errors.append({'status': 'error', 'message': 'هیچ کامیونی با این پلاک وجود ندارد.'})
+                return JsonResponse({'status': 'error', 'errors': errors}, status=404)
 
             # Save the new Shipment object to the database
             try:
@@ -890,8 +894,9 @@ def add_shipment(request):
                 return JsonResponse({'status': 'success', 'message': 'بار نامه با موفقیت اضافه شد.'})
 
             except Exception as e:
+                errors.append({'status': 'error', 'message': f'Error adding shipment: {str(e)}'})
                 # Handle any exceptions that occur during the save operation
-                return JsonResponse({'status': 'error', 'message': f'Error adding supplier: {str(e)}'})
+                return JsonResponse({'status': 'error', 'errors': errors})
     else:
         return render(request, 'add_shipment.html')
 

@@ -126,27 +126,31 @@ export default {
         "username": this.forms.username.value,
         "Incoming": this.Incoming,
       };
-      this.errors = []
+      this.errors = []; // Reset errors array
 
-      for (const key in this.forms) {
-        if (this.forms[key].value == ''){
-          if (this.forms.shipmet_type.value == "Incoming"){
-            if (key!='customer_name') {
-              this.forms[key].error = true
-              this.errors.push({'message': `${this.forms[key].name} مورد نیاز است`})
-            }
-          } else {
-            // outgoing shipment tyepe
-            this.forms.supplier_name.error = true
-            this.forms.matrial_type.error = true
-            this.forms.matrial_name.error = true
-            // this.forms.lic_number.error = false
-            // this.forms.username.error = false
-          }
-        }else {
-           this.forms[key].error = false
+
+      // Additional checks for specific conditions
+      if (this.forms.shipmet_type.value === "Incoming") { // Corrected property name
+        if (this.forms.supplier_name.value === '') {
+          this.errors.push({status: 'error', message: 'سام تامین کننده را انتخاب کنید'});
+        }
+        if (this.forms.material_type.value === '') {
+          this.errors.push({status: 'error', message: 'نوع ماده را انتخاب کنید'});
+        }
+        if (this.forms.material_name.value === '') {
+          this.errors.push({status: 'error', message: 'اسم ماده را انتخاب کنید'});
+        }
+      } else {
+        if (this.forms.customer_name.value === '') {
+          this.errors.push({status: 'error', message: 'اسم مشتری را انتخاب کنید'});
         }
       }
+
+      // Check for username
+      if (this.forms.username.value === '') {
+        this.errors.push({status: 'error', message: 'نام کاربری را وارد کنید'});
+      }
+
       if (this.errors.length == 0){
         console.log('no error')
         this.error = false
