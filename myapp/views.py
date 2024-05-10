@@ -2724,7 +2724,7 @@ def cancel(request):
         status = 'Cancelled'
         location = 'Cancelled'
         action = 'Cancelled'
-
+        print(shipment_obj)
         shipment = Shipments.objects.get(id=shipment_obj['id'])
         # Update the attributes of the shipment instance
         shipment.status = status
@@ -2839,7 +2839,7 @@ def load_shipments_baesd_license_number_for_canceling(request):
         shipments = shipments.order_by('-id')
         if shipments.exists():
             shipment_list = shipments.values(
-                # 'id',
+                'id',
                 'receive_date',
                 'supplier_name',
                 'customer_name',

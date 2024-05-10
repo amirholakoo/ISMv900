@@ -335,8 +335,8 @@ export default {
                               <label :id="'bordered-radio-'+index" class="w-full py-4 ms-2 text-sm font-medium text-gray-900 dark:text-gray-300"></label>
                           </div>
                        </td>
-                       <template v-for="profile in obj">
-                          <td class="px-6 py-4">
+                       <template v-for="(profile, key) in obj">
+                          <td class="px-6 py-4" v-if="key != 'id'">
                             {{ profile }}
                           </td>
                        </template>
