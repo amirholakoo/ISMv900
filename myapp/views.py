@@ -1178,7 +1178,7 @@ def show_weight1(request):
         else:
             return JsonResponse({'error': 'شماره پلاک مورد نیازاست'}, status=400)
 
-
+@csrf_exempt
 def update_weight2(request):
     """
     Handles a POST request to update the weight2 and net_weight of a Shipments instance.
@@ -2071,6 +2071,7 @@ def used(request):
     else:
         return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=400)
 
+@csrf_exempt
 def load_data_for_moved(request):
     try:
         # Extract the anbar_location from the query parameters
@@ -2629,10 +2630,6 @@ def add_unit(request):
         # Handle non-POST requests
         return render(request, 'add_unit.html')
 
-def get_unit_based_on_material_type(request):
-    if request.method == 'GET':
-        pass
-
 
 @csrf_exempt
 def add_consumption_profile(request):
@@ -2714,7 +2711,7 @@ def add_consumption_profile(request):
         return render(request, 'add_consumption_profile.html')
 
 
-from jdatetime import datetime
+@csrf_exempt
 def cancel(request):
     if request.method == 'POST':
         license_number = request.GET.get('license_number')
@@ -2956,6 +2953,7 @@ def loadReportData(request):
     else:
         return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=400)
 
+@csrf_exempt
 def report_page(request):
     if request.method == 'POST':
         pass
@@ -2968,6 +2966,7 @@ import pandas as pd
 from django.utils import timezone
 from django.http import FileResponse
 
+@csrf_exempt
 def generate_excel_report(request):
     model_name = request.GET.get('model_name')
     models = {
@@ -3013,6 +3012,8 @@ def generate_excel_report(request):
 import os
 import qrcode
 # from qrcode.image.pil import PilImage
+
+@csrf_exempt
 def generate_qrCode(request):
     # print(json.loads(dict(request.GET)))
     # Data to encode
@@ -3044,7 +3045,7 @@ def generate_qrCode(request):
 
 
 datetime_fields = ['receive_date', 'entry_time', 'weight1_time', 'weight2_time', 'exit_time', 'date', 'payment_date']
-from datetime import timedelta
+
 
 from django.http import JsonResponse
 from django.utils import timezone
@@ -3052,6 +3053,7 @@ from datetime import timedelta
 from .models import Shipments
 import jdatetime
 
+@csrf_exempt
 def report_shipment(request):
     try:
         if request.method == 'POST':
@@ -3092,7 +3094,7 @@ def report_shipment(request):
         return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
 
 
-
+@csrf_exempt
 def report_Sales(request):
     try:
         if request.method == 'POST':
@@ -3134,6 +3136,7 @@ def report_Sales(request):
         return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
 
 
+@csrf_exempt
 def report_Purchases(request):
     try:
         if request.method == 'POST':
@@ -3204,6 +3207,7 @@ def report_Purchases(request):
         return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
 
 
+@csrf_exempt
 def report_RawMaterial(request):
     try:
         if request.method == 'POST':
@@ -3273,6 +3277,7 @@ def report_RawMaterial(request):
         return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
 
 
+@csrf_exempt
 def report_Products(request):
     try:
         if request.method == 'POST':
@@ -3332,6 +3337,7 @@ def report_Products(request):
         return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
 
 
+@csrf_exempt
 def report_Consumption(request):
     try:
         if request.method == 'POST':
@@ -3390,7 +3396,7 @@ def report_Consumption(request):
         return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
 
 
-
+@csrf_exempt
 def report_Alert(request):
     try:
         if request.method == 'POST':
@@ -3433,6 +3439,7 @@ def all_pages(request):
     if request.method == 'GET':
         return render(request, 'all_pages.html')
 
+@csrf_exempt
 def products_page(request):
     try:
         if request.method == 'POST':
