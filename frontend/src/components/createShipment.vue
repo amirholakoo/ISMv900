@@ -18,8 +18,8 @@ export default {
         lic_number: {status:true, type: 'dropdown', name: 'شماره پلاک',title: 'شماره پلاک', data: '', value: ''},
         shipmet_type: {status:true, type: 'dropdown', name: 'نوع بار نامه',title: 'نوع بار نامه', data: ['Incoming', 'Outgoing'], value: 'Incoming'},
         supplier_name: {status:true, type: 'dropdown', name: 'اسم فروشنده',title: 'اسم تامین کننده', data: '', value: ''},
-        matrial_type: {status:true, type: 'dropdown', name: 'نوع ماده',title: 'نوع ماده', data: '', value: ''},
-        matrial_name: {status:true, type: 'dropdown', name: 'اسم ماده',title: 'اسم ماده', data: '', value: ''},
+        material_type: {status:true, type: 'dropdown', name: 'نوع ماده',title: 'نوع ماده', data: '', value: ''},
+        material_name: {status:true, type: 'dropdown', name: 'اسم ماده',title: 'اسم ماده', data: '', value: ''},
         customer_name: {status:false, type: 'dropdown', name: 'اسم مشتری',title: 'اسم مشتری', data: '', value: ''},
         username: {status:true, type: 'input', name: 'نام کاربر',title:'نام کاربر', value: ''},
       },
@@ -41,7 +41,7 @@ export default {
     },
   },
   mounted() {
-    console.log(this.$route.query.license_number)
+    // console.log(this.$route.query.license_number)
     if (this.$route.query.license_number){
       this.forms.lic_number.name = this.$route.query.license_number
       this.forms.lic_number.value = this.$route.query.license_number
@@ -77,34 +77,34 @@ export default {
         }
         this.axios.get('/myapp/api/getMaterialTypes',{params: params}).then((response) => {
           console.log(response.data)
-          this.forms.matrial_type.data = response.data['material_types']
+          this.forms.material_type.data = response.data['material_types']
         })
         this.axios.get('/myapp/api/getMaterialNames', { params: params }).then((response) => {
           console.log(response.data)
-          this.forms.matrial_name.data = response.data['material_names']
+          this.forms.material_name.data = response.data['material_names']
         })
       }
-      if (k == 'matrial_type'){
-        this.forms.matrial_type.name = name
-        this.forms.matrial_type.value = name
+      if (k == 'material_type'){
+        this.forms.material_type.name = name
+        this.forms.material_type.value = name
       }
-      if (k == 'matrial_name'){
-        this.forms.matrial_name.name = name
-        this.forms.matrial_name.value = name
+      if (k == 'material_name'){
+        this.forms.material_name.name = name
+        this.forms.material_name.value = name
       }
       if (k == 'shipmet_type'){
         this.forms.shipmet_type.name = name
         this.forms.shipmet_type.value = name
         if (name=='Incoming'){
             this.forms.supplier_name.status = true
-            this.forms.matrial_type.status = true
-            this.forms.matrial_name.status = true
+            this.forms.material_type.status = true
+            this.forms.material_name.status = true
             this.forms.customer_name.status = false
             this.Incoming = true
         }else {
             this.forms.supplier_name.status = false
-            this.forms.matrial_type.status = false
-            this.forms.matrial_name.status = false
+            this.forms.material_type.status = false
+            this.forms.material_name.status = false
             this.forms.customer_name.status = true
             this.Incoming = false
         }
@@ -119,8 +119,8 @@ export default {
       const params = {
         "license_number": this.forms.lic_number.value,
         "supplier_name": this.forms.supplier_name.value,
-        "material_type": this.forms.matrial_type.value,
-        "material_name": this.forms.matrial_name.value,
+        "material_type": this.forms.material_type.value,
+        "material_name": this.forms.material_name.value,
         "shipment_type": this.forms.shipmet_type.value,
         "customer_name": this.forms.customer_name.value,
         "username": this.forms.username.value,
@@ -134,6 +134,7 @@ export default {
         if (this.forms.supplier_name.value === '') {
           this.errors.push({status: 'error', message: 'سام تامین کننده را انتخاب کنید'});
         }
+        console.log('mat', this.forms.material_type.value)
         if (this.forms.material_type.value === '') {
           this.errors.push({status: 'error', message: 'نوع ماده را انتخاب کنید'});
         }
