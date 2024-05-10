@@ -21,7 +21,7 @@ export default {
         shipments:{type:'input', title: 'لیست بارنامه',filter:'فیلتر', data:'', value:'', fields: []},
         sales:{type:'input', title: 'لیست فروش',filter:'فیلتر', data:'', value:'', fields: []},
         purchases:{type:'input', title: 'لیست خرید',filter:'فیلتر', data:'', value:'', fields: []},
-        rawMaterial:{type:'input', title: 'لیست مواد',filter:'فیلتر', data:'', value:'', fields: []},
+        rawMaterial:{type:'input', title: 'لیست مواد اولیه',filter:'فیلتر', data:'', value:'', fields: []},
         products:{type:'input', title: 'لیست محصولات',filter:'فیلتر', data:'', value:'', fields: []},
         consumption:{type:'input', title: 'لیست مصرف',filter:'فیلتر', data:'', value:'', fields: []},
         alerts:{type:'input', title: 'هشدار ها',filter:'فیلتر', data:[], value:'', fields: ['date', 'status', 'message']},
@@ -302,7 +302,7 @@ export default {
 <!--<Card title="گزارش">-->
   <div class="w-screen p-5 container relative">
   <!-- The div that should appear in front of all others -->
-  <div class="flex flex-col fixed top-0 right-0 left-0 z-10 w-1/2">
+  <div class="flex flex-col fixed top-0 right-0 left-0 z-10 w-full">
     <template v-for="(alert, index) in alerts" :key="index">
       <Alert :msg="alert.message"></Alert>
     </template>

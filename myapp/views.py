@@ -3222,20 +3222,6 @@ def report_RawMaterial(request):
             filter_type = request.GET.get('filter')
             current_time = timezone.now()
 
-
-            # if filter_type == 'year':
-            #     rawMaterial = RawMaterial.objects.filter(receive_date__year=current_time.year).exclude(status='Cancelled').values()
-            # elif filter_type == 'month':
-            #     rawMaterial = RawMaterial.objects.filter(receive_date__month=current_time.month).exclude(status='Cancelled').values()
-            # elif filter_type == 'week':
-            #     start_of_last_week = current_time - timedelta(days=6)
-            #     end_of_last_week = current_time
-            #     rawMaterial = RawMaterial.objects.filter(receive_date__range=(start_of_last_week, end_of_last_week)).exclude(status='Cancelled').values()
-            # elif filter_type == 'day':
-            #     hours_ago = current_time - timedelta(hours=24)
-            #     rawMaterial = RawMaterial.objects.filter(receive_date__gte=hours_ago, receive_date__lt=current_time).exclude(status='Cancelled').values()
-            # else:
-            #     return JsonResponse({'status': 'error', 'message': 'Invalid filter type'}, status=400)
             field_names = [
                  'date',
                  'location',
@@ -3254,27 +3240,42 @@ def report_RawMaterial(request):
                  'username',
                  'logs'
             ]
+            field_names = ['unit', 'location', 'supplier_name', 'material_type', 'material_name',]
             # Get all table names from the database
             all_table_names = connection.introspection.table_names()
             anbar_table_names = [name for name in all_table_names if name.startswith('Anbar_')]
             mavad = []
             for anbar_name in anbar_table_names:
                 AnbarModel = apps.get_model('myapp', anbar_name)
-                anbar_records = AnbarModel.objects.filter(status='In-stock', reel_number__isnull=True, supplier_name__isnull=False).order_by('location').values(*field_names)
 
+                if filter_type == 'year':
+                    rawMaterial = AnbarModel.objects.filter(receive_date__year=current_time.year, status='In-stock', reel_number__isnull=True, supplier_name__isnull=False)
+                elif filter_type == 'month':
+                    rawMaterial = AnbarModel.objects.filter(receive_date__month=current_time.month, status='In-stock', reel_number__isnull=True, supplier_name__isnull=False)
+                elif filter_type == 'week':
+                    start_of_last_week = current_time - timedelta(days=6)
+                    end_of_last_week = current_time
+                    rawMaterial = AnbarModel.objects.filter(receive_date__range=(start_of_last_week, end_of_last_week), status='In-stock', reel_number__isnull=True, supplier_name__isnull=False)
+                elif filter_type == 'day':
+                    hours_ago = current_time - timedelta(hours=24)
+                    rawMaterial = AnbarModel.objects.filter(receive_date__gte=hours_ago, receive_date__lt=current_time, status='In-stock', reel_number__isnull=True, supplier_name__isnull=False)
+                else:
+                    return JsonResponse({'status': 'error', 'message': 'Invalid filter type'}, status=400)
+                anbar_records = rawMaterial.values(*field_names).annotate(quantity=Count('id')).order_by('location')
                 if anbar_records.exists():
                     for raw in anbar_records:
-                        for field in datetime_fields:
-                            if field in raw and raw[field] is not None:
-                                # Convert to Shamsi date
-                                shamsi_date = jdatetime.datetime.fromgregorian(datetime=raw[field])
-                                # Update the field in the dictionary
-                                raw[field] = shamsi_date.strftime('%Y-%m-%d %H:%M')
+                    #     for field in datetime_fields:
+                    #         if field in raw and raw[field] is not None:
+                    #             # Convert to Shamsi date
+                    #             shamsi_date = jdatetime.datetime.fromgregorian(datetime=raw[field])
+                    #             # Update the field in the dictionary
+                    #             raw[field] = shamsi_date.strftime('%Y-%m-%d %H:%M')
 
                         mavad.append(raw)
 
             if mavad:
-                data = {'values': mavad, 'fields': field_names, 'title': 'لیست مواد',}
+                field_names = ['unit', 'location','quantity', 'supplier_name', 'material_type', 'material_name',]
+                data = {'values': mavad, 'fields': field_names , 'title': 'لیست مواد اولیه',}
                 return JsonResponse(data=data, status=200)
             else:
                 return JsonResponse({'status': 'error', 'message': 'No raw material records found'}, status=404)
@@ -3488,7 +3489,7 @@ def products_page(request):
 
             sorted_results = sorted(all_results, key=sorting_key)
 
-            print(sorted_results)
+            # print(sorted_results)
             # all_results = sorted(all_results, key=lambda x: x['width'])
             data = {'values': sorted_results, 'fields': field_names, 'title': 'لیست محصولات', }
             return JsonResponse(data=data, status=200)
