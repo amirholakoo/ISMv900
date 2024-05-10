@@ -3029,8 +3029,7 @@ def generate_qrCode(request):
         box_size=10,
         border=4,
     )
-    print(data)
-    print(data['data'][0])
+
     # 1. Convert dictionary to list of key-value pairs
     list_of_pairs = [(key, str(value)) for key, value in d.items()]
 
@@ -3038,7 +3037,6 @@ def generate_qrCode(request):
     separator = ":"  # You can change this separator as desired
     my_string = ",\n".join([pair[0] + separator + pair[1] for pair in list_of_pairs])
 
-    print(my_string)
     qr.add_data(my_string)
     qr.make(fit=True)
     # Create an image from the QR Code instance

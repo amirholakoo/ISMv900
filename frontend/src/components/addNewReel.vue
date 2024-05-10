@@ -140,13 +140,13 @@ export default {
             "consumption_profile_name": this.forms.consumption_profile_name.value,
             "username": this.forms.username.value,
           };
-          console.log(params)
           const listOfPairs = Object.entries(params).map(([key, value]) => `${key}:${String(value)}`);
+          // console.log(listOfPairs)
 
           // 2. Join the key-value pairs with a separator
           const outputString = listOfPairs.join(',\n');
 
-          console.log(outputString);
+          // console.log(outputString);
           this.qrcode = await QRCode.toDataURL(outputString, {
             width: 256,
             height: 256,
