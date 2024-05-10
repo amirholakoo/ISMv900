@@ -164,10 +164,10 @@ export default {
                 <tbody>
                     <template v-for="(v, index) in val.data">
                           <tr class="truncate bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-green-50 dark:hover:bg-gray-600">
-                            <template v-for="(i ,k) in v">
-                              <template v-if="k !='id'">
+                            <template v-for="(field ,k) in val.fields">
+                              <template v-if="field !='id'">
                                 <td class="w-4 p-4">
-                                  {{ i }}
+                                  {{ v[field] }}
                                 </td>
                               </template>
                             </template>

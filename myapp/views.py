@@ -3463,23 +3463,23 @@ def products_page(request):
                 model = apps.get_model('myapp', anbar_table_name)
 
                 if filter_type == 'year':
-                    products = model.objects.filter(receive_date__year=current_time.year,status='In-stock')
+                    products = model.objects.filter(receive_date__year=current_time.year,status='In-stock', width__isnull=False)
                 elif filter_type == 'month':
-                    products = model.objects.filter(receive_date__month=current_time.month, status='In-stock')
+                    products = model.objects.filter(receive_date__month=current_time.month, status='In-stock', width__isnull=False)
                 elif filter_type == 'week':
                     start_of_last_week = current_time - timedelta(days=6)
                     end_of_last_week = current_time
-                    products = model.objects.filter(receive_date__range=(start_of_last_week, end_of_last_week), status='In-stock')
+                    products = model.objects.filter(receive_date__range=(start_of_last_week, end_of_last_week), status='In-stock', width__isnull=False)
                 elif filter_type == 'day':
                     hours_ago = current_time - timedelta(hours=24)
-                    products = model.objects.filter(receive_date__gte=hours_ago, receive_date__lt=current_time, status='In-stock')
+                    products = model.objects.filter(receive_date__gte=hours_ago, receive_date__lt=current_time, status='In-stock', width__isnull=False)
                 else:
                     return JsonResponse({'status': 'error', 'message': 'Invalid filter type'}, status=400)
 
                 result = products.values('width', 'location', 'status').annotate(quantity=Count('id')).order_by('-width')
                 all_results.extend(result)
 
-            field_names = ['width', 'location', 'status', 'quantity']
+            field_names = ['width', 'location', 'quantity', 'status',]
             # Now sort all_results by 'location' and then by 'width'
             # Sorting function
             def sorting_key(d):
