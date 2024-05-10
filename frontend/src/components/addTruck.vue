@@ -207,7 +207,7 @@ export default {
           ایران
           <p class="place-self-center sm:text-4xl">{{ year.val }}</p>
         </label>
-        <label class="flex-grow flex flex-row px-2 gap-2 sm:gap-4 justify-center items-center sm:p-4 font-mono text-xl sm:text-5xl font-bold">
+        <label class="flex-grow flex flex-row px-2 gap-2 sm:gap-4 justify-center items-center sm:p-4 font-mono text-4xl sm:text-5xl font-bold">
           <h>{{ second.val }}</h>
           <h>{{ letter.val }}</h>
           <h>{{ first.val }}</h>
@@ -294,23 +294,22 @@ export default {
             </ul>
           </div>
         </div>
-    <div v-if="success" class="flex p-4 mb-4 text-sm text-green-800 rounded-lg bg-green-50 dark:bg-gray-800 dark:text-green-400" role="alert">
-      <div>
-        <div class="mt-2 flex flex-row items-center gap-1">
-          <svg class="flex-shrink-0 inline w-4 h-4 me-3 mt-[2px]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-            <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
-          </svg>
-          <p class="font-medium">پلاک جدید </p>
-          <lic_numer :lic="{
-                  first: this.first.val,
-                  letter: this.letter.val,
-                  second: this.second.val,
-                  country: 'ایران',
-                  year: this.year.val
-              }"></lic_numer>
-          <p class="font-medium"> با موفقیت به سیستم اضافه شد.</p>
-        </div>
+    <div class="flex p-4 mb-4 text-sm text-green-800 rounded-lg bg-green-50 dark:bg-gray-800 dark:text-green-400" role="alert">
+      <div class="flex flex-col items-center gap-2 sm:flex-row sm:items-center sm:gap-1 sm:space-x-4 mt-2">
+        <svg class="flex-shrink-0 inline w-4 h-4 me-3 mt-[2px]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+          <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
+        </svg>
+        <p class="font-medium">پلاک جدید</p>
+        <lic_numer :lic="{
+                first: this.first.val,
+                letter: this.letter.val,
+                second: this.second.val,
+                country: 'ایران',
+                year: this.year.val
+            }"></lic_numer>
+        <p class="font-medium">با موفقیت به سیستم اضافه شد.</p>
       </div>
+
     </div>
     <template v-for="(val, form_name) in forms">
         <template v-if="val.type=='input'">

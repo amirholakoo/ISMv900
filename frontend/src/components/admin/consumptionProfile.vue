@@ -181,9 +181,9 @@ export default {
           </button>
         </template>
         <template v-if="val.type=='list'">
-          <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
+          <div class="flex flex-col gap-2 font-bold max-w-full relative overflow-x-auto shadow-md sm:rounded-lg">
             <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-                <thead class="text-md text-gray-100 uppercase bg-green-500 dark:bg-gray-700 dark:text-gray-400">
+                <thead class="truncate text-md text-gray-100 uppercase bg-green-500 dark:bg-gray-700 dark:text-gray-400">
                     <tr>
                         <th scope="col" class="px-6 py-3">
                             اسم فروشنده
@@ -204,7 +204,7 @@ export default {
                 </thead>
                 <tbody>
                     <template v-for="(obj, index) in forms.consumption_list.value">
-                       <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-green-50 dark:hover:bg-gray-600">
+                       <tr class="truncate bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-green-50 dark:hover:bg-gray-600">
                          <template v-for="profile in obj">
                             <td class="px-6 py-4">
                               {{ profile }}
@@ -224,9 +224,9 @@ export default {
       <template v-slot:button>اضافه کردن</template>
       <template v-slot:table>
         <div class="flex flex-col gap-2 font-bold max-w-xs">
-          <div class="max-w-xs overflow-x-auto shadow-md sm:rounded-lg">
-                    <table class="max-w-xs text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-                        <thead class="text-md text-gray-100 uppercase bg-green-500 dark:bg-gray-700 dark:text-gray-400">
+          <div class="flex flex-col gap-2 font-bold max-w-full relative overflow-x-auto shadow-md sm:rounded-lg">
+                    <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                        <thead class="truncate text-md text-gray-100 uppercase bg-green-500 dark:bg-gray-700 dark:text-gray-400">
                             <tr>
                                 <th scope="col" class="px-2 py-1">
                                     اسم فروشنده
@@ -247,7 +247,7 @@ export default {
                         </thead>
                         <tbody>
                             <template v-for="(obj, index) in forms.consumption_list.value">
-                               <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-green-50 dark:hover:bg-gray-600">
+                               <tr class="truncate bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-green-50 dark:hover:bg-gray-600">
                                  <template v-for="profile in obj">
                                     <td class="px-2 py-1">
                                       {{ profile }}
@@ -263,6 +263,12 @@ export default {
                   </div>
         </div>
       </template>
+        <template v-slot:text>
+          <div class="flex flex-col gap-2 font-bold">
+              <p>{{forms.profile_name.title}}: {{forms.profile_name.value}}</p>
+              <p>{{forms.username.title}}: {{forms.username.value}}</p>
+          </div>
+        </template>
       <template v-slot:btns>
         <div>
           <ModalButton @close="consumptionProfile" />
