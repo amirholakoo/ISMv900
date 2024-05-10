@@ -141,7 +141,13 @@ export default {
             "username": this.forms.username.value,
           };
           console.log(params)
-          this.qrcode = await QRCode.toDataURL(JSON.stringify(params), {
+          const listOfPairs = Object.entries(params).map(([key, value]) => `${key}:${String(value)}`);
+
+          // 2. Join the key-value pairs with a separator
+          const outputString = listOfPairs.join(',\n');
+
+          console.log(outputString);
+          this.qrcode = await QRCode.toDataURL(outputString, {
             width: 256,
             height: 256,
           })
