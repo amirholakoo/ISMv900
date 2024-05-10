@@ -368,7 +368,7 @@ class Sales(models.Model):
     customer_name = models.CharField(max_length=255, null=False)
     license_number = models.CharField(max_length=255, null=True)
     list_of_reels = models.TextField(null=True)
-    profile_name = models.CharField(max_length=255, null=True)
+    width = models.IntegerField(null=True, blank=True)
     weight1 = models.IntegerField(null=True)
     weight2 = models.IntegerField(null=True)
     net_weight = models.IntegerField(null=True)
@@ -376,7 +376,7 @@ class Sales(models.Model):
     vat = models.IntegerField(null=True)
     total_price = models.BigIntegerField(null=True)
     extra_cost = models.BigIntegerField(null=True)
-    width = models.IntegerField(null=True, blank=True)
+    profile_name = models.CharField(max_length=255, null=True)
     invoice_status = models.CharField(max_length=255, choices=[('Sent', 'Sent'), ('NA', 'NA')], null=True)
     invoice_number = models.CharField(max_length=255, null=True)
 
