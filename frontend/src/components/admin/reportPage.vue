@@ -24,7 +24,7 @@ export default {
         rawMaterial:{type:'input', title: 'لیست مواد',filter:'فیلتر', data:'', value:'', fields: []},
         products:{type:'input', title: 'لیست محصولات',filter:'فیلتر', data:'', value:'', fields: []},
         consumption:{type:'input', title: 'لیست مصرف',filter:'فیلتر', data:'', value:'', fields: []},
-        alerts:{type:'input', title: 'هشدار ها',filter:'فیلتر', data:'', value:'', fields: []},
+        alerts:{type:'input', title: 'هشدار ها',filter:'فیلتر', data:[], value:'', fields: ['date', 'status', 'message']},
       },
       filters: [
         {lable:'یک سال اخیر', value: 'year'},
@@ -70,7 +70,7 @@ export default {
       console.log(this.forms.alerts.data);
       console.log(data.data);
       this.alerts.push({ message: data.message });
-      this.forms.alerts.data.unshift(data.data)
+      this.update_alert(data.data)
     };
 
     // Handle WebSocket errors
@@ -86,6 +86,9 @@ export default {
     }
   },
   methods: {
+    update_alert(d) {
+      this.forms.alerts.data.unshift(d);
+    },
     async generate_excel_report(model_name){
       console.log(model_name)
       const params = {
