@@ -3092,6 +3092,48 @@ def report_shipment(request):
                             # Update the field in the dictionary
                             shipment[field] = shamsi_date.strftime('%Y-%m-%d %H:%M')
                 field_names = [k for k in list(shipments)[0]]
+                print(field_names)
+                field_names = [
+                    'status',
+                    'location',
+                    'license_number',
+                    'unload_location',
+                    'quality',
+                    'shipment_type',
+                    'customer_name',
+                    'supplier_name',
+                    'entry_time',
+                    'weight1',
+                    'weight1_time',
+                    'unit',
+                    'quantity',
+                    'width',
+                    'list_of_reels',
+                    'weight2',
+                    'weight2_time',
+                    'net_weight',
+                    'price_per_kg',
+                    'vat',
+                    'total_price',
+                    'penalty',
+                    'extra_cost',
+                    'exit_time',
+                    'receive_date',
+                    'date',
+                    'profile_name',
+                    'material_type',
+                    'material_name',
+                    'invoice_status',
+                    'payment_status',
+                    'document_info',
+                    'comments',
+                    'cancellation_reason',
+                    'sales_id',
+                    'purchase_id_id',
+                    'username',
+                    'logs']
+
+
                 data = {'values': list(shipments), 'fields': field_names, 'title': 'لیست بارنامه',}
                 return JsonResponse(data=data, status=200)
             else:
