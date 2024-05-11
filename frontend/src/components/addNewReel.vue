@@ -3,7 +3,6 @@ import { initFlowbite } from 'flowbite'
 import Card from './Card'
 import Alert from "@/components/Alert.vue";
 import modal from "@/components/Modal.vue";
-import QRCode from "qrcode";
 import ModalButton from "@/components/custom/ModalButton.vue";
 import Input from "@/components/custom/Input.vue";
 import Dropdown from "@/components/custom/Dropdown.vue";
@@ -88,9 +87,12 @@ export default {
         "consumption_profile_name": this.forms.consumption_profile_name.value,
         "username": this.forms.username.value,
       };
-      const response = await this.axios.post('/myapp/api/generateQrCode', {}, {params: {'data':JSON.stringify(params)}})
+      let params_QR = `Reel Number: ${params['reel_number']},\nWidth: ${params['width']},\nGSM: ${params['gsm']},\nLength: ${params['length']},\nBreaks: ${params['breaks']},\nGrade: ${params['grade']},\nComment: ${params['commnet']},\nConsumption Profile Name: ${params['consumption_profile_name']},\nUsername: ${params['username']}`
+      const response = await this.axios.post('/myapp/api/generateQrCode', {}, {params: {'data':JSON.stringify(params), 'd':params_QR}})
       // console.log(response.data)
       let filename = response.data.filename
+      let file = response.data.file
+      this.qrcode = `data:image/png;base64,${file}`;
       // console.log(filename)
       // this.qrcode = await QRCode.toDataURL(JSON.stringify(params), {
       //   width: 256,
@@ -129,28 +131,6 @@ export default {
         // console.log(response.data); // Access response data
         if (response.data['status'] == 'success'){
           this.success = true
-          let params = {
-            "reel_number": parseInt(this.forms.reel_number.value.toString().replace(/,/g, '')),
-            "width": parseInt(this.forms.width.value.toString().replace(/,/g, '')),
-            "gsm": parseInt(this.forms.GSM.value.toString().replace(/,/g, '')),
-            "length": parseInt(this.forms.length.value.toString().replace(/,/g, '')),
-            "breaks": parseInt(this.forms.breaks.value.toString().replace(/,/g, '')),
-            "grade": parseInt(this.forms.grade.value.toString().replace(/,/g, '')),
-            "commnet": this.forms.commnet.value,
-            "consumption_profile_name": this.forms.consumption_profile_name.value,
-            "username": this.forms.username.value,
-          };
-          const listOfPairs = Object.entries(params).map(([key, value]) => `${key}:${String(value)}`);
-          // console.log(listOfPairs)
-
-          // 2. Join the key-value pairs with a separator
-          const outputString = listOfPairs.join(',\n');
-
-          // console.log(outputString);
-          this.qrcode = await QRCode.toDataURL(outputString, {
-            width: 256,
-            height: 256,
-          })
           this.loading=false
           if (response.data['warning']){
             this.warinig.status = true

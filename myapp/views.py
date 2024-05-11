@@ -1897,8 +1897,7 @@ def get_supplierNames_based_consumtioon(request):
             if profile_name:
                 used_records = Consumption.objects.filter(profile_name='')
             else:
-                used_records = Consumption.objects.filter(status='Used').exclude(profile_name__isnull=True).exclude(
-                    profile_name='')
+                used_records = Consumption.objects.filter(status='Used').exclude(profile_name__isnull=True).exclude(profile_name='')
 
             # If you want to get all unique supplier_names from these records
             supplier_names = used_records.values_list('supplier_name', flat=True).distinct()
@@ -3011,6 +3010,10 @@ def generate_excel_report(request):
 
 import os
 import qrcode
+from io import BytesIO
+from django.core.files.base import ContentFile
+from django.http import HttpResponse
+import base64
 # from qrcode.image.pil import PilImage
 
 @csrf_exempt
@@ -3031,12 +3034,13 @@ def generate_qrCode(request):
     )
 
     # 1. Convert dictionary to list of key-value pairs
-    list_of_pairs = [(key, str(value)) for key, value in d.items()]
-
-    # 2. Join the key-value pairs with a separator
-    separator = ":"  # You can change this separator as desired
-    my_string = ",\n".join([pair[0] + separator + pair[1] for pair in list_of_pairs])
-
+    # list_of_pairs = [(key, str(value)) for key, value in d.items()]
+    #
+    # # 2. Join the key-value pairs with a separator
+    # separator = ":"  # You can change this separator as desired
+    # my_string = ",\n".join([pair[0] + separator + pair[1] for pair in list_of_pairs])
+    my_string = data['d'][0]
+    print(my_string)
     qr.add_data(my_string)
     qr.make(fit=True)
     # Create an image from the QR Code instance
@@ -3046,10 +3050,17 @@ def generate_qrCode(request):
     if not os.path.exists(qrcode_dir):
         os.makedirs(qrcode_dir)
 
+    file_path = os.path.join(qrcode_dir, filename)
     # Save the image
-    img.save(os.path.join(qrcode_dir, filename))
+    img.save(file_path)
 
-    return JsonResponse({'status': 'succeses', 'filename': os.path.join(qrcode_dir, filename)})
+    buffer = BytesIO()
+    img.save(buffer, format="PNG")
+    buffer.seek(0)
+    # Encode the binary data to base64
+    image_base64 = base64.b64encode(buffer.read()).decode('utf-8')
+
+    return JsonResponse({'status': 'succeses', 'filename': file_path, 'file':image_base64})
 
 
 datetime_fields = ['receive_date', 'entry_time', 'weight1_time', 'weight2_time', 'exit_time', 'date', 'payment_date']
