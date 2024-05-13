@@ -759,7 +759,7 @@ def get_material_names(request):
     if request.method == 'GET':
         try:
             supplier_name = request.GET.get('supplier_name')
-            # print(request.GET)
+            print(request.GET)
             if not supplier_name:
                 return JsonResponse({'error': 'Supplier name is required'}, status=400)
 
@@ -846,11 +846,11 @@ def add_shipment(request):
             errors.append({'status': 'error', 'message': 'نام کاربری را وارد کنید'})
 
         if errors:
-            # print(errors)
+            print(errors)
             return JsonResponse({'status': 'error', 'errors': errors})
 
         else:
-            # print('dooooooo')
+            print('dooooooo')
             # Create new shipment
             if shipment_type == "Incoming":
                 shipment = Shipments(
@@ -1641,7 +1641,7 @@ def unload(request):
                 supplier_name = shipment.first().supplier_name
                 shipment_id = shipment.first()
                 shipment_log = shipment.first().logs
-
+                
 
                 shipment.update(
                     unload_location=unloading_location,
@@ -1799,7 +1799,7 @@ def loaded(request):
                 shipment = Shipments.objects.filter(license_number=license_number, status='LoadingUnloading',location='Weight1', shipment_type='Outgoing')
                 # material_name = shipment[0].material_name
                 # supplier_name = shipment[0].supplier_name
-                # print(shipment)
+                print(shipment)
                 # Dynamically import the model class
                 AnbarModel = apps.get_model('myapp', loading_location)
                 for reel_number in reel_numbers:
@@ -1931,7 +1931,7 @@ def get_unit_based_supplier_name(request):
             # Get all unit names for the specified supplier
             unit_names = Unit.objects.filter(supplier_name=supplier_name).values_list('unit_name', flat=True)
             unit_names = list(unit_names)
-            # print(unit_names)
+            print(unit_names)
             # Return the widths as a JSON response
             return JsonResponse({'unit_names': unit_names}, status=200)
         except Exception as e:
@@ -2723,7 +2723,7 @@ def cancel(request):
         status = 'Cancelled'
         location = 'Cancelled'
         action = 'Cancelled'
-        # print(shipment_obj)
+        print(shipment_obj)
         shipment = Shipments.objects.get(id=shipment_obj['id'])
         # Update the attributes of the shipment instance
         shipment.status = status
@@ -3032,7 +3032,15 @@ def generate_qrCode(request):
         box_size=10,
         border=4,
     )
+
+    # 1. Convert dictionary to list of key-value pairs
+    # list_of_pairs = [(key, str(value)) for key, value in d.items()]
+    #
+    # # 2. Join the key-value pairs with a separator
+    # separator = ":"  # You can change this separator as desired
+    # my_string = ",\n".join([pair[0] + separator + pair[1] for pair in list_of_pairs])
     my_string = data['d'][0]
+    print(my_string)
     qr.add_data(my_string)
     qr.make(fit=True)
     # Create an image from the QR Code instance
@@ -3094,8 +3102,8 @@ def report_shipment(request):
                             shamsi_date = jdatetime.datetime.fromgregorian(datetime=shipment[field])
                             # Update the field in the dictionary
                             shipment[field] = shamsi_date.strftime('%Y-%m-%d %H:%M')
-                # field_names = [k for k in list(shipments)[0]]
-                # print(field_names)
+                field_names = [k for k in list(shipments)[0]]
+                print(field_names)
                 field_names = [
                     'status',
                     'location',
