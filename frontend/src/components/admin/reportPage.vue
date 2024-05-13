@@ -18,13 +18,13 @@ export default {
   data(){
     return {
       forms: {
-        shipments:{type:'input', title: 'لیست بارنامه',filter:'فیلتر', data:'', value:'', fields: []},
-        sales:{type:'input', title: 'لیست فروش',filter:'فیلتر', data:'', value:'', fields: []},
-        purchases:{type:'input', title: 'لیست خرید',filter:'فیلتر', data:'', value:'', fields: []},
-        rawMaterial:{type:'input', title: 'لیست مواد اولیه',filter:'فیلتر', data:'', value:'', fields: []},
-        products:{type:'input', title: 'لیست محصولات',filter:'فیلتر', data:'', value:'', fields: []},
-        consumption:{type:'input', title: 'لیست مصرف',filter:'فیلتر', data:'', value:'', fields: []},
-        alerts:{type:'input', title: 'هشدار ها',filter:'فیلتر', data:[], value:'', fields: ['date', 'status', 'message']},
+        shipments:{type:'input', title: 'لیست بارنامه',filter:'فیلتر', data:'', value:'', fields: [], CopyData: [], searchQuery: ''},
+        sales:{type:'input', title: 'لیست فروش',filter:'فیلتر', data:'', value:'', fields: [], CopyData: [], searchQuery: ''},
+        purchases:{type:'input', title: 'لیست خرید',filter:'فیلتر', data:'', value:'', fields: [], CopyData: [], searchQuery: ''},
+        rawMaterial:{type:'input', title: 'لیست مواد اولیه',filter:'فیلتر', data:'', value:'', fields: [], CopyData: [], searchQuery: ''},
+        products:{type:'input', title: 'لیست محصولات',filter:'فیلتر', data:'', value:'', fields: [], CopyData: [], searchQuery: ''},
+        consumption:{type:'input', title: 'لیست مصرف',filter:'فیلتر', data:'', value:'', fields: [], CopyData: [], searchQuery: ''},
+        alerts:{type:'input', title: 'هشدار ها',filter:'فیلتر', data:[], value:'', fields: ['date', 'status', 'message'], CopyData: [], searchQuery: ''},
       },
       filters: [
         {lable:'یک سال اخیر', value: 'year'},
@@ -37,9 +37,10 @@ export default {
       errors: [],
 
       // Initialize the countdown to 15 minutes (15 * 60 seconds)
-      totalSeconds: 15 * 60,
+      totalSeconds: 5 * 60,
       alerts: [], // Reactive property to store messages
       alertSocket: null, // WebSocket connection
+      searchQuery: '',
     }
   },
   computed: {
@@ -189,6 +190,7 @@ export default {
       const response = await this.axios.post('/myapp/api/reportSales', {}, {params:params})
       console.log(response.data);
       this.forms['sales'].data = response.data['values']
+      this.forms['sales'].CopyData = response.data['values']
       this.forms['sales'].fields = response.data['fields']
    } catch (error) {
       console.error("Error fetching sales report:", error);
@@ -205,6 +207,7 @@ export default {
         const response = await this.axios.post('/myapp/api/reportPurchases', {}, {params:params})
         console.log(response.data);
         this.forms['purchases'].data = response.data['values']
+        this.forms['purchases'].CopyData = response.data['values']
         this.forms['purchases'].fields = response.data['fields']
      } catch (error) {
         console.error("Error fetching purchases report:", error);
@@ -221,6 +224,7 @@ export default {
         const response = await this.axios.post('/myapp/api/reportRawMaterial', {}, {params:params})
         console.log(response.data);
         this.forms['rawMaterial'].data = response.data['values']
+        this.forms['rawMaterial'].CopyData = response.data['values']
         this.forms['rawMaterial'].fields = response.data['fields']
      } catch (error) {
         console.error("Error fetching raw material report:", error);
@@ -237,6 +241,7 @@ export default {
         const response = await this.axios.post('/myapp/api/reportProducts', {}, {params:params})
         console.log(response.data);
         this.forms['products'].data = response.data['values']
+        this.forms['products'].CopyData = response.data['values']
         this.forms['products'].fields = response.data['fields']
      } catch (error) {
         console.error("Error fetching products report:", error);
@@ -253,6 +258,7 @@ export default {
         const response = await this.axios.post('/myapp/api/reportConsumption', {}, {params:params})
         console.log(response.data);
         this.forms['consumption'].data = response.data['values']
+        this.forms['consumption'].CopyData = response.data['values']
         this.forms['consumption'].fields = response.data['fields']
      } catch (error) {
         console.error("Error fetching consumption report:", error);
@@ -269,6 +275,7 @@ export default {
         const response = await this.axios.post('/myapp/api/reportShipment', {}, {params:params})
         console.log(response.data);
         this.forms['shipments'].data = response.data['values']
+        this.forms['shipments'].CopyData = response.data['values']
         this.forms['shipments'].fields = response.data['fields']
         console.log(this.forms.shipments)
      } catch (error) {
@@ -277,6 +284,7 @@ export default {
         // this.errorMessage = "Failed to fetch shipment report. Please try again.";
      }
     },
+
     async report_alerts(filter) {
      try {
         const params = {
@@ -285,12 +293,71 @@ export default {
         const response = await this.axios.post('/myapp/api/reportAlert', {}, {params:params})
         console.log(response.data);
         this.forms['alerts'].data = response.data['values']
+        this.forms['alerts'].CopyData = response.data['values']
         this.forms['alerts'].fields = response.data['fields']
         console.log(this.forms.alerts)
      } catch (error) {
         console.error("Error fetching alerts report:", error);
      }
     },
+
+    sortTable(tableName, column) {
+      this.forms[tableName].data.sort((a, b) => {
+        // Check if the column data is a number
+        if (!isNaN(a[column]) &&!isNaN(b[column])) {
+          return a[column] - b[column];
+        }
+        // Check if the column data is a string
+        if (typeof a[column] === 'string' && typeof b[column] === 'string') {
+          // Convert both strings to lowercase for case-insensitive comparison
+          const aLower = a[column].toLowerCase();
+          const bLower = b[column].toLowerCase();
+          if (aLower < bLower) {
+            return -1;
+          }
+          if (aLower > bLower) {
+            return 1;
+          }
+          return 0;
+        }
+        // If the data is neither a number nor a string, sort alphabetically
+        if (a[column] < b[column]) {
+          return -1;
+        }
+        if (a[column] > b[column]) {
+          return 1;
+        }
+        return 0;
+      });
+    },
+
+    reverseTable(tableName, column) {
+
+
+        // Reverse the order of the data in the specified column using.reverse()
+        this.forms[tableName].data = this.forms[tableName].data.map(row => {
+          const reversedRow = {};
+          for (const key in row) {
+            reversedRow[key] = row[key];
+          }
+          reversedRow[column] = row[column].reverse();
+          return reversedRow;
+        });
+    },
+
+    filterTable(tableName) {
+      if (this.forms[tableName].searchQuery) {
+        // this.forms[tableName].CopyData = this.forms[tableName].data
+        this.forms[tableName].data = this.forms[tableName].data.filter(item => {
+          return Object.values(item).some(value =>
+            value !== null && value !== undefined &&
+            value.toString().toLowerCase().includes(this.forms[tableName].searchQuery.toLowerCase())
+          );
+        });
+      } else {
+        this.forms[tableName].data = this.forms[tableName].CopyData
+      }
+    }
 
   },
 }
@@ -314,13 +381,13 @@ export default {
     {{ formattedTime }}
   </p>
   <form class="flex flex-col items-center mt-5 gap-4">
-    <template v-for="(val, form_name) in forms">
+    <template v-for="(val, tableName) in forms">
         <div class="relative w-full h-auto max-h-[500px] overflow-y-scroll overflow-x-auto shadow-md sm:rounded-lg">
-            <table :id="form_name" class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+            <table :id="tableName" class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
                 <caption class="p-5 text-lg font-semibold text-left rtl:text-right text-gray-900 bg-white dark:text-white dark:bg-gray-800">
 
                     <div class="flex flex-row gap-2 items-center">
-                      <template v-if="form_name == 'products'">
+                      <template v-if="tableName == 'products'">
                         <router-link
                             to="/myapp/ProductsPage/"
                             type="button"
@@ -332,39 +399,39 @@ export default {
                       <template v-else>
                         {{val.title}}
                       </template>
-                      <button @click="printTable(form_name)" class="w-auto block text-white bg-green-500 hover:bg-green-600 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="button">
+                      <button @click="printTable(tableName)" class="w-auto block text-white bg-green-500 hover:bg-green-600 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="button">
                         PDF
                       </button>
-                      <button @click="generate_excel_report(form_name)"  class="w-auto block text-white bg-green-500 hover:bg-green-600 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="button">
+                      <button @click="generate_excel_report(tableName)"  class="w-auto block text-white bg-green-500 hover:bg-green-600 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="button">
                       XLS
                     </button>
 
-                      <button :id="form_name + 'Button1'" :data-dropdown-toggle="form_name+'dropdown1'" class="justify-between w-44 text-white bg-green-500 hover:bg-green-600 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="button">
+                      <button :id="tableName + 'Button1'" :data-dropdown-toggle="tableName+'dropdown1'" class="justify-between w-44 text-white bg-green-500 hover:bg-green-600 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="button">
                         {{ val.filter }}
                         <svg class="w-2.5 h-2.5 ms-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
                           <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>
                         </svg>
                       </button>
                       <!-- Dropdown menu -->
-                      <div :id="form_name+'dropdown1'" class="z-50 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
-                        <ul class="overflow-y-auto h-auto max-h-48 py-2 text-sm text-gray-700 dark:text-gray-200" :aria-labelledby="form_name + 'Button1'">
+                      <div :id="tableName+'dropdown1'" class="z-50 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
+                        <ul class="overflow-y-auto h-auto max-h-48 py-2 text-sm text-gray-700 dark:text-gray-200" :aria-labelledby="tableName + 'Button1'">
                           <li v-for="data in filters">
-                            <a @click='clicked(form_name ,data)' type="button" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
+                            <a @click='clicked(tableName ,data)' type="button" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
                               {{ data.lable }}
                             </a>
                           </li>
                         </ul>
                       </div>
-
+                      <input type="text" v-model="forms[tableName].searchQuery" @input="filterTable(tableName)" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-md pl-10 p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Search" required="">
                     </div>
 
                 </caption>
                 <thead class="text-xs text-gray-100 uppercase bg-green-500 dark:bg-gray-700 dark:text-gray-400">
                     <tr>
-                         <template v-for="(i ,k) in val.fields">
-                           <template v-if="i !='id'">
-                              <th scope="col" class="px-2 py-3">
-                                  {{i}}
+                         <template v-for="(column ,k) in val.fields">
+                           <template v-if="column !='id'">
+                              <th scope="col" class="px-2 py-3" @click="sortTable(tableName, column)">
+                                  {{column}}
                               </th>
                            </template>
                       </template>
