@@ -40,7 +40,7 @@ export default {
   mounted() {
     initFlowbite();
     this.axios.get('/myapp/api/getReelNumber').then((response) => {
-      console.log(response.data)
+
       this.forms.reel_number.value = response.data['next_reel_number'].toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
       this.forms.width.value = response.data['width'].toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
       this.forms.GSM.value = response.data['GSM'].toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
@@ -52,7 +52,7 @@ export default {
 
     })
     this.axios.get('/myapp/api/getConsumptionProfileNames').then((response) => {
-      // console.log(response.data)
+      //
       this.forms.consumption_profile_name.data = response.data['profile_names']
     })
   },
@@ -65,7 +65,7 @@ export default {
   },
   methods: {
     clicked(k, name){
-      // console.log(k, name)
+      //
       if (k == 'consumption_profile_name'){
         this.forms.consumption_profile_name.value = name
         this.forms.consumption_profile_name.name = name
@@ -89,20 +89,20 @@ export default {
       };
       let params_QR = `Reel Number: ${params['reel_number']},\nWidth: ${params['width']},\nGSM: ${params['gsm']},\nLength: ${params['length']},\nBreaks: ${params['breaks']},\nGrade: ${params['grade']},\nComment: ${params['commnet']},\nConsumption Profile Name: ${params['consumption_profile_name']},\nUsername: ${params['username']}`
       const response = await this.axios.post('/myapp/api/generateQrCode', {}, {params: {'data':JSON.stringify(params), 'd':params_QR}})
-      // console.log(response.data)
+      //
       let filename = response.data.filename
       let file = response.data.file
       this.qrcode = `data:image/png;base64,${file}`;
-      // console.log(filename)
+      //
       // this.qrcode = await QRCode.toDataURL(JSON.stringify(params), {
       //   width: 256,
       //   height: 256,
       // })
       params['qr_code']=filename
-      // console.log('params is:',params)
+      //
       this.errors = []
       for (const key in this.forms) {
-        // console.log(key ,':', this.forms[key].value,typeof this.forms[key].value, this.forms[key].value === 0)
+        //
         if ((this.forms[key].value == '')){
           if (key!='commnet'){
             if ((this.forms[key].value !== 0)){
@@ -115,7 +115,7 @@ export default {
            this.forms[key].error = false
           if (key == 'breaks'){
             let breaks = parseInt(this.forms.breaks.value.toString().replace(/,/g, ''))
-            // console.log(breaks)
+            //
             if ((breaks <= -1) || (breaks >=21)){
                 this.error = true
                 this.errors.push({'message': 'مقدار پارگی باید بین 0 تا 20 باشد'})
@@ -126,13 +126,13 @@ export default {
       }
       if (this.errors.length == 0){
         this.error = false
-        console.log(params)
+
         const response = await this.axios.post('/myapp/addNewReel/', {}, {params: params})
-        // console.log(response.data); // Access response data
+
         if (response.data['status'] == 'success'){
           this.success = true
           this.loading=false
-          if (response.data['warning']){
+          if (response.data['warning'].length != 0){
             this.warinig.status = true
             this.warinig.data = response.data['warning']
           }
