@@ -43,7 +43,7 @@ export default {
   },
   mounted() {
     this.axios.get('/myapp/api/getAnbarTableNames').then((response) => {
-      console.log(response.data)
+
       this.forms.unloading_location.data = response.data['data']
     })
   },
@@ -52,7 +52,7 @@ export default {
       this.forms.shipment_list.value = obj
     },
     clicked(k, name){
-      console.log(k, name)
+
       if (k == 'letter'){
         this.letter.val = name
       }
@@ -67,11 +67,11 @@ export default {
       };
 
       const response = await this.axios.post('/myapp/api/loadShipmentsBaesdLicenseNumberForCanceling', {}, {params: params})
-      console.log(response.data); // Access response data
-      // console.log(JSON.parse(response.data['isExists'])); // Access response data
-      this.form = JSON.parse(response.data['isExists'])
-      this.forms.shipment_list.data = JSON.parse(response.data['shipment_list'])
-      // console.log(JSON.parse(response.data['shipment_list']))
+
+      this.isExists = JSON.parse(response.data['isExists'])
+      if (!this.isExists){
+        this.forms.shipment_list.data = JSON.parse(response.data['shipment_list'])
+      }
     },
     async cancel() {
       const params = {
@@ -89,8 +89,8 @@ export default {
               if (this.forms.shipment_list.value['unload_location'] == null){
                 // this.forms[key].error = true
                 // this.errors.push({'message': `${this.forms[key].name} مورد نیاز است`})
-                console.log(this.forms.shipment_list.value)
-                console.log(this.forms.shipment_list.value['unload_location'] == null)
+
+
               } else {
                 this.forms[key].error = true
                 this.errors.push({'message': `${this.forms[key].name} مورد نیاز است`})
@@ -109,7 +109,7 @@ export default {
       if (this.errors.length == 0){
         this.error = false
         const response = await this.axios.post('/myapp/cancel/', {}, {params: params})
-        console.log(response.data); // Access response data
+
         if (response.data['status'] == 'success'){
           this.success = true
         }else {
@@ -131,7 +131,7 @@ export default {
         // for (const cKey in this.forms) {
         //   this.forms[cKey].value = ''
         //   this.forms[cKey].data = ''
-        //   console.log(this.forms[cKey])
+        //
         // }
       }
     }
