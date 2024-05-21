@@ -3,6 +3,5 @@ pandas
 openpyxl
 jdatetime
 qrcode
-qrcode
 psycopg2-binary
 daphne
