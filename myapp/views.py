@@ -3047,7 +3047,7 @@ def generate_qrCode(request):
     img.save(file_path)
 
     buffer = BytesIO()
-    img.save(buffer, format="PNG")
+    img.save(buffer)
     buffer.seek(0)
     # Encode the binary data to base64
     image_base64 = base64.b64encode(buffer.read()).decode('utf-8')
