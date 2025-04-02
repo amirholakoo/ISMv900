@@ -592,14 +592,14 @@ class Anbar_PAK(AnbarGeneric):
         return f"{self.material_name} - {self.reel_number} - {self.location}"
 
 
-class Anbar_Muhavateh_Homayound(AnbarGeneric):
+class Anbar_Muhavateh_Homayoun(AnbarGeneric):
     """
     Model representing an anbar item in Muhavateh Homayound.
     Inherits from AnbarGeneric to reuse common fields and behaviors.
     """
     class Meta:
-        verbose_name_plural = "Anbar Muhavateh Homayound"
-        db_table = 'Anbar_Muhavateh_Homayound'
+        verbose_name_plural = "Anbar Muhavateh Homayoun"
+        db_table = 'Anbar_Muhavateh_Homayoun'
 
     def __str__(self):
         return f"{self.material_name} - {self.reel_number} - {self.location}"
