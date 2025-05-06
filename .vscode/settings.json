@@ -1,0 +1,41 @@
+{
+    "editor.formatOnSave": true,
+    "editor.formatOnSaveMode": "file",
+    "editor.defaultFormatter": "ms-python.autopep8",
+    "editor.autoIndent": "full",
+    "editor.fontFamily": "JetBrains Mono, Menlo, Monaco, 'Courier New', monospace",
+    "editor.fontLigatures": true,
+    "python.formatting.provider": "black",
+    "python.formatting.blackargs": [
+        "--line-length", 
+        "3192"
+    ],
+    "python.sortImports.args": [
+        "--profile=black",
+    ],
+    "python.formating.provider": "black",
+    "python.formatting.blackArgs": [
+        "--line-length=119"
+    ],
+    "python.analysis.extraPaths": [
+    "~/.local/lib/Google/google_appengine",
+    "~/.local/lib/Google/google_appengine/lib/flask-0.12" ],
+    "python.linting.enabled": true,
+    "python.linting.lintOnSave": true,
+    "python.linting.flake8Enabled": false,
+    "python.linting.flake8Args": [
+        "--max-line-length",
+        "1190"
+    ],
+    "[python]": {
+        "editor.codeActionsOnSave": {
+            "source.organizeImports": "explicit"
+        },
+        "editor.defaultFormatter": "ms-python.autopep8"
+    },
+    "[typescriptreact]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "DockerRun.DisableAutoGenerateConfig": true,
+
+}

@@ -1,0 +1,1025 @@
+[
+    {
+        "label": "json",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "json",
+        "description": "json",
+        "detail": "json",
+        "documentation": {}
+    },
+    {
+        "label": "stringify",
+        "importPath": "flatted",
+        "description": "flatted",
+        "isExtraImport": true,
+        "detail": "flatted",
+        "documentation": {}
+    },
+    {
+        "label": "parse",
+        "importPath": "flatted",
+        "description": "flatted",
+        "isExtraImport": true,
+        "detail": "flatted",
+        "documentation": {}
+    },
+    {
+        "label": "logging",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "logging",
+        "description": "logging",
+        "detail": "logging",
+        "documentation": {}
+    },
+    {
+        "label": "os",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "os",
+        "description": "os",
+        "detail": "os",
+        "documentation": {}
+    },
+    {
+        "label": "dirname",
+        "importPath": "os.path",
+        "description": "os.path",
+        "isExtraImport": true,
+        "detail": "os.path",
+        "documentation": {}
+    },
+    {
+        "label": "join",
+        "importPath": "os.path",
+        "description": "os.path",
+        "isExtraImport": true,
+        "detail": "os.path",
+        "documentation": {}
+    },
+    {
+        "label": "load_dotenv",
+        "importPath": "dotenv",
+        "description": "dotenv",
+        "isExtraImport": true,
+        "detail": "dotenv",
+        "documentation": {}
+    },
+    {
+        "label": "FastAPI",
+        "importPath": "fastapi",
+        "description": "fastapi",
+        "isExtraImport": true,
+        "detail": "fastapi",
+        "documentation": {}
+    },
+    {
+        "label": "HTTPException",
+        "importPath": "fastapi",
+        "description": "fastapi",
+        "isExtraImport": true,
+        "detail": "fastapi",
+        "documentation": {}
+    },
+    {
+        "label": "HTTPException",
+        "importPath": "fastapi",
+        "description": "fastapi",
+        "isExtraImport": true,
+        "detail": "fastapi",
+        "documentation": {}
+    },
+    {
+        "label": "BackgroundTasks",
+        "importPath": "fastapi",
+        "description": "fastapi",
+        "isExtraImport": true,
+        "detail": "fastapi",
+        "documentation": {}
+    },
+    {
+        "label": "FastAPI",
+        "importPath": "fastapi",
+        "description": "fastapi",
+        "isExtraImport": true,
+        "detail": "fastapi",
+        "documentation": {}
+    },
+    {
+        "label": "HTTPException",
+        "importPath": "fastapi",
+        "description": "fastapi",
+        "isExtraImport": true,
+        "detail": "fastapi",
+        "documentation": {}
+    },
+    {
+        "label": "BackgroundTasks",
+        "importPath": "fastapi",
+        "description": "fastapi",
+        "isExtraImport": true,
+        "detail": "fastapi",
+        "documentation": {}
+    },
+    {
+        "label": "HTTPException",
+        "importPath": "fastapi",
+        "description": "fastapi",
+        "isExtraImport": true,
+        "detail": "fastapi",
+        "documentation": {}
+    },
+    {
+        "label": "CORSMiddleware",
+        "importPath": "fastapi.middleware.cors",
+        "description": "fastapi.middleware.cors",
+        "isExtraImport": true,
+        "detail": "fastapi.middleware.cors",
+        "documentation": {}
+    },
+    {
+        "label": "CORSMiddleware",
+        "importPath": "fastapi.middleware.cors",
+        "description": "fastapi.middleware.cors",
+        "isExtraImport": true,
+        "detail": "fastapi.middleware.cors",
+        "documentation": {}
+    },
+    {
+        "label": "time",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "time",
+        "description": "time",
+        "detail": "time",
+        "documentation": {}
+    },
+    {
+        "label": "ProductData",
+        "importPath": "db",
+        "description": "db",
+        "isExtraImport": true,
+        "detail": "db",
+        "documentation": {}
+    },
+    {
+        "label": "redis_connection",
+        "importPath": "db",
+        "description": "db",
+        "isExtraImport": true,
+        "detail": "db",
+        "documentation": {}
+    },
+    {
+        "label": "*",
+        "importPath": "db",
+        "description": "db",
+        "isExtraImport": true,
+        "detail": "db",
+        "documentation": {}
+    },
+    {
+        "label": "redis",
+        "importPath": "db",
+        "description": "db",
+        "isExtraImport": true,
+        "detail": "db",
+        "documentation": {}
+    },
+    {
+        "label": "ProductData",
+        "importPath": "db",
+        "description": "db",
+        "isExtraImport": true,
+        "detail": "db",
+        "documentation": {}
+    },
+    {
+        "label": "OrderData",
+        "importPath": "db",
+        "description": "db",
+        "isExtraImport": true,
+        "detail": "db",
+        "documentation": {}
+    },
+    {
+        "label": "get_db_connection",
+        "importPath": "db",
+        "description": "db",
+        "isExtraImport": true,
+        "detail": "db",
+        "documentation": {}
+    },
+    {
+        "label": "*",
+        "importPath": "db",
+        "description": "db",
+        "isExtraImport": true,
+        "detail": "db",
+        "documentation": {}
+    },
+    {
+        "label": "OrderData",
+        "importPath": "db",
+        "description": "db",
+        "isExtraImport": true,
+        "detail": "db",
+        "documentation": {}
+    },
+    {
+        "label": "redis_connection",
+        "importPath": "db",
+        "description": "db",
+        "isExtraImport": true,
+        "detail": "db",
+        "documentation": {}
+    },
+    {
+        "label": "BaseModel",
+        "importPath": "pydantic",
+        "description": "pydantic",
+        "isExtraImport": true,
+        "detail": "pydantic",
+        "documentation": {}
+    },
+    {
+        "label": "BaseModel",
+        "importPath": "pydantic",
+        "description": "pydantic",
+        "isExtraImport": true,
+        "detail": "pydantic",
+        "documentation": {}
+    },
+    {
+        "label": "HashModel",
+        "importPath": "redis_om",
+        "description": "redis_om",
+        "isExtraImport": true,
+        "detail": "redis_om",
+        "documentation": {}
+    },
+    {
+        "label": "get_redis_connection",
+        "importPath": "redis_om",
+        "description": "redis_om",
+        "isExtraImport": true,
+        "detail": "redis_om",
+        "documentation": {}
+    },
+    {
+        "label": "HashModel",
+        "importPath": "redis_om",
+        "description": "redis_om",
+        "isExtraImport": true,
+        "detail": "redis_om",
+        "documentation": {}
+    },
+    {
+        "label": "NotFoundError",
+        "importPath": "redis_om",
+        "description": "redis_om",
+        "isExtraImport": true,
+        "detail": "redis_om",
+        "documentation": {}
+    },
+    {
+        "label": "get_redis_connection",
+        "importPath": "redis_om",
+        "description": "redis_om",
+        "isExtraImport": true,
+        "detail": "redis_om",
+        "documentation": {}
+    },
+    {
+        "label": "*",
+        "importPath": "config",
+        "description": "config",
+        "isExtraImport": true,
+        "detail": "config",
+        "documentation": {}
+    },
+    {
+        "label": "*",
+        "importPath": "config",
+        "description": "config",
+        "isExtraImport": true,
+        "detail": "config",
+        "documentation": {}
+    },
+    {
+        "label": "pytest",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "pytest",
+        "description": "pytest",
+        "detail": "pytest",
+        "documentation": {}
+    },
+    {
+        "label": "TestClient",
+        "importPath": "fastapi.testclient",
+        "description": "fastapi.testclient",
+        "isExtraImport": true,
+        "detail": "fastapi.testclient",
+        "documentation": {}
+    },
+    {
+        "label": "TestClient",
+        "importPath": "fastapi.testclient",
+        "description": "fastapi.testclient",
+        "isExtraImport": true,
+        "detail": "fastapi.testclient",
+        "documentation": {}
+    },
+    {
+        "label": "app",
+        "importPath": "main",
+        "description": "main",
+        "isExtraImport": true,
+        "detail": "main",
+        "documentation": {}
+    },
+    {
+        "label": "app",
+        "importPath": "main",
+        "description": "main",
+        "isExtraImport": true,
+        "detail": "main",
+        "documentation": {}
+    },
+    {
+        "label": "requests",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "requests",
+        "description": "requests",
+        "detail": "requests",
+        "documentation": {}
+    },
+    {
+        "label": "Request",
+        "importPath": "starlette.requests",
+        "description": "starlette.requests",
+        "isExtraImport": true,
+        "detail": "starlette.requests",
+        "documentation": {}
+    },
+    {
+        "label": "site",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "site",
+        "description": "site",
+        "detail": "site",
+        "documentation": {}
+    },
+    {
+        "label": "sys",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "sys",
+        "description": "sys",
+        "detail": "sys",
+        "documentation": {}
+    },
+    {
+        "label": "_Known",
+        "kind": 6,
+        "importPath": "frontend.node_modules.flatted.python.flatted",
+        "description": "frontend.node_modules.flatted.python.flatted",
+        "peekOfCode": "class _Known:\n    def __init__(self):\n        self.key = []\n        self.value = []\nclass _String:\n    def __init__(self, value):\n        self.value = value\ndef _array_keys(value):\n    keys = []\n    i = 0",
+        "detail": "frontend.node_modules.flatted.python.flatted",
+        "documentation": {}
+    },
+    {
+        "label": "_String",
+        "kind": 6,
+        "importPath": "frontend.node_modules.flatted.python.flatted",
+        "description": "frontend.node_modules.flatted.python.flatted",
+        "peekOfCode": "class _String:\n    def __init__(self, value):\n        self.value = value\ndef _array_keys(value):\n    keys = []\n    i = 0\n    for _ in value:\n        keys.append(i)\n        i += 1\n    return keys",
+        "detail": "frontend.node_modules.flatted.python.flatted",
+        "documentation": {}
+    },
+    {
+        "label": "parse",
+        "kind": 2,
+        "importPath": "frontend.node_modules.flatted.python.flatted",
+        "description": "frontend.node_modules.flatted.python.flatted",
+        "peekOfCode": "def parse(value, *args, **kwargs):\n    json = _json.loads(value, *args, **kwargs)\n    wrapped = []\n    for value in json:\n        wrapped.append(_wrap(value))\n    input = []\n    for value in wrapped:\n        if isinstance(value, _String):\n            input.append(value.value)\n        else:",
+        "detail": "frontend.node_modules.flatted.python.flatted",
+        "documentation": {}
+    },
+    {
+        "label": "stringify",
+        "kind": 2,
+        "importPath": "frontend.node_modules.flatted.python.flatted",
+        "description": "frontend.node_modules.flatted.python.flatted",
+        "peekOfCode": "def stringify(value, *args, **kwargs):\n    known = _Known()\n    input = []\n    output = []\n    i = int(_index(known, input, value))\n    while i < len(input):\n        output.append(_transform(known, input, input[i]))\n        i += 1\n    return _json.dumps(output, *args, **kwargs)",
+        "detail": "frontend.node_modules.flatted.python.flatted",
+        "documentation": {}
+    },
+    {
+        "label": "stringify",
+        "kind": 2,
+        "importPath": "frontend.node_modules.flatted.python.test",
+        "description": "frontend.node_modules.flatted.python.test",
+        "peekOfCode": "def stringify(value):\n    return _stringify(value, separators=(',', ':'))\nassert stringify([None, None]) == '[[null,null]]'\na = []\no = {}\nassert stringify(a) == '[[]]'\nassert stringify(o) == '[{}]'\na.append(a)\no['o'] = o\nassert stringify(a) == '[[\"0\"]]'",
+        "detail": "frontend.node_modules.flatted.python.test",
+        "documentation": {}
+    },
+    {
+        "label": "a",
+        "kind": 5,
+        "importPath": "frontend.node_modules.flatted.python.test",
+        "description": "frontend.node_modules.flatted.python.test",
+        "peekOfCode": "a = []\no = {}\nassert stringify(a) == '[[]]'\nassert stringify(o) == '[{}]'\na.append(a)\no['o'] = o\nassert stringify(a) == '[[\"0\"]]'\nassert stringify(o) == '[{\"o\":\"0\"}]'\nb = parse(stringify(a))\nassert isinstance(b, list) and b[0] == b",
+        "detail": "frontend.node_modules.flatted.python.test",
+        "documentation": {}
+    },
+    {
+        "label": "o",
+        "kind": 5,
+        "importPath": "frontend.node_modules.flatted.python.test",
+        "description": "frontend.node_modules.flatted.python.test",
+        "peekOfCode": "o = {}\nassert stringify(a) == '[[]]'\nassert stringify(o) == '[{}]'\na.append(a)\no['o'] = o\nassert stringify(a) == '[[\"0\"]]'\nassert stringify(o) == '[{\"o\":\"0\"}]'\nb = parse(stringify(a))\nassert isinstance(b, list) and b[0] == b\na.append(1)",
+        "detail": "frontend.node_modules.flatted.python.test",
+        "documentation": {}
+    },
+    {
+        "label": "o['o']",
+        "kind": 5,
+        "importPath": "frontend.node_modules.flatted.python.test",
+        "description": "frontend.node_modules.flatted.python.test",
+        "peekOfCode": "o['o'] = o\nassert stringify(a) == '[[\"0\"]]'\nassert stringify(o) == '[{\"o\":\"0\"}]'\nb = parse(stringify(a))\nassert isinstance(b, list) and b[0] == b\na.append(1)\na.append('two')\na.append(True)\no['one'] = 1\no['two'] = 'two'",
+        "detail": "frontend.node_modules.flatted.python.test",
+        "documentation": {}
+    },
+    {
+        "label": "b",
+        "kind": 5,
+        "importPath": "frontend.node_modules.flatted.python.test",
+        "description": "frontend.node_modules.flatted.python.test",
+        "peekOfCode": "b = parse(stringify(a))\nassert isinstance(b, list) and b[0] == b\na.append(1)\na.append('two')\na.append(True)\no['one'] = 1\no['two'] = 'two'\no['three'] = True\nassert stringify(a) == '[[\"0\",1,\"1\",true],\"two\"]'\nassert stringify(o) == '[{\"o\":\"0\",\"one\":1,\"two\":\"1\",\"three\":true},\"two\"]'",
+        "detail": "frontend.node_modules.flatted.python.test",
+        "documentation": {}
+    },
+    {
+        "label": "o['one']",
+        "kind": 5,
+        "importPath": "frontend.node_modules.flatted.python.test",
+        "description": "frontend.node_modules.flatted.python.test",
+        "peekOfCode": "o['one'] = 1\no['two'] = 'two'\no['three'] = True\nassert stringify(a) == '[[\"0\",1,\"1\",true],\"two\"]'\nassert stringify(o) == '[{\"o\":\"0\",\"one\":1,\"two\":\"1\",\"three\":true},\"two\"]'\na.append(o)\no['a'] = a\nassert stringify(a) == '[[\"0\",1,\"1\",true,\"2\"],\"two\",{\"o\":\"2\",\"one\":1,\"two\":\"1\",\"three\":true,\"a\":\"0\"}]'\nassert stringify(o) == '[{\"o\":\"0\",\"one\":1,\"two\":\"1\",\"three\":true,\"a\":\"2\"},\"two\",[\"2\",1,\"1\",true,\"0\"]]'\na.append({'test': 'OK'})",
+        "detail": "frontend.node_modules.flatted.python.test",
+        "documentation": {}
+    },
+    {
+        "label": "o['two']",
+        "kind": 5,
+        "importPath": "frontend.node_modules.flatted.python.test",
+        "description": "frontend.node_modules.flatted.python.test",
+        "peekOfCode": "o['two'] = 'two'\no['three'] = True\nassert stringify(a) == '[[\"0\",1,\"1\",true],\"two\"]'\nassert stringify(o) == '[{\"o\":\"0\",\"one\":1,\"two\":\"1\",\"three\":true},\"two\"]'\na.append(o)\no['a'] = a\nassert stringify(a) == '[[\"0\",1,\"1\",true,\"2\"],\"two\",{\"o\":\"2\",\"one\":1,\"two\":\"1\",\"three\":true,\"a\":\"0\"}]'\nassert stringify(o) == '[{\"o\":\"0\",\"one\":1,\"two\":\"1\",\"three\":true,\"a\":\"2\"},\"two\",[\"2\",1,\"1\",true,\"0\"]]'\na.append({'test': 'OK'})\na.append([1, 2, 3])",
+        "detail": "frontend.node_modules.flatted.python.test",
+        "documentation": {}
+    },
+    {
+        "label": "o['three']",
+        "kind": 5,
+        "importPath": "frontend.node_modules.flatted.python.test",
+        "description": "frontend.node_modules.flatted.python.test",
+        "peekOfCode": "o['three'] = True\nassert stringify(a) == '[[\"0\",1,\"1\",true],\"two\"]'\nassert stringify(o) == '[{\"o\":\"0\",\"one\":1,\"two\":\"1\",\"three\":true},\"two\"]'\na.append(o)\no['a'] = a\nassert stringify(a) == '[[\"0\",1,\"1\",true,\"2\"],\"two\",{\"o\":\"2\",\"one\":1,\"two\":\"1\",\"three\":true,\"a\":\"0\"}]'\nassert stringify(o) == '[{\"o\":\"0\",\"one\":1,\"two\":\"1\",\"three\":true,\"a\":\"2\"},\"two\",[\"2\",1,\"1\",true,\"0\"]]'\na.append({'test': 'OK'})\na.append([1, 2, 3])\no['test'] = {'test': 'OK'}",
+        "detail": "frontend.node_modules.flatted.python.test",
+        "documentation": {}
+    },
+    {
+        "label": "o['a']",
+        "kind": 5,
+        "importPath": "frontend.node_modules.flatted.python.test",
+        "description": "frontend.node_modules.flatted.python.test",
+        "peekOfCode": "o['a'] = a\nassert stringify(a) == '[[\"0\",1,\"1\",true,\"2\"],\"two\",{\"o\":\"2\",\"one\":1,\"two\":\"1\",\"three\":true,\"a\":\"0\"}]'\nassert stringify(o) == '[{\"o\":\"0\",\"one\":1,\"two\":\"1\",\"three\":true,\"a\":\"2\"},\"two\",[\"2\",1,\"1\",true,\"0\"]]'\na.append({'test': 'OK'})\na.append([1, 2, 3])\no['test'] = {'test': 'OK'}\no['array'] = [1, 2, 3]\nassert stringify(a) == '[[\"0\",1,\"1\",true,\"2\",\"3\",\"4\"],\"two\",{\"o\":\"2\",\"one\":1,\"two\":\"1\",\"three\":true,\"a\":\"0\",\"test\":\"3\",\"array\":\"4\"},{\"test\":\"5\"},[1,2,3],\"OK\"]'\nassert stringify(o) == '[{\"o\":\"0\",\"one\":1,\"two\":\"1\",\"three\":true,\"a\":\"2\",\"test\":\"3\",\"array\":\"4\"},\"two\",[\"2\",1,\"1\",true,\"0\",\"3\",\"4\"],{\"test\":\"5\"},[1,2,3],\"OK\"]'\na2 = parse(stringify(a));",
+        "detail": "frontend.node_modules.flatted.python.test",
+        "documentation": {}
+    },
+    {
+        "label": "o['test']",
+        "kind": 5,
+        "importPath": "frontend.node_modules.flatted.python.test",
+        "description": "frontend.node_modules.flatted.python.test",
+        "peekOfCode": "o['test'] = {'test': 'OK'}\no['array'] = [1, 2, 3]\nassert stringify(a) == '[[\"0\",1,\"1\",true,\"2\",\"3\",\"4\"],\"two\",{\"o\":\"2\",\"one\":1,\"two\":\"1\",\"three\":true,\"a\":\"0\",\"test\":\"3\",\"array\":\"4\"},{\"test\":\"5\"},[1,2,3],\"OK\"]'\nassert stringify(o) == '[{\"o\":\"0\",\"one\":1,\"two\":\"1\",\"three\":true,\"a\":\"2\",\"test\":\"3\",\"array\":\"4\"},\"two\",[\"2\",1,\"1\",true,\"0\",\"3\",\"4\"],{\"test\":\"5\"},[1,2,3],\"OK\"]'\na2 = parse(stringify(a));\no2 = parse(stringify(o));\nassert a2[0] == a2\nassert o2['o'] == o2\nassert a2[1] == 1 and a2[2] == 'two' and a2[3] == True and isinstance(a2[4], dict)\nassert a2[4] == a2[4]['o'] and a2 == a2[4]['o']['a']",
+        "detail": "frontend.node_modules.flatted.python.test",
+        "documentation": {}
+    },
+    {
+        "label": "o['array']",
+        "kind": 5,
+        "importPath": "frontend.node_modules.flatted.python.test",
+        "description": "frontend.node_modules.flatted.python.test",
+        "peekOfCode": "o['array'] = [1, 2, 3]\nassert stringify(a) == '[[\"0\",1,\"1\",true,\"2\",\"3\",\"4\"],\"two\",{\"o\":\"2\",\"one\":1,\"two\":\"1\",\"three\":true,\"a\":\"0\",\"test\":\"3\",\"array\":\"4\"},{\"test\":\"5\"},[1,2,3],\"OK\"]'\nassert stringify(o) == '[{\"o\":\"0\",\"one\":1,\"two\":\"1\",\"three\":true,\"a\":\"2\",\"test\":\"3\",\"array\":\"4\"},\"two\",[\"2\",1,\"1\",true,\"0\",\"3\",\"4\"],{\"test\":\"5\"},[1,2,3],\"OK\"]'\na2 = parse(stringify(a));\no2 = parse(stringify(o));\nassert a2[0] == a2\nassert o2['o'] == o2\nassert a2[1] == 1 and a2[2] == 'two' and a2[3] == True and isinstance(a2[4], dict)\nassert a2[4] == a2[4]['o'] and a2 == a2[4]['o']['a']\nstr = parse('[{\"prop\":\"1\",\"a\":\"2\",\"b\":\"3\"},{\"value\":123},[\"4\",\"5\"],{\"e\":\"6\",\"t\":\"7\",\"p\":4},{},{\"b\":\"8\"},\"f\",{\"a\":\"9\"},[\"10\"],\"sup\",{\"a\":1,\"d\":2,\"c\":\"7\",\"z\":\"11\",\"h\":1},{\"g\":2,\"a\":\"7\",\"b\":\"12\",\"f\":6},{\"r\":4,\"u\":\"7\",\"c\":5}]')",
+        "detail": "frontend.node_modules.flatted.python.test",
+        "documentation": {}
+    },
+    {
+        "label": "a2",
+        "kind": 5,
+        "importPath": "frontend.node_modules.flatted.python.test",
+        "description": "frontend.node_modules.flatted.python.test",
+        "peekOfCode": "a2 = parse(stringify(a));\no2 = parse(stringify(o));\nassert a2[0] == a2\nassert o2['o'] == o2\nassert a2[1] == 1 and a2[2] == 'two' and a2[3] == True and isinstance(a2[4], dict)\nassert a2[4] == a2[4]['o'] and a2 == a2[4]['o']['a']\nstr = parse('[{\"prop\":\"1\",\"a\":\"2\",\"b\":\"3\"},{\"value\":123},[\"4\",\"5\"],{\"e\":\"6\",\"t\":\"7\",\"p\":4},{},{\"b\":\"8\"},\"f\",{\"a\":\"9\"},[\"10\"],\"sup\",{\"a\":1,\"d\":2,\"c\":\"7\",\"z\":\"11\",\"h\":1},{\"g\":2,\"a\":\"7\",\"b\":\"12\",\"f\":6},{\"r\":4,\"u\":\"7\",\"c\":5}]')\nassert str['b']['t']['a'] == 'sup' and str['a'][1]['b'][0]['c'] == str['b']['t']\noo = parse('[{\"a\":\"1\",\"b\":\"0\",\"c\":\"2\"},{\"aa\":\"3\"},{\"ca\":\"4\",\"cb\":\"5\",\"cc\":\"6\",\"cd\":\"7\",\"ce\":\"8\",\"cf\":\"9\"},{\"aaa\":\"10\"},{\"caa\":\"4\"},{\"cba\":\"5\"},{\"cca\":\"2\"},{\"cda\":\"4\"},\"value2\",\"value3\",\"value1\"]');\nassert oo['a']['aa']['aaa'] == 'value1' and oo == oo['b'] and oo['c']['ca']['caa'] == oo['c']['ca']",
+        "detail": "frontend.node_modules.flatted.python.test",
+        "documentation": {}
+    },
+    {
+        "label": "o2",
+        "kind": 5,
+        "importPath": "frontend.node_modules.flatted.python.test",
+        "description": "frontend.node_modules.flatted.python.test",
+        "peekOfCode": "o2 = parse(stringify(o));\nassert a2[0] == a2\nassert o2['o'] == o2\nassert a2[1] == 1 and a2[2] == 'two' and a2[3] == True and isinstance(a2[4], dict)\nassert a2[4] == a2[4]['o'] and a2 == a2[4]['o']['a']\nstr = parse('[{\"prop\":\"1\",\"a\":\"2\",\"b\":\"3\"},{\"value\":123},[\"4\",\"5\"],{\"e\":\"6\",\"t\":\"7\",\"p\":4},{},{\"b\":\"8\"},\"f\",{\"a\":\"9\"},[\"10\"],\"sup\",{\"a\":1,\"d\":2,\"c\":\"7\",\"z\":\"11\",\"h\":1},{\"g\":2,\"a\":\"7\",\"b\":\"12\",\"f\":6},{\"r\":4,\"u\":\"7\",\"c\":5}]')\nassert str['b']['t']['a'] == 'sup' and str['a'][1]['b'][0]['c'] == str['b']['t']\noo = parse('[{\"a\":\"1\",\"b\":\"0\",\"c\":\"2\"},{\"aa\":\"3\"},{\"ca\":\"4\",\"cb\":\"5\",\"cc\":\"6\",\"cd\":\"7\",\"ce\":\"8\",\"cf\":\"9\"},{\"aaa\":\"10\"},{\"caa\":\"4\"},{\"cba\":\"5\"},{\"cca\":\"2\"},{\"cda\":\"4\"},\"value2\",\"value3\",\"value1\"]');\nassert oo['a']['aa']['aaa'] == 'value1' and oo == oo['b'] and oo['c']['ca']['caa'] == oo['c']['ca']\nprint('OK')",
+        "detail": "frontend.node_modules.flatted.python.test",
+        "documentation": {}
+    },
+    {
+        "label": "str",
+        "kind": 5,
+        "importPath": "frontend.node_modules.flatted.python.test",
+        "description": "frontend.node_modules.flatted.python.test",
+        "peekOfCode": "str = parse('[{\"prop\":\"1\",\"a\":\"2\",\"b\":\"3\"},{\"value\":123},[\"4\",\"5\"],{\"e\":\"6\",\"t\":\"7\",\"p\":4},{},{\"b\":\"8\"},\"f\",{\"a\":\"9\"},[\"10\"],\"sup\",{\"a\":1,\"d\":2,\"c\":\"7\",\"z\":\"11\",\"h\":1},{\"g\":2,\"a\":\"7\",\"b\":\"12\",\"f\":6},{\"r\":4,\"u\":\"7\",\"c\":5}]')\nassert str['b']['t']['a'] == 'sup' and str['a'][1]['b'][0]['c'] == str['b']['t']\noo = parse('[{\"a\":\"1\",\"b\":\"0\",\"c\":\"2\"},{\"aa\":\"3\"},{\"ca\":\"4\",\"cb\":\"5\",\"cc\":\"6\",\"cd\":\"7\",\"ce\":\"8\",\"cf\":\"9\"},{\"aaa\":\"10\"},{\"caa\":\"4\"},{\"cba\":\"5\"},{\"cca\":\"2\"},{\"cda\":\"4\"},\"value2\",\"value3\",\"value1\"]');\nassert oo['a']['aa']['aaa'] == 'value1' and oo == oo['b'] and oo['c']['ca']['caa'] == oo['c']['ca']\nprint('OK')",
+        "detail": "frontend.node_modules.flatted.python.test",
+        "documentation": {}
+    },
+    {
+        "label": "oo",
+        "kind": 5,
+        "importPath": "frontend.node_modules.flatted.python.test",
+        "description": "frontend.node_modules.flatted.python.test",
+        "peekOfCode": "oo = parse('[{\"a\":\"1\",\"b\":\"0\",\"c\":\"2\"},{\"aa\":\"3\"},{\"ca\":\"4\",\"cb\":\"5\",\"cc\":\"6\",\"cd\":\"7\",\"ce\":\"8\",\"cf\":\"9\"},{\"aaa\":\"10\"},{\"caa\":\"4\"},{\"cba\":\"5\"},{\"cca\":\"2\"},{\"cda\":\"4\"},\"value2\",\"value3\",\"value1\"]');\nassert oo['a']['aa']['aaa'] == 'value1' and oo == oo['b'] and oo['c']['ca']['caa'] == oo['c']['ca']\nprint('OK')",
+        "detail": "frontend.node_modules.flatted.python.test",
+        "documentation": {}
+    },
+    {
+        "label": "logger",
+        "kind": 5,
+        "importPath": "inventory.config",
+        "description": "inventory.config",
+        "peekOfCode": "logger = logging.getLogger(\"StackpayConfig\")\nload_dotenv()\ndotenv_path = join(dirname('/'), '.env')\nload_dotenv(dotenv_path)\n# Create the FastAPI application instance\napp = FastAPI()\nstack_origins = [\n    (os.environ.get('FRONTEND_ALLOWED_ROUTE')),\n]\n# CORS configuration",
+        "detail": "inventory.config",
+        "documentation": {}
+    },
+    {
+        "label": "dotenv_path",
+        "kind": 5,
+        "importPath": "inventory.config",
+        "description": "inventory.config",
+        "peekOfCode": "dotenv_path = join(dirname('/'), '.env')\nload_dotenv(dotenv_path)\n# Create the FastAPI application instance\napp = FastAPI()\nstack_origins = [\n    (os.environ.get('FRONTEND_ALLOWED_ROUTE')),\n]\n# CORS configuration\napp.add_middleware(\n    CORSMiddleware,",
+        "detail": "inventory.config",
+        "documentation": {}
+    },
+    {
+        "label": "app",
+        "kind": 5,
+        "importPath": "inventory.config",
+        "description": "inventory.config",
+        "peekOfCode": "app = FastAPI()\nstack_origins = [\n    (os.environ.get('FRONTEND_ALLOWED_ROUTE')),\n]\n# CORS configuration\napp.add_middleware(\n    CORSMiddleware,\n    allow_origins=[\"*\"],\n    allow_credentials=True,\n    allow_methods=[\"*\"],",
+        "detail": "inventory.config",
+        "documentation": {}
+    },
+    {
+        "label": "stack_origins",
+        "kind": 5,
+        "importPath": "inventory.config",
+        "description": "inventory.config",
+        "peekOfCode": "stack_origins = [\n    (os.environ.get('FRONTEND_ALLOWED_ROUTE')),\n]\n# CORS configuration\napp.add_middleware(\n    CORSMiddleware,\n    allow_origins=[\"*\"],\n    allow_credentials=True,\n    allow_methods=[\"*\"],\n    allow_headers=[\"*\"],",
+        "detail": "inventory.config",
+        "documentation": {}
+    },
+    {
+        "label": "process_completed_orders",
+        "kind": 2,
+        "importPath": "inventory.consumer",
+        "description": "inventory.consumer",
+        "peekOfCode": "def process_completed_orders():\n    while True:\n        try:\n            results = redis.xreadgroup(consumer_group, stream_key, {\n                                       stream_key: '>'}, None)\n            if results:\n                for result in results:\n                    obj = result[1][0][1]\n                    product = Product.get(obj['product_id'])\n                    if product:",
+        "detail": "inventory.consumer",
+        "documentation": {}
+    },
+    {
+        "label": "redis",
+        "kind": 5,
+        "importPath": "inventory.consumer",
+        "description": "inventory.consumer",
+        "peekOfCode": "redis = redis_connection\n# Stream key and consumer group\nstream_key = 'order_completed'\nconsumer_group = 'inventory_group'\n# Create the consumer group if it doesn't exist\ntry:\n    redis.xgroup_create(stream_key, consumer_group)\nexcept Exception as e:\n    print('Group Already Exists')\n# Function to process completed orders",
+        "detail": "inventory.consumer",
+        "documentation": {}
+    },
+    {
+        "label": "stream_key",
+        "kind": 5,
+        "importPath": "inventory.consumer",
+        "description": "inventory.consumer",
+        "peekOfCode": "stream_key = 'order_completed'\nconsumer_group = 'inventory_group'\n# Create the consumer group if it doesn't exist\ntry:\n    redis.xgroup_create(stream_key, consumer_group)\nexcept Exception as e:\n    print('Group Already Exists')\n# Function to process completed orders\ndef process_completed_orders():\n    while True:",
+        "detail": "inventory.consumer",
+        "documentation": {}
+    },
+    {
+        "label": "consumer_group",
+        "kind": 5,
+        "importPath": "inventory.consumer",
+        "description": "inventory.consumer",
+        "peekOfCode": "consumer_group = 'inventory_group'\n# Create the consumer group if it doesn't exist\ntry:\n    redis.xgroup_create(stream_key, consumer_group)\nexcept Exception as e:\n    print('Group Already Exists')\n# Function to process completed orders\ndef process_completed_orders():\n    while True:\n        try:",
+        "detail": "inventory.consumer",
+        "documentation": {}
+    },
+    {
+        "label": "ProductDataRequest",
+        "kind": 6,
+        "importPath": "inventory.db",
+        "description": "inventory.db",
+        "peekOfCode": "class ProductDataRequest(BaseModel):\n    \"\"\"\n    Pydantic model for validating product request data.\n    Attributes:\n        name (str): The name of the product.\n        price (int): The price of the product.\n        quantity (int): The quantity of the product.\n    \"\"\"\n    name: str\n    price: int",
+        "detail": "inventory.db",
+        "documentation": {}
+    },
+    {
+        "label": "ProductData",
+        "kind": 6,
+        "importPath": "inventory.db",
+        "description": "inventory.db",
+        "peekOfCode": "class ProductData(HashModel):\n    \"\"\"\n    Redis-OM model for storing product data.\n    Attributes:\n        name (str): The name of the product.\n        price (int): The price of the product.\n        quantity (int): The quantity of the product.\n    \"\"\"\n    name: str\n    price: int",
+        "detail": "inventory.db",
+        "documentation": {}
+    },
+    {
+        "label": "get_db_connection",
+        "kind": 2,
+        "importPath": "inventory.db",
+        "description": "inventory.db",
+        "peekOfCode": "def get_db_connection():\n    return get_redis_connection(\n        host='localhost', port=6379, password=None, decode_responses=True\n    )\nredis_connection = get_db_connection()\nclass ProductDataRequest(BaseModel):\n    \"\"\"\n    Pydantic model for validating product request data.\n    Attributes:\n        name (str): The name of the product.",
+        "detail": "inventory.db",
+        "documentation": {}
+    },
+    {
+        "label": "redis_connection",
+        "kind": 5,
+        "importPath": "inventory.db",
+        "description": "inventory.db",
+        "peekOfCode": "redis_connection = get_db_connection()\nclass ProductDataRequest(BaseModel):\n    \"\"\"\n    Pydantic model for validating product request data.\n    Attributes:\n        name (str): The name of the product.\n        price (int): The price of the product.\n        quantity (int): The quantity of the product.\n    \"\"\"\n    name: str",
+        "detail": "inventory.db",
+        "documentation": {}
+    },
+    {
+        "label": "get_all_products",
+        "kind": 2,
+        "importPath": "inventory.main",
+        "description": "inventory.main",
+        "peekOfCode": "def get_all_products():\n    \"\"\"\n    Fetch all product keys from the database.\n    Returns:\n        List[dict]: A list of all product details.\n    \"\"\"\n    logger.info(\"Fetching all product keys\")\n    try:\n        return [format_product(pk) for pk in ProductData.all_pks()]\n    except Exception as e:",
+        "detail": "inventory.main",
+        "documentation": {}
+    },
+    {
+        "label": "format_product",
+        "kind": 2,
+        "importPath": "inventory.main",
+        "description": "inventory.main",
+        "peekOfCode": "def format_product(pk: str):\n    \"\"\"\n    Format the product information for output.\n    Args:\n        pk (str): The product primary key.\n    Returns:\n        dict: The formatted product details.\n    \"\"\"\n    product = ProductData.get(pk=pk)\n    return {",
+        "detail": "inventory.main",
+        "documentation": {}
+    },
+    {
+        "label": "get_single_product",
+        "kind": 2,
+        "importPath": "inventory.main",
+        "description": "inventory.main",
+        "peekOfCode": "def get_single_product(pk: str):\n    \"\"\"\n    Fetch a single product by its primary key.\n    Args:\n        pk (str): The product primary key.\n    Returns:\n        dict: The product details.\n    \"\"\"\n    return ProductData.get(pk)\n@app.delete('/products/{pk}')",
+        "detail": "inventory.main",
+        "documentation": {}
+    },
+    {
+        "label": "delete_product",
+        "kind": 2,
+        "importPath": "inventory.main",
+        "description": "inventory.main",
+        "peekOfCode": "def delete_product(pk: str):\n    \"\"\"\n    Delete a product by its primary key.\n    Args:\n        pk (str): The product primary key.\n    Returns:\n        int: The number of deleted products.\n    \"\"\"\n    return ProductData.delete(pk)\n@app.post('/products/')",
+        "detail": "inventory.main",
+        "documentation": {}
+    },
+    {
+        "label": "db",
+        "kind": 5,
+        "importPath": "inventory.main",
+        "description": "inventory.main",
+        "peekOfCode": "db = get_db_connection()\n@app.get('/products')\ndef get_all_products():\n    \"\"\"\n    Fetch all product keys from the database.\n    Returns:\n        List[dict]: A list of all product details.\n    \"\"\"\n    logger.info(\"Fetching all product keys\")\n    try:",
+        "detail": "inventory.main",
+        "documentation": {}
+    },
+    {
+        "label": "setup_teardown",
+        "kind": 2,
+        "importPath": "inventory.test",
+        "description": "inventory.test",
+        "peekOfCode": "def setup_teardown():\n    \"\"\"\n    Setup and teardown for the test suite. This ensures that\n    the Redis database is cleaned before and after the tests.\n    \"\"\"\n    redis.flushdb()\n    yield\n    redis.flushdb()\ndef test_create_product():\n    \"\"\"",
+        "detail": "inventory.test",
+        "documentation": {}
+    },
+    {
+        "label": "test_create_product",
+        "kind": 2,
+        "importPath": "inventory.test",
+        "description": "inventory.test",
+        "peekOfCode": "def test_create_product():\n    \"\"\"\n    Test the product creation endpoint.\n    \"\"\"\n    response = client.post(\n        \"/products/\",\n        json={\"name\": \"Test Product\", \"price\": 100, \"quantity\": 10}\n    )\n    assert response.status_code == 200\n    data = response.json()",
+        "detail": "inventory.test",
+        "documentation": {}
+    },
+    {
+        "label": "test_get_all_products",
+        "kind": 2,
+        "importPath": "inventory.test",
+        "description": "inventory.test",
+        "peekOfCode": "def test_get_all_products():\n    \"\"\"\n    Test the endpoint for fetching all products.\n    \"\"\"\n    response = client.get(\"/products\")\n    assert response.status_code == 200\n    data = response.json()\n    assert isinstance(data, list)\n    assert len(data) > 0\n    assert data[0][\"name\"] == \"Test Product\"",
+        "detail": "inventory.test",
+        "documentation": {}
+    },
+    {
+        "label": "test_get_single_product",
+        "kind": 2,
+        "importPath": "inventory.test",
+        "description": "inventory.test",
+        "peekOfCode": "def test_get_single_product():\n    \"\"\"\n    Test the endpoint for fetching a single product by primary key.\n    \"\"\"\n    all_products = client.get(\"/products\").json()\n    product_id = all_products[0][\"id\"]\n    response = client.get(f\"/products/{product_id}\")\n    assert response.status_code == 200\n    data = response.json()\n    assert data[\"name\"] == \"Test Product\"",
+        "detail": "inventory.test",
+        "documentation": {}
+    },
+    {
+        "label": "test_delete_product",
+        "kind": 2,
+        "importPath": "inventory.test",
+        "description": "inventory.test",
+        "peekOfCode": "def test_delete_product():\n    \"\"\"\n    Test the endpoint for deleting a product by primary key.\n    \"\"\"\n    all_products = client.get(\"/products\").json()\n    product_id = all_products[0][\"id\"]\n    response = client.delete(f\"/products/{product_id}\")\n    assert response.status_code == 200\n    assert response.json() == 1\n    # Confirm deletion",
+        "detail": "inventory.test",
+        "documentation": {}
+    },
+    {
+        "label": "client",
+        "kind": 5,
+        "importPath": "inventory.test",
+        "description": "inventory.test",
+        "peekOfCode": "client = TestClient(app)\n@pytest.fixture(scope=\"module\", autouse=True)\ndef setup_teardown():\n    \"\"\"\n    Setup and teardown for the test suite. This ensures that\n    the Redis database is cleaned before and after the tests.\n    \"\"\"\n    redis.flushdb()\n    yield\n    redis.flushdb()",
+        "detail": "inventory.test",
+        "documentation": {}
+    },
+    {
+        "label": "logger",
+        "kind": 5,
+        "importPath": "payments.config",
+        "description": "payments.config",
+        "peekOfCode": "logger = logging.getLogger(\"StackpayPaymentConfig\")\n# Create the FastAPI application instance\napp = FastAPI()\n# CORS configuration\napp.add_middleware(\n    CORSMiddleware,\n    allow_origins=[\"*\"],\n    allow_credentials=True,\n    allow_methods=[\"*\"],\n    allow_headers=[\"*\"],",
+        "detail": "payments.config",
+        "documentation": {}
+    },
+    {
+        "label": "app",
+        "kind": 5,
+        "importPath": "payments.config",
+        "description": "payments.config",
+        "peekOfCode": "app = FastAPI()\n# CORS configuration\napp.add_middleware(\n    CORSMiddleware,\n    allow_origins=[\"*\"],\n    allow_credentials=True,\n    allow_methods=[\"*\"],\n    allow_headers=[\"*\"],\n    expose_headers=[\"*\"],\n    max_age=3600,",
+        "detail": "payments.config",
+        "documentation": {}
+    },
+    {
+        "label": "process_refund_orders",
+        "kind": 2,
+        "importPath": "payments.consumer",
+        "description": "payments.consumer",
+        "peekOfCode": "def process_refund_orders():\n    \"\"\"\n    Process refund orders by listening to the Redis stream\n    and updating the order status.\n    This function runs in an infinite loop, continually\n    checking for new messages in the Redis stream.\n    \"\"\"\n    while True:\n        try:\n            results = redis.xreadgroup(",
+        "detail": "payments.consumer",
+        "documentation": {}
+    },
+    {
+        "label": "redis",
+        "kind": 5,
+        "importPath": "payments.consumer",
+        "description": "payments.consumer",
+        "peekOfCode": "redis = get_db_connection()\n# Stream key and consumer group\nstream_key = 'refund_order'\nconsumer_group = 'payment_group'\n# Create the consumer group if it doesn't exist\ntry:\n    redis.xgroup_create(stream_key, consumer_group)\nexcept Exception as e:\n    print('Group Already Exists')\ndef process_refund_orders():",
+        "detail": "payments.consumer",
+        "documentation": {}
+    },
+    {
+        "label": "stream_key",
+        "kind": 5,
+        "importPath": "payments.consumer",
+        "description": "payments.consumer",
+        "peekOfCode": "stream_key = 'refund_order'\nconsumer_group = 'payment_group'\n# Create the consumer group if it doesn't exist\ntry:\n    redis.xgroup_create(stream_key, consumer_group)\nexcept Exception as e:\n    print('Group Already Exists')\ndef process_refund_orders():\n    \"\"\"\n    Process refund orders by listening to the Redis stream",
+        "detail": "payments.consumer",
+        "documentation": {}
+    },
+    {
+        "label": "consumer_group",
+        "kind": 5,
+        "importPath": "payments.consumer",
+        "description": "payments.consumer",
+        "peekOfCode": "consumer_group = 'payment_group'\n# Create the consumer group if it doesn't exist\ntry:\n    redis.xgroup_create(stream_key, consumer_group)\nexcept Exception as e:\n    print('Group Already Exists')\ndef process_refund_orders():\n    \"\"\"\n    Process refund orders by listening to the Redis stream\n    and updating the order status.",
+        "detail": "payments.consumer",
+        "documentation": {}
+    },
+    {
+        "label": "OrderDataRequest",
+        "kind": 6,
+        "importPath": "payments.db",
+        "description": "payments.db",
+        "peekOfCode": "class OrderDataRequest(BaseModel):\n    \"\"\"\n    Pydantic model for validating order request data.\n    Attributes:\n        product_id (str): The ID of the product being ordered.\n        quantity (int): The quantity of the product being ordered.\n    \"\"\"\n    product_id: str\n    quantity: int\nclass OrderData(HashModel):",
+        "detail": "payments.db",
+        "documentation": {}
+    },
+    {
+        "label": "OrderData",
+        "kind": 6,
+        "importPath": "payments.db",
+        "description": "payments.db",
+        "peekOfCode": "class OrderData(HashModel):\n    \"\"\"\n    Redis-OM model for storing order data.\n    Attributes:\n        product_id (str): The ID of the product being ordered.\n        price (float): The price of the product.\n        fee (float): The fee associated with the order.\n        total (float): The total cost of the order.\n        quantity (int): The quantity of the product being ordered.\n        status (str): The status of the order (e.g., pending, complete, refunded).",
+        "detail": "payments.db",
+        "documentation": {}
+    },
+    {
+        "label": "get_db_connection",
+        "kind": 2,
+        "importPath": "payments.db",
+        "description": "payments.db",
+        "peekOfCode": "def get_db_connection():\n    return get_redis_connection(\n        host='localhost', port=6379, password=None, decode_responses=True\n    )\nredis_connection = get_db_connection()\nclass OrderDataRequest(BaseModel):\n    \"\"\"\n    Pydantic model for validating order request data.\n    Attributes:\n        product_id (str): The ID of the product being ordered.",
+        "detail": "payments.db",
+        "documentation": {}
+    },
+    {
+        "label": "redis_connection",
+        "kind": 5,
+        "importPath": "payments.db",
+        "description": "payments.db",
+        "peekOfCode": "redis_connection = get_db_connection()\nclass OrderDataRequest(BaseModel):\n    \"\"\"\n    Pydantic model for validating order request data.\n    Attributes:\n        product_id (str): The ID of the product being ordered.\n        quantity (int): The quantity of the product being ordered.\n    \"\"\"\n    product_id: str\n    quantity: int",
+        "detail": "payments.db",
+        "documentation": {}
+    },
+    {
+        "label": "get_all_orders",
+        "kind": 2,
+        "importPath": "payments.main",
+        "description": "payments.main",
+        "peekOfCode": "def get_all_orders():\n    \"\"\"\n    Fetch all order keys from the database.\n    Returns:\n        List[str]: A list of all order primary keys.\n    \"\"\"\n    return OrderData.all_pks()\n@app.get('/orders/{pk}')\ndef get_single_order(pk: str):\n    \"\"\"",
+        "detail": "payments.main",
+        "documentation": {}
+    },
+    {
+        "label": "get_single_order",
+        "kind": 2,
+        "importPath": "payments.main",
+        "description": "payments.main",
+        "peekOfCode": "def get_single_order(pk: str):\n    \"\"\"\n    Fetch a single order by its primary key.\n    Args:\n        pk (str): The order primary key.\n    Returns:\n        Order: The order details.\n    \"\"\"\n    try:\n        return OrderData.get(pk)",
+        "detail": "payments.main",
+        "documentation": {}
+    },
+    {
+        "label": "process_order_completion",
+        "kind": 2,
+        "importPath": "payments.main",
+        "description": "payments.main",
+        "peekOfCode": "def process_order_completion(order: OrderData):\n    \"\"\"\n    Process the completion of an order after a delay.\n    Args:\n        order (Order): The order to be processed.\n    \"\"\"\n    import time\n    time.sleep(5)\n    order.status = 'completed'\n    order.save()",
+        "detail": "payments.main",
+        "documentation": {}
+    },
+    {
+        "label": "db",
+        "kind": 5,
+        "importPath": "payments.main",
+        "description": "payments.main",
+        "peekOfCode": "db = get_db_connection()\n@app.get(\"/orders/\")\ndef get_all_orders():\n    \"\"\"\n    Fetch all order keys from the database.\n    Returns:\n        List[str]: A list of all order primary keys.\n    \"\"\"\n    return OrderData.all_pks()\n@app.get('/orders/{pk}')",
+        "detail": "payments.main",
+        "documentation": {}
+    },
+    {
+        "label": "setup_teardown",
+        "kind": 2,
+        "importPath": "payments.test",
+        "description": "payments.test",
+        "peekOfCode": "def setup_teardown():\n    \"\"\"\n    Setup and teardown for the test suite. This ensures that\n    the Redis database is cleaned before and after the tests.\n    \"\"\"\n    redis_connection.flushdb()\n    yield\n    redis_connection.flushdb()\ndef test_create_order():\n    \"\"\"",
+        "detail": "payments.test",
+        "documentation": {}
+    },
+    {
+        "label": "test_create_order",
+        "kind": 2,
+        "importPath": "payments.test",
+        "description": "payments.test",
+        "peekOfCode": "def test_create_order():\n    \"\"\"\n    Test the order creation endpoint.\n    \"\"\"\n    response = client.post(\n        \"/orders\",\n        json={\"product_id\": \"test_product\", \"quantity\": 2}\n    )\n    assert response.status_code == 200\n    data = response.json()",
+        "detail": "payments.test",
+        "documentation": {}
+    },
+    {
+        "label": "test_get_all_orders",
+        "kind": 2,
+        "importPath": "payments.test",
+        "description": "payments.test",
+        "peekOfCode": "def test_get_all_orders():\n    \"\"\"\n    Test the endpoint for fetching all orders.\n    \"\"\"\n    response = client.get(\"/orders/\")\n    assert response.status_code == 200\n    data = response.json()\n    assert isinstance(data, list)\n    assert len(data) > 0\n    assert data[0] == \"1\"  # Assuming the first order's pk is \"1\"",
+        "detail": "payments.test",
+        "documentation": {}
+    },
+    {
+        "label": "test_get_single_order",
+        "kind": 2,
+        "importPath": "payments.test",
+        "description": "payments.test",
+        "peekOfCode": "def test_get_single_order():\n    \"\"\"\n    Test the endpoint for fetching a single order by primary key.\n    \"\"\"\n    all_orders = client.get(\"/orders/\").json()\n    order_id = all_orders[0]\n    response = client.get(f\"/orders/{order_id}\")\n    assert response.status_code == 200\n    data = response.json()\n    assert data[\"product_id\"] == \"test_product\"",
+        "detail": "payments.test",
+        "documentation": {}
+    },
+    {
+        "label": "test_order_processing",
+        "kind": 2,
+        "importPath": "payments.test",
+        "description": "payments.test",
+        "peekOfCode": "def test_order_processing():\n    \"\"\"\n    Test the background task for processing an order.\n    \"\"\"\n    all_orders = client.get(\"/orders/\").json()\n    order_id = all_orders[0]\n    # Simulate the background task running and completing the order\n    order = OrderData.get(order_id)\n    order.status = 'completed'\n    order.save()",
+        "detail": "payments.test",
+        "documentation": {}
+    },
+    {
+        "label": "test_order_not_found",
+        "kind": 2,
+        "importPath": "payments.test",
+        "description": "payments.test",
+        "peekOfCode": "def test_order_not_found():\n    \"\"\"\n    Test fetching an order that does not exist.\n    \"\"\"\n    response = client.get(\"/orders/nonexistent\")\n    assert response.status_code == 404\n    assert response.json() == {\"detail\": \"Order not found\"}",
+        "detail": "payments.test",
+        "documentation": {}
+    },
+    {
+        "label": "client",
+        "kind": 5,
+        "importPath": "payments.test",
+        "description": "payments.test",
+        "peekOfCode": "client = TestClient(app)\n@pytest.fixture(scope=\"module\", autouse=True)\ndef setup_teardown():\n    \"\"\"\n    Setup and teardown for the test suite. This ensures that\n    the Redis database is cleaned before and after the tests.\n    \"\"\"\n    redis_connection.flushdb()\n    yield\n    redis_connection.flushdb()",
+        "detail": "payments.test",
+        "documentation": {}
+    },
+    {
+        "label": "bin_dir",
+        "kind": 5,
+        "importPath": "venv.bin.activate_this",
+        "description": "venv.bin.activate_this",
+        "peekOfCode": "bin_dir = os.path.dirname(abs_file)\nbase = bin_dir[: -len(\"bin\") - 1]  # strip away the bin part from the __file__, plus the path separator\n# prepend bin to PATH (this file is inside the bin directory)\nos.environ[\"PATH\"] = os.pathsep.join([bin_dir] + os.environ.get(\"PATH\", \"\").split(os.pathsep))\nos.environ[\"VIRTUAL_ENV\"] = base  # virtual env is right above bin directory\n# add the virtual environments libraries to the host python import mechanism\nprev_length = len(sys.path)\nfor lib in \"../lib/python3.11/site-packages\".split(os.pathsep):\n    path = os.path.realpath(os.path.join(bin_dir, lib))\n    site.addsitedir(path.decode(\"utf-8\") if \"\" else path)",
+        "detail": "venv.bin.activate_this",
+        "documentation": {}
+    },
+    {
+        "label": "base",
+        "kind": 5,
+        "importPath": "venv.bin.activate_this",
+        "description": "venv.bin.activate_this",
+        "peekOfCode": "base = bin_dir[: -len(\"bin\") - 1]  # strip away the bin part from the __file__, plus the path separator\n# prepend bin to PATH (this file is inside the bin directory)\nos.environ[\"PATH\"] = os.pathsep.join([bin_dir] + os.environ.get(\"PATH\", \"\").split(os.pathsep))\nos.environ[\"VIRTUAL_ENV\"] = base  # virtual env is right above bin directory\n# add the virtual environments libraries to the host python import mechanism\nprev_length = len(sys.path)\nfor lib in \"../lib/python3.11/site-packages\".split(os.pathsep):\n    path = os.path.realpath(os.path.join(bin_dir, lib))\n    site.addsitedir(path.decode(\"utf-8\") if \"\" else path)\nsys.path[:] = sys.path[prev_length:] + sys.path[0:prev_length]",
+        "detail": "venv.bin.activate_this",
+        "documentation": {}
+    },
+    {
+        "label": "os.environ[\"PATH\"]",
+        "kind": 5,
+        "importPath": "venv.bin.activate_this",
+        "description": "venv.bin.activate_this",
+        "peekOfCode": "os.environ[\"PATH\"] = os.pathsep.join([bin_dir] + os.environ.get(\"PATH\", \"\").split(os.pathsep))\nos.environ[\"VIRTUAL_ENV\"] = base  # virtual env is right above bin directory\n# add the virtual environments libraries to the host python import mechanism\nprev_length = len(sys.path)\nfor lib in \"../lib/python3.11/site-packages\".split(os.pathsep):\n    path = os.path.realpath(os.path.join(bin_dir, lib))\n    site.addsitedir(path.decode(\"utf-8\") if \"\" else path)\nsys.path[:] = sys.path[prev_length:] + sys.path[0:prev_length]\nsys.real_prefix = sys.prefix\nsys.prefix = base",
+        "detail": "venv.bin.activate_this",
+        "documentation": {}
+    },
+    {
+        "label": "os.environ[\"VIRTUAL_ENV\"]",
+        "kind": 5,
+        "importPath": "venv.bin.activate_this",
+        "description": "venv.bin.activate_this",
+        "peekOfCode": "os.environ[\"VIRTUAL_ENV\"] = base  # virtual env is right above bin directory\n# add the virtual environments libraries to the host python import mechanism\nprev_length = len(sys.path)\nfor lib in \"../lib/python3.11/site-packages\".split(os.pathsep):\n    path = os.path.realpath(os.path.join(bin_dir, lib))\n    site.addsitedir(path.decode(\"utf-8\") if \"\" else path)\nsys.path[:] = sys.path[prev_length:] + sys.path[0:prev_length]\nsys.real_prefix = sys.prefix\nsys.prefix = base",
+        "detail": "venv.bin.activate_this",
+        "documentation": {}
+    },
+    {
+        "label": "prev_length",
+        "kind": 5,
+        "importPath": "venv.bin.activate_this",
+        "description": "venv.bin.activate_this",
+        "peekOfCode": "prev_length = len(sys.path)\nfor lib in \"../lib/python3.11/site-packages\".split(os.pathsep):\n    path = os.path.realpath(os.path.join(bin_dir, lib))\n    site.addsitedir(path.decode(\"utf-8\") if \"\" else path)\nsys.path[:] = sys.path[prev_length:] + sys.path[0:prev_length]\nsys.real_prefix = sys.prefix\nsys.prefix = base",
+        "detail": "venv.bin.activate_this",
+        "documentation": {}
+    },
+    {
+        "label": "sys.path[:]",
+        "kind": 5,
+        "importPath": "venv.bin.activate_this",
+        "description": "venv.bin.activate_this",
+        "peekOfCode": "sys.path[:] = sys.path[prev_length:] + sys.path[0:prev_length]\nsys.real_prefix = sys.prefix\nsys.prefix = base",
+        "detail": "venv.bin.activate_this",
+        "documentation": {}
+    },
+    {
+        "label": "sys.real_prefix",
+        "kind": 5,
+        "importPath": "venv.bin.activate_this",
+        "description": "venv.bin.activate_this",
+        "peekOfCode": "sys.real_prefix = sys.prefix\nsys.prefix = base",
+        "detail": "venv.bin.activate_this",
+        "documentation": {}
+    },
+    {
+        "label": "sys.prefix",
+        "kind": 5,
+        "importPath": "venv.bin.activate_this",
+        "description": "venv.bin.activate_this",
+        "peekOfCode": "sys.prefix = base",
+        "detail": "venv.bin.activate_this",
+        "documentation": {}
+    }
+]
