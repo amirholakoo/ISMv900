@@ -1,7 +1,5 @@
 from django.utils import timezone
 from django.db import models
-# Create your models here.
-
 
 class Truck(models.Model):
     """
@@ -202,7 +200,6 @@ class Customer(models.Model):
     username = models.CharField(max_length=255, null=False, blank=True)
     logs = models.TextField(blank=True)
 
-    # Meta
     class Meta:
         db_table = 'Customer'
 
@@ -232,7 +229,6 @@ class RawMaterial(models.Model):
     username = models.CharField(max_length=255, null=False, blank=True)
     logs = models.TextField(blank=True)
 
-    # Meta
     class Meta:
         db_table = 'RawMaterial'
 
@@ -280,7 +276,6 @@ class Purchases(models.Model):
         shipment (ForeignKey): Reference to the Shipment related to the purchase (optional).
 
     """
-    # Fields
 
     date = models.DateTimeField(default=timezone.now, blank=True)
     status = models.CharField(max_length=225, choices=[('Paid', 'Paid'), ('Terms', 'Terms'), ('Cancelled', 'Cancelled')], blank=True, null=True)
@@ -360,7 +355,6 @@ class Sales(models.Model):
     - Each sale is related to one customer, one truck, and one shipment.
     - The customer, truck, and shipment fields are foreign keys, establishing a relationship with the Customers, Trucks, and Shipments models, respectively.
     """
-    # Fields
 
     date = models.DateTimeField(default=timezone.now, null=True)
     status = models.CharField(max_length=255, choices=[('Paid', 'Paid'), ('Terms', 'Terms'), ('Cancelled', 'Cancelled')], null=True)
@@ -395,8 +389,6 @@ class Sales(models.Model):
 
     def __str__(self):
         return f"Sale (ID: {self.id}, Date: {self.date}, Customer: {self.customer})"
-
-
 
 
 class AnbarGeneric(models.Model):
@@ -475,8 +467,6 @@ class AnbarGeneric(models.Model):
         abstract = True # Make this model abstract so it's not created in the DB
 
 
-
-# Define the specific anbar models
 class Anbar_Sangin(AnbarGeneric):
     """
     Model representing an anbar item in Sangin.

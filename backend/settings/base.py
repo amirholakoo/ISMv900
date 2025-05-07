@@ -1,11 +1,12 @@
 from pathlib import Path
 import os
+from config import Config
 # Base directory of the project
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 # General Django settings
-SECRET_KEY = config.SECRET_KEY
-DEBUG = config.DEBUG
+SECRET_KEY = Config.SECRET_KEY
+DEBUG = Config.DEBUG
 ALLOWED_HOSTS = ['*'] if DEBUG else ['your-production-domain.com']
 
 # Installed apps
@@ -36,7 +37,7 @@ ROOT_URLCONF = "backend.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [os.path.join(BASE_DIR, 'templates')],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -82,3 +83,12 @@ CHANNEL_LAYERS = {
         "BACKEND": "channels.layers.InMemoryChannelLayer",
     },
 }
+
+
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:8000",
+    "http://192.168.6.165:8000",
+]
+
+
+

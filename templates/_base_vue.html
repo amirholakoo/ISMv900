@@ -1,36 +1,22 @@
-<head><script defer src="http://localhost:8080/js/app.js"></script></head>Html Webpack Plugin:
-<pre>
-Error: Child compilation failed:
-Module not found: Error: Can't resolve '/home/darbandi/Desktop/Python/HomayounCorps/frontend/node_modules/html-webpack-plugin/lib/loader.js' in '/home/darbandi/Desktop/Python/HomayounCorps/frontend'
-ModuleNotFoundError: Module not found: Error: Can't resolve '/home/darbandi/Desktop/Python/HomayounCorps/frontend/node_modules/html-webpack-plugin/lib/loader.js' in '/home/darbandi/Desktop/Python/HomayounCorps/frontend'
-    at /home/darbandi/Desktop/Python/HomayounCorps/frontend/node_modules/webpack/lib/Compilation.js:2029:28
-    at /home/darbandi/Desktop/Python/HomayounCorps/frontend/node_modules/webpack/lib/NormalModuleFactory.js:895:13
-    at eval (eval at create (/home/darbandi/Desktop/Python/HomayounCorps/frontend/node_modules/tapable/lib/HookCodeFactory.js:33:10), <anonymous>:10:1)
-    at /home/darbandi/Desktop/Python/HomayounCorps/frontend/node_modules/webpack/lib/NormalModuleFactory.js:332:22
-    at eval (eval at create (/home/darbandi/Desktop/Python/HomayounCorps/frontend/node_modules/tapable/lib/HookCodeFactory.js:33:10), <anonymous>:9:1)
-    at /home/darbandi/Desktop/Python/HomayounCorps/frontend/node_modules/webpack/lib/NormalModuleFactory.js:509:22
-    at /home/darbandi/Desktop/Python/HomayounCorps/frontend/node_modules/webpack/lib/NormalModuleFactory.js:151:11
-    at /home/darbandi/Desktop/Python/HomayounCorps/frontend/node_modules/webpack/lib/NormalModuleFactory.js:729:23
-    at /home/darbandi/Desktop/Python/HomayounCorps/frontend/node_modules/neo-async/async.js:2830:7
-    at done (/home/darbandi/Desktop/Python/HomayounCorps/frontend/node_modules/neo-async/async.js:2925:13)
-    at /home/darbandi/Desktop/Python/HomayounCorps/frontend/node_modules/webpack/lib/NormalModuleFactory.js:1165:23
-    at finishWithoutResolve (/home/darbandi/Desktop/Python/HomayounCorps/frontend/node_modules/enhanced-resolve/lib/Resolver.js:372:11)
-    at /home/darbandi/Desktop/Python/HomayounCorps/frontend/node_modules/enhanced-resolve/lib/Resolver.js:461:15
-    at /home/darbandi/Desktop/Python/HomayounCorps/frontend/node_modules/enhanced-resolve/lib/Resolver.js:519:5
-    at eval (eval at create (/home/darbandi/Desktop/Python/HomayounCorps/frontend/node_modules/tapable/lib/HookCodeFactory.js:33:10), <anonymous>:16:1)
-    at /home/darbandi/Desktop/Python/HomayounCorps/frontend/node_modules/enhanced-resolve/lib/Resolver.js:519:5
-    at eval (eval at create (/home/darbandi/Desktop/Python/HomayounCorps/frontend/node_modules/tapable/lib/HookCodeFactory.js:33:10), <anonymous>:16:1)
-    at /home/darbandi/Desktop/Python/HomayounCorps/frontend/node_modules/enhanced-resolve/lib/Resolver.js:519:5
-    at eval (eval at create (/home/darbandi/Desktop/Python/HomayounCorps/frontend/node_modules/tapable/lib/HookCodeFactory.js:33:10), <anonymous>:15:1)
-    at /home/darbandi/Desktop/Python/HomayounCorps/frontend/node_modules/enhanced-resolve/lib/Resolver.js:519:5
-    at eval (eval at create (/home/darbandi/Desktop/Python/HomayounCorps/frontend/node_modules/tapable/lib/HookCodeFactory.js:33:10), <anonymous>:15:1)
-    at /home/darbandi/Desktop/Python/HomayounCorps/frontend/node_modules/enhanced-resolve/lib/Resolver.js:519:5
-    at eval (eval at create (/home/darbandi/Desktop/Python/HomayounCorps/frontend/node_modules/tapable/lib/HookCodeFactory.js:33:10), <anonymous>:16:1)
-    at /home/darbandi/Desktop/Python/HomayounCorps/frontend/node_modules/enhanced-resolve/lib/Resolver.js:519:5
-    at eval (eval at create (/home/darbandi/Desktop/Python/HomayounCorps/frontend/node_modules/tapable/lib/HookCodeFactory.js:33:10), <anonymous>:16:1)
-    at /home/darbandi/Desktop/Python/HomayounCorps/frontend/node_modules/enhanced-resolve/lib/Resolver.js:519:5
-    at eval (eval at create (/home/darbandi/Desktop/Python/HomayounCorps/frontend/node_modules/tapable/lib/HookCodeFactory.js:33:10), <anonymous>:16:1)
-    at /home/darbandi/Desktop/Python/HomayounCorps/frontend/node_modules/enhanced-resolve/lib/Resolver.js:519:5
-    at eval (eval at create (/home/darbandi/Desktop/Python/HomayounCorps/frontend/node_modules/tapable/lib/HookCodeFactory.js:33:10), <anonymous>:15:1)
-    at /home/darbandi/Desktop/Python/HomayounCorps/frontend/node_modules/enhanced-resolve/lib/DirectoryExistsPlugin.js:41:15
-    at process.processTicksAndRejections (node:internal/process/task_queues:81:21)</pre>
+{% extends '_base.html' %}
+
+{% block html %}
+<html lang="" dir="rtl"><head><script defer src="http://localhost:8080/js/chunk-vendors.js"></script><script defer src="http://localhost:8080/js/app.js"></script></head>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <link rel="icon" href="http://localhost:8080/favicon.ico">
+      {% block head %}{{ block.super }}{% endblock %}
+  <body class="bg-main-bg">
+  {% block body %}
+    {{ block.super }}
+    <noscript>
+      <strong>We're sorry but vue-games doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
+    </noscript>
+    <div id="app"></div>
+    <!-- built files will be auto injected -->
+  {% endblock body%}
+  </body>
+</html>
+{% endblock html %}

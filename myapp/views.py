@@ -17,8 +17,25 @@ import jdatetime
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 from django.forms.models import model_to_dict
+import os
+import qrcode
+from io import BytesIO
+from django.core.files.base import ContentFile
+from django.http import HttpResponse
+import base64
+from django.contrib import admin
+from django.http import JsonResponse
+import pandas as pd
+from django.utils import timezone
+from django.http import FileResponse
+from django.http import JsonResponse
+from django.utils import timezone
+from datetime import timedelta
+from .models import Shipments
 
-# Create your views here.
+datetime_fields = ['receive_date', 'entry_time', 'weight1_time', 'weight2_time', 'exit_time', 'date', 'payment_date']
+
+
 def get_time():
     return timezone.now().strftime('%Y-%m-%d %H:%M')
 
@@ -62,16 +79,6 @@ def append_log(fields, page):
 def not_enough_message(inventory, amount, required, transferred, location, action):
     msg = f"عدم موجودی کافی در انبار {location}! موجودی: {inventory}, درخواست شده: {amount}, مقدار مورد نیاز: {required}, انتقال یافته: {transferred}, متاسفیم! درحال حاضر موجودی در انبار {location} کافی نیست. حداکثر {transferred} از این کالا {action}."
     return msg
-
-# Incoming process:
-# Add Truck
-# Add Shipments
-# Weight 1
-# Unloading by forklift
-# Weight 2
-# Create Purchase Order
-
-# Operation API:
 
 
 @csrf_exempt
@@ -901,8 +908,6 @@ def add_shipment(request):
         return render(request, 'add_shipment.html')
 
 
-# Weight Station/Create Orders
-
 def weight_station_panel(request):
     if request.method == 'GET':
         return render(request, 'weight_station_panel.html')
@@ -1562,7 +1567,7 @@ def get_unit_names_based_on_supplier(request):
     else:
         return JsonResponse({"error": "Invalid request method"}, status=400)
 
-# Forklift Panel
+
 def forklift_panel(request):
     if request.method == 'GET':
         return render(request, 'forklift_panel.html')
@@ -2420,9 +2425,6 @@ def retuned(request):
         return JsonResponse({'status': 'error', 'message': 'Invalid request method.'})
 
 
-# Admin panel
-from django.contrib import admin
-
 @csrf_exempt
 def add_new_anbar(request):
     """
@@ -2960,11 +2962,6 @@ def report_page(request):
         return render(request, 'report_page.html')
 
 
-from django.http import JsonResponse
-import pandas as pd
-from django.utils import timezone
-from django.http import FileResponse
-
 @csrf_exempt
 def generate_excel_report(request):
     model_name = request.GET.get('model_name')
@@ -3008,13 +3005,7 @@ def generate_excel_report(request):
 
     return response
 
-import os
-import qrcode
-from io import BytesIO
-from django.core.files.base import ContentFile
-from django.http import HttpResponse
-import base64
-# from qrcode.image.pil import PilImage
+
 
 @csrf_exempt
 def generate_qrCode(request):
@@ -3055,14 +3046,6 @@ def generate_qrCode(request):
     return JsonResponse({'status': 'succeses', 'filename': file_path, 'file':image_base64})
 
 
-datetime_fields = ['receive_date', 'entry_time', 'weight1_time', 'weight2_time', 'exit_time', 'date', 'payment_date']
-
-
-from django.http import JsonResponse
-from django.utils import timezone
-from datetime import timedelta
-from .models import Shipments
-import jdatetime
 
 @csrf_exempt
 def report_shipment(request):

@@ -1,5 +1,6 @@
 from django.urls import path
 from .views import *
+from invoice.views import *
 urlpatterns = [
     # Following paths are related to APIs:
 
@@ -70,5 +71,8 @@ urlpatterns = [
     path("forkliftPanel/", forklift_panel),
     path("cancel/", cancel),
     path("report/", report_page),
+
+    
+    path("invoice/", invoice_page),
 ]
 
