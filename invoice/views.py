@@ -3,6 +3,18 @@ from django.views.decorators.csrf import csrf_exempt
 
 @csrf_exempt
 def invoice_page(request):
+    return render(request, 'invoice.html')
+
+@csrf_exempt
+def Havaleh(request):
+    return render(request, 'Havaleh.html')
+
+@csrf_exempt
+def SalesOrder(request):
+    return render(request, 'SalesOrder.html')
+
+@csrf_exempt
+def Purchases(request):
     if request.method == 'POST':
 
         items = []
@@ -50,4 +62,4 @@ def invoice_page(request):
             'grand_total': grand_total,
         }
 
-    return render(request, 'templates/invoice.html')
+    return render(request, 'Purchases.html')

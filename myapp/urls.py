@@ -74,5 +74,8 @@ urlpatterns = [
 
     
     path("invoice/", invoice_page),
+    path("invoice/Havaleh", Havaleh),
+    path("SalesOrder/", SalesOrder),
+    path("Purchases/", Purchases),
 ]
 

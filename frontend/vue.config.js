@@ -5,7 +5,9 @@ module.exports = defineConfig({
   publicPath: process.env.NODE_ENV === 'production' ? '/static/' : 'http://localhost:8080',
   outputDir: '../static/',
   indexPath: '../templates/_base_vue.html',
-
+  define: {
+    __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: false,
+  },
   configureWebpack: {
     devServer: {
       devMiddleware: {

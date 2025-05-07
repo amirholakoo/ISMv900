@@ -135,6 +135,22 @@ const routes = [
     name: 'Products',
     component: Products
   },
+  {
+    path: '/myapp/invoice/',
+    component: () => import('@/components/invoice.vue')
+  },
+  {
+    path: '/myapp/invoice/Havaleh',
+    component: () => import('@/components/Havaleh.vue')
+  },
+  {
+    path: '/myapp/invoice/salesorder',
+    component: () => import('@/components/salesorder.vue')
+  },
+  {
+    path: '/myapp/invoice/purchaseorder',
+    component: () => import('@/components/purchaseorder.vue')
+  }
 ]
 
 const router = createRouter({
