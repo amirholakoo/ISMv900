@@ -1,6 +1,7 @@
 from django.urls import path
 from .views import *
 from invoice.views import *
+from invoice import views
 urlpatterns = [
     # Following paths are related to APIs:
 
@@ -48,6 +49,7 @@ urlpatterns = [
     path("api/reportProducts", report_Products),
     path("api/reportConsumption", report_Consumption),
     path("api/reportAlert", report_Alert),
+    path("api/generate-purchase-order-pdf/", generate_purchase_order_pdf),
     path("ProductsPage/", products_page),
 
     # Following paths are related to Pages:
@@ -75,7 +77,8 @@ urlpatterns = [
     
     path("invoice/", invoice_page),
     path("invoice/Havaleh", Havaleh),
-    path("SalesOrder/", SalesOrder),
-    path("Purchases/", Purchases),
+    path("invoice/SalesOrder/", SalesOrder),
+    path("invoice/Purchases/", Purchases),
+    path('api/havaleh-pdf/', Havaleh, name='havaleh_pdf'),
 ]
 

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: Tahoma, sans-serif;
+            direction: rtl;
+            margin: 40px;
+        }
+
+        .title {
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .section {
+            margin-top: 20px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .field {
+            margin-bottom: 10px;
+        }
+
+        .field label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .signatures {
+            margin-top: 30px;
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+        }
+
+        .signature-field {
+            text-align: center;
+        }
+
+        .end-statement {
+            margin-top: 20px;
+            border-top: 1px solid #000;
+            padding-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="title">صورتحساب فروش</div>
+
+    <div class="grid">
+        <div class="field">
+            <label>ردیف:</label>
+            <span>{{ row }}</span>
+        </div>
+        <div class="field">
+            <label>نام کالا و مشخصات کالا:</label>
+            <span>{{ product_name }}</span>
+        </div>
+        <div class="field">
+            <label>گرماژ:</label>
+            <span>{{ grammage }}</span>
+        </div>
+        <div class="field">
+            <label>عرض کاغذ:</label>
+            <span>{{ paper_width }}</span>
+        </div>
+        <div class="field">
+            <label>نام خریدار:</label>
+            <span>{{ buyer_name }}</span>
+        </div>
+        <div class="field">
+            <label>تعداد/مقدار:</label>
+            <span>{{ quantity }}</span>
+        </div>
+        <div class="field">
+            <label>وزن کالا:</label>
+            <span>{{ product_weight }}</span>
+        </div>
+        <div class="field">
+            <label>ملاحظات:</label>
+            <span>{{ notes }}</span>
+        </div>
+        <div class="field">
+            <label>جمع:</label>
+            <span>{{ total }}</span>
+        </div>
+    </div>
+
+    <div class="signatures">
+        <div class="signature-field">
+            <label>حسابداری</label>
+            <div>{{ accounting }}</div>
+        </div>
+        <div class="signature-field">
+            <label>انبارداری</label>
+            <div>{{ warehouse }}</div>
+        </div>
+        <div class="signature-field">
+            <label>مدیرفروش</label>
+            <div>{{ sales_manager }}</div>
+        </div>
+        <div class="signature-field">
+            <label>مدیریت کارخانه</label>
+            <div>{{ factory_manager }}</div>
+        </div>
+        <div class="signature-field">
+            <label>تحویل گیرنده</label>
+            <div>{{ receiver }}</div>
+        </div>
+    </div>
+
+    <div class="end-statement">
+        <p><strong>بار صحیح و سالم تجویل اینجانب گردید:</strong></p>
+        <p>{{ end_statement }}</p>
+    </div>
+</body>
+
+</html>

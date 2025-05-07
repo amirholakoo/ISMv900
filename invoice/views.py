@@ -1,13 +1,45 @@
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
+from django.http import HttpResponse
+from django.template.loader import render_to_string
+from xhtml2pdf import pisa
+import io
+import json
 
 @csrf_exempt
 def invoice_page(request):
     return render(request, 'invoice.html')
 
+
 @csrf_exempt
 def Havaleh(request):
-    return render(request, 'Havaleh.html')
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            total_weight = sum(float(item['weight']) for item in data['items'] if item['weight'])
+
+            context = {
+                'date': data.get('date'),
+                'serial': data.get('serial'),
+                'customer': data.get('customer'),
+                'address': data.get('address'),
+                'note': data.get('note'),
+                'items': data.get('items', []),
+                'total_weight': total_weight,
+            }
+
+            html = render_to_string("havaleh.html", context)
+            result = io.BytesIO()
+            pisa_status = pisa.CreatePDF(html, dest=result)
+            if pisa_status.err:
+                return HttpResponse('خطا در تولید PDF', status=500)
+            return HttpResponse(result.getvalue(), content_type='application/pdf')
+
+        except Exception as e:
+            return HttpResponse(f"خطای داخلی: {str(e)}", status=500)
+    else:
+        return HttpResponse("فقط POST پشتیبانی می‌شود.", status=405)
+    
 
 @csrf_exempt
 def SalesOrder(request):
@@ -63,3 +95,41 @@ def Purchases(request):
         }
 
     return render(request, 'Purchases.html')
+
+@csrf_exempt
+def generate_purchase_order_pdf(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            
+            context = {
+                'row': data.get('row', ''),
+                'product_name': data.get('product_name', ''),
+                'grammage': data.get('grammage', ''),
+                'paper_width': data.get('paper_width', ''),
+                'buyer_name': data.get('buyer_name', ''),
+                'quantity': data.get('quantity', ''),
+                'product_weight': data.get('product_weight', ''),
+                'notes': data.get('notes', ''),
+                'total': data.get('total', ''),
+                'accounting': data.get('accounting', ''),
+                'warehouse': data.get('warehouse', ''),
+                'sales_manager': data.get('sales_manager', ''),
+                'factory_manager': data.get('factory_manager', ''),
+                'receiver': data.get('receiver', ''),
+                'end_statement': data.get('end_statement', '')
+            }
+
+            html = render_to_string("purchaseorder.html", context)
+            result = io.BytesIO()
+            pisa_status = pisa.CreatePDF(html, dest=result)
+            
+            if pisa_status.err:
+                return HttpResponse('خطا در تولید PDF', status=500)
+                
+            return HttpResponse(result.getvalue(), content_type='application/pdf')
+
+        except Exception as e:
+            return HttpResponse(f"خطای داخلی: {str(e)}", status=500)
+    else:
+        return HttpResponse("فقط POST پشتیبانی می‌شود.", status=405)
