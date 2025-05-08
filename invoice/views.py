@@ -1,10 +1,44 @@
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
+from django.contrib.auth.decorators import login_required
 from django.template.loader import render_to_string
 from xhtml2pdf import pisa
 import io
 import json
+
+
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt
+from django.http import HttpResponse, JsonResponse
+from django.template.loader import render_to_string
+from weasyprint import HTML
+import tempfile
+import json
+from datetime import datetime
+import jdatetime  # Install with: pip install jdatetime
+
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt
+from django.http import HttpResponse, JsonResponse
+from django.template.loader import render_to_string
+from weasyprint import HTML
+import tempfile
+import json
+import jdatetime
+
+import base64
+
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt
+from django.http import HttpResponse, JsonResponse
+from django.template.loader import render_to_string
+from django.contrib.staticfiles import finders  # Add this import
+from weasyprint import HTML
+import tempfile
+import json
+import os
+from django.conf import settings
 
 @csrf_exempt
 def invoice_page(request):
@@ -12,34 +46,50 @@ def invoice_page(request):
 
 
 @csrf_exempt
-def Havaleh(request):
+def havaleh(request):
     if request.method == "POST":
         try:
             data = json.loads(request.body)
-            total_weight = sum(float(item['weight']) for item in data['items'] if item['weight'])
+            
+            # Convert the current UTC time to Jalali
+            current_time = datetime(2025, 5, 8, 13, 23, 21)  # Your provided timestamp
+            jalali_datetime = jdatetime.datetime.fromgregorian(datetime=current_time)
+            persian_date = jalali_datetime.strftime('%Y/%m/%d')  # Format as YYYY/MM/DD in Persian
+            
+            # Calculate total weight
+            total_weight = 0
+            for item in data.get('items', []):
+                try:
+                    total_weight += float(item.get('weight', 0))
+                except (ValueError, TypeError):
+                    pass
 
             context = {
-                'date': data.get('date'),
-                'serial': data.get('serial'),
-                'customer': data.get('customer'),
-                'address': data.get('address'),
-                'note': data.get('note'),
+                'date': persian_date,  # Use the Persian date here
+                'serial': data.get('serial', ''),
                 'items': data.get('items', []),
-                'total_weight': total_weight,
+                'total_weight': f"{total_weight:,.0f}",
+                'note': data.get('note', ''),
             }
 
-            html = render_to_string("havaleh.html", context)
-            result = io.BytesIO()
-            pisa_status = pisa.CreatePDF(html, dest=result)
-            if pisa_status.err:
-                return HttpResponse('خطا در تولید PDF', status=500)
-            return HttpResponse(result.getvalue(), content_type='application/pdf')
+            # Generate HTML
+            html_string = render_to_string('havaleh.html', context)
+            
+            # Create PDF using WeasyPrint with base_url for static files
+            html = HTML(string=html_string, base_url=request.build_absolute_uri('/'))
+            pdf = html.write_pdf()
+            
+            # Return the PDF
+            response = HttpResponse(pdf, content_type='application/pdf')
+            response['Content-Disposition'] = f'attachment; filename=havaleh_{data.get("serial", "")}.pdf'
+            return response
 
         except Exception as e:
-            return HttpResponse(f"خطای داخلی: {str(e)}", status=500)
-    else:
-        return HttpResponse("فقط POST پشتیبانی می‌شود.", status=405)
-    
+            print(f"Error: {str(e)}")  # For debugging
+            return JsonResponse({
+                'error': f'Server Error: {str(e)}',
+                'status': 'error'
+            }, status=500)
 
 @csrf_exempt
 def SalesOrder(request):

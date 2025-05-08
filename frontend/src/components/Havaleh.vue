@@ -1,89 +1,179 @@
-<!-- havaleh.vue -->
 <template>
-  <div class="p-4 max-w-xl mx-auto">
-    <h2 class="text-xl font-bold mb-4 text-center">فرم صدور حواله خروج</h2>
-
-    <form @submit.prevent="submitForm">
-      <div class="mb-2">
-        <label>تاریخ:</label>
-        <input v-model="form.date" class="border p-1 w-full" type="text">
+  <div class="havaleh-form">
+    <h2>حواله خروج از انبار</h2>
+    <div class="form-header">
+      <div class="form-group">
+        <label>تاریخ ارسال:</label>
+        <input type="text" v-model="formData.date" readonly />
       </div>
-      <div class="mb-2">
+      <div class="form-group">
         <label>شماره سریال:</label>
-        <input v-model="form.serial" class="border p-1 w-full" type="text">
+        <input type="text" v-model="formData.serial" />
       </div>
-      <div class="mb-2">
-        <label>نام خریدار:</label>
-        <input v-model="form.customer" class="border p-1 w-full" type="text">
-      </div>
-      <div class="mb-2">
-        <label>آدرس:</label>
-        <input v-model="form.address" class="border p-1 w-full" type="text">
-      </div>
+    </div>
 
-      <h3 class="mt-4 font-semibold">اقلام:</h3>
-      <div v-for="(item, index) in form.items" :key="index" class="grid grid-cols-4 gap-2 mb-2">
-        <input v-model="item.width" class="border p-1" placeholder="عرض">
-        <input v-model="item.grammage" class="border p-1" placeholder="گرماژ">
-        <input v-model="item.quantity" class="border p-1" placeholder="تعداد">
-        <input v-model="item.weight" class="border p-1" placeholder="وزن">
-      </div>
+    <!-- Items Table -->
+    <div class="items-table">
+      <table>
+        <thead>
+          <tr>
+            <th>ردیف</th>
+            <th>نام کالا و مشخصات کالا</th>
+            <th>گرماژ</th>
+            <th>عرض کاغذ</th>
+            <th>نام خریدار</th>
+            <th>تعداد / مقدار</th>
+            <th>وزن کالا</th>
+            <th>عملیات</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(item, index) in formData.items" :key="index">
+            <td>{{ index + 1 }}</td>
+            <td>
+              <input type="text" v-model="item.name" />
+            </td>
+            <td>
+              <input type="text" v-model="item.gsm" />
+            </td>
+            <td>
+              <input type="text" v-model="item.width" />
+            </td>
+            <td>
+              <input type="text" v-model="item.buyer" />
+            </td>
+            <td>
+              <input type="number" v-model="item.quantity" />
+            </td>
+            <td>
+              <input type="number" v-model="item.weight" />
+            </td>
+            <td>
+              <button @click="removeItem(index)" class="remove-btn">حذف</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <button @click="addItem" class="add-btn">افزودن ردیف جدید</button>
+    </div>
 
-      <button type="button" class="bg-gray-200 px-3 py-1 rounded mb-3" @click="addItem">افزودن سطر</button>
-
-      <div class="mb-2">
+    <div class="form-footer">
+      <div class="form-group">
         <label>ملاحظات:</label>
-        <input v-model="form.note" class="border p-1 w-full" type="text">
+        <textarea v-model="formData.note"></textarea>
       </div>
-
-      <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">تولید PDF</button>
-    </form>
+      <div class="total-weight">
+        <strong>جمع کل وزن:</strong> {{ calculateTotalWeight() }}
+      </div>
+      <button @click="generatePDF" class="generate-btn">تولید PDF</button>
+    </div>
   </div>
 </template>
 
 <script>
-import axios from 'axios';
-
 export default {
+  name: 'Havaleh',
   data() {
     return {
-      form: {
-        date: '',
+      formData: {
+        date: this.getCurrentDate(), // Initialize date here
         serial: '',
-        customer: '',
-        address: '',
-        note: '',
-        items: [
-          { width: '', grammage: '', quantity: '', weight: '' }
-        ]
-      }
-    };
-  },
-  methods: {
-    addItem() {
-      this.form.items.push({ width: '', grammage: '', quantity: '', weight: '' });
-    },
-    async submitForm() {
-      try {
-        console.log('Form data being sent:', this.form);
-        const response = await axios.post('/myapp/api/havaleh-pdf/', this.form, {
-          responseType: 'blob'
-        });
-        const blob = new Blob([response.data], { type: 'application/pdf' });
-        const link = document.createElement('a');
-        link.href = window.URL.createObjectURL(blob);
-        link.download = 'havaleh.pdf';
-        link.click();
-      } catch (error) {
-        console.error("خطا در تولید PDF:", error.response || error.message);
+        items: [],
+        note: ''
       }
     }
+  },
+  created() {
+    // If you want to update the date when component is created
+    this.formData.date = this.getCurrentDate();
+  },
+  methods: {
+    getCurrentDate() {
+      // Convert to Iranian date format
+      const today = new Date();
+      // Format: YYYY/MM/DD
+      const year = today.getFullYear();
+      const month = String(today.getMonth() + 1).padStart(2, '0');
+      const day = String(today.getDate()).padStart(2, '0');
+      return `${year}/${month}/${day}`;
+    },
+    addItem() {
+      this.formData.items.push({
+        name: '',
+        gsm: '',
+        width: '',
+        buyer: '',
+        quantity: '',
+        weight: ''
+      });
+    },
+    removeItem(index) {
+      this.formData.items.splice(index, 1);
+    },
+    calculateTotalWeight() {
+      return this.formData.items.reduce((total, item) => {
+        return total + (parseFloat(item.weight) || 0);
+      }, 0).toLocaleString();
+    },
+    async generatePDF() {
+      try {
+        const requestData = {
+          date: this.formData.date,
+          serial: this.formData.serial,
+          items: this.formData.items,
+          note: this.formData.note
+        };
+
+        console.log('Form data being sent:', requestData);
+
+        const response = await fetch('/myapp/api/havaleh-pdf/', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': this.getCookie('csrftoken'),
+          },
+          body: JSON.stringify(requestData),
+          credentials: 'include'
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Error generating PDF');
+        }
+
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `havaleh_${this.formData.serial}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+
+      } catch (error) {
+        console.error('خطا در تولید PDF:', error);
+        alert('خطا در تولید PDF: ' + error.message);
+      }
+    },
+    getCookie(name) {
+      let cookieValue = null;
+      if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+          const cookie = cookies[i].trim();
+          if (cookie.substring(0, name.length + 1) === (name + '=')) {
+            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+            break;
+          }
+        }
+      }
+      return cookieValue;
+    }
   }
-};
+}
 </script>
 
 <style scoped>
-input {
-  text-align: right;
-}
+/* ... Your existing styles ... */
 </style>
