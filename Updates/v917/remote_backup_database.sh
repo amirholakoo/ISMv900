@@ -4,12 +4,12 @@
 # This script backs up the SQLite database to a remote Raspberry Pi
 
 # Database path
-DB_PATH="/home/admin/Dowmloads/ISMv900/db.sqlite3"
+DB_PATH="/home/admin/Downloads/ISMv900/db.sqlite3"
 
 # Remote backup settings
 REMOTE_USER="admin"
 REMOTE_IP="192.168.1.26"
-REMOTE_DIR="/home/admin/Dowmloads/ISMv900"
+REMOTE_DIR="/home/admin/Downloads/ISMv900"
 
 # Get current timestamp
 TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
@@ -28,7 +28,7 @@ rm "$TEMP_BACKUP"
 ssh "$REMOTE_USER@$REMOTE_IP" "ls -t $REMOTE_DIR/database_backup_* | tail -n +222 | xargs -r rm"
 
 # Log the backup
-echo "Remote backup created at: $TIMESTAMP" >> "/home/admin/Dowmloads/ISMv900/remote_backup_log.txt"
+echo "Remote backup created at: $TIMESTAMP" >> "/home/admin/Downloads/ISMv900/remote_backup_log.txt"
 ssh "$REMOTE_USER@$REMOTE_IP" "echo 'Backup received at: $TIMESTAMP' >> $REMOTE_DIR/remote_backup_log.txt"
 
 echo "Remote backup completed successfully!"
