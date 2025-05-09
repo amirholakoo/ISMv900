@@ -1,4 +1,11 @@
 ```
+
+chmod +x /home/admin/Downloads/ISMv900/fix_cron_permissions.sh
+/home/admin/Downloads/ISMv900/fix_cron_permissions.sh
+
+./setup_backup_task.sh
+
+
 chmod +x /home/admin/Dowmloads/ISMv900/setup_remote_backup.sh
 chmod +x /home/admin/Dowmloads/ISMv900/remote_backup_database.sh
 
