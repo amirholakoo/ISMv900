@@ -54,7 +54,7 @@ pip install django-cors-headers
 pip install daphne
 
 # OR install all requirements from a file
-#pip install -r requirements.txt
+pip install -r requirements.txt
 
 echo " Create static/dist directories in the project root"
 mkdir -p static/dist
