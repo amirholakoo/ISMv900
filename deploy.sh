@@ -51,6 +51,7 @@ pip install qrcode
 pip install channels
 pip install pillow
 pip install django-cors-headers
+pip install daphne
 
 # OR install all requirements from a file
 #pip install -r requirements.txt
