@@ -1,4 +1,5 @@
 ```
+sudo chmod -R 755 frontend/
 
 chmod +x /home/admin/Downloads/ISMv900/fix_cron_permissions.sh
 /home/admin/Downloads/ISMv900/fix_cron_permissions.sh
