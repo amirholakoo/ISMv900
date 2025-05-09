@@ -5,3 +5,6 @@ jdatetime
 qrcode
 psycopg2-binary
 daphne
+channels
+pillow
+django-cors-headers
