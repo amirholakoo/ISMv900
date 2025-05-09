@@ -258,3 +258,9 @@ Clone: git clone https://github.com/amirholakoo/ISMv900.git
 
 `sudo chmod -R 755 frontend/`
 
+```
+sudo apt install snapd
+sudo reboot
+sudo snap install snapd
+sudo snap install sqlitebrowser
+```
