@@ -255,3 +255,6 @@ Clone: git clone https://github.com/amirholakoo/ISMv900.git
 
 `python manage.py runserver`
 
+
+`sudo chmod -R 755 frontend/`
+
