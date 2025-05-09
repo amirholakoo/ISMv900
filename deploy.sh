@@ -48,6 +48,9 @@ pip install jdatetime
 pip install pandas
 pip install openpyxl
 pip install qrcode
+pip install channels
+pip install pillow
+pip install django-cors-headers
 
 # OR install all requirements from a file
 #pip install -r requirements.txt
