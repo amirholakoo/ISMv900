@@ -10,6 +10,7 @@ SHELL=/bin/bash
 
 # Remote backup every 5 minutes
 */5 * * * * /home/admin/Downloads/ISMv900/remote_backup_database.sh >> /home/admin/Downloads/ISMv900/cron_log.txt 2>&1
+*/15 * * * * /home/admin/Downloads/ISMv900/backup_database.sh
 "
 
 # Add proper cron job with full environment
