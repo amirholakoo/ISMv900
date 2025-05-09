@@ -3,7 +3,7 @@
 # Setup passwordless SSH for database backups to remote Raspberry Pi
 REMOTE_IP="192.168.1.26"
 REMOTE_USER="admin"
-REMOTE_DIR="/home/admin/Dowmloads/ISMv900"
+REMOTE_DIR="/home/admin/Downloads/ISMv900"
 
 echo "Setting up passwordless SSH to $REMOTE_USER@$REMOTE_IP"
 
