@@ -91,9 +91,53 @@ def havaleh(request):
                 'status': 'error'
             }, status=500)
 
+from django.views.decorators.csrf import csrf_exempt
+from django.http import HttpResponse, JsonResponse
+from django.template.loader import render_to_string
+from weasyprint import HTML
+import json
+from datetime import datetime
+import jdatetime
+
 @csrf_exempt
-def SalesOrder(request):
-    return render(request, 'SalesOrder.html')
+def sales_order(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            current_time = datetime.now()
+            jalali_datetime = jdatetime.datetime.fromgregorian(datetime=current_time)
+            persian_date = jalali_datetime.strftime('%Y/%m/%d')
+            total_amount = 0
+            items = []
+            for item in data.get('items', []):
+                quantity = float(item.get('quantity', 0))
+                price = float(item.get('price', 0))
+                total = quantity * price
+                items.append({
+                    'description': item.get('description', ''),
+                    'quantity': quantity,
+                    'price': price,
+                    'total': total
+                })
+                total_amount += total
+            context = {
+                'date': persian_date,
+                'serial': data.get('serial', ''),
+                'customer': data.get('customer', ''),
+                'economic_code': data.get('economic_code', ''),
+                'national_id': data.get('national_id', ''),
+                'items': items,
+                'total_amount': f"{total_amount:,.0f}",
+                'note': data.get('note', ''),
+            }
+            html_string = render_to_string('sales_order.html', context)
+            html = HTML(string=html_string, base_url=request.build_absolute_uri('/'))
+            pdf = html.write_pdf()
+            response = HttpResponse(pdf, content_type='application/pdf')
+            response['Content-Disposition'] = f'attachment; filename=sales_order_{data.get("serial", "")}.pdf'
+            return response
+        except Exception as e:
+            return JsonResponse({'error': f'Server Error: {str(e)}', 'status': 'error'}, status=500)
 
 @csrf_exempt
 def Purchases(request):

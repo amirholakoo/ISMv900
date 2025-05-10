@@ -1,0 +1,187 @@
+{% load static %}
+<!DOCTYPE html>
+<html dir="rtl" lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <title>پیش فاکتور فروش</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            direction: rtl;
+            background: white;
+            margin: 0;
+            padding: 0;
+        }
+        .order-copy {
+            width: 650px;
+            margin: 24px auto;
+            border: 1px solid #222;
+            background: #fff;
+            padding: 18px 16px 80px 16px;
+            box-sizing: border-box;
+            min-height: 240px;
+            page-break-inside: avoid;
+            position: relative;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 14px;
+        }
+        .logo-section {
+            width: 70px;
+            text-align: right;
+        }
+        .logo-section img {
+            width: 55px;
+            height: 55px;
+            object-fit: contain;
+            display: block;
+            margin-bottom: 2px;
+        }
+        .company-info {
+            flex: 1;
+            text-align: center;
+            margin: 0 5px;
+        }
+        .company-name {
+            font-size: 13pt;
+            font-weight: bold;
+            margin-bottom: 2px;
+        }
+        .document-title {
+            font-size: 11pt;
+            margin-bottom: 0;
+        }
+        .document-info {
+            width: 120px;
+            text-align: left;
+            font-size: 9pt;
+            line-height: 1.7;
+        }
+        .customer-info {
+            font-size: 10pt;
+            margin-bottom: 10px;
+            text-align: right;
+        }
+        .table-container {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+        table {
+            width: 97%;
+            margin: 0 auto;
+            border-collapse: collapse;
+            font-size: 10pt;
+            table-layout: fixed;
+        }
+        th, td {
+            border: 1px solid #222;
+            padding: 7px 6px 6px 6px;
+            text-align: center;
+            font-family: Arial, sans-serif;
+        }
+        th {
+            background-color: #f7f7f7;
+            font-weight: bold;
+        }
+        .col-1 { width: 7%; }
+        .col-2 { width: 36%; }
+        .col-3 { width: 12%; }
+        .col-4 { width: 16%; }
+        .col-5 { width: 18%; }
+        .total-row td {
+            font-weight: bold;
+            background-color: transparent;
+            border-top: 2px solid #222;
+        }
+        .notes {
+            text-align: right;
+            margin: 9px 0 0 0;
+            font-size: 9pt;
+            line-height: 1.7;
+        }
+        .footer {
+            display: flex;
+            justify-content: space-between;
+            gap: 6px;
+            position: absolute;
+            bottom: 35px;
+            left: 16px;
+            right: 16px;
+        }
+        .signature-line {
+            flex: 1;
+            text-align: center;
+            border-top: 1px solid #222;
+            padding-top: 2px;
+            font-size: 9pt;
+        }
+    </style>
+</head>
+<body>
+    {% for i in '123'|make_list %}
+    <div class="order-copy">
+        <div class="header">
+            <div class="logo-section">
+                <img src="{% static 'images/homayoun-logo.png' %}" alt="Homayoun Logo">
+                <div>همایون</div>
+                <div>HOMAYOUN</div>
+            </div>
+            <div class="company-info">
+                <div class="company-name">شرکت صنایع تولیدی کاغذ و مقوای همایون</div>
+                <div class="document-title">پیش فاکتور فروش</div>
+            </div>
+            <div class="document-info">
+                <div>تاریخ: {{ date }}</div>
+                <div>شماره سریال: {{ serial }}</div>
+            </div>
+        </div>
+        <div class="customer-info">
+            مشتری: {{ customer|default:"-" }}<br>
+            کد اقتصادی: {{ economic_code|default:"-" }}<br>
+            شناسه ملی: {{ national_id|default:"-" }}
+        </div>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th class="col-1">ردیف</th>
+                        <th class="col-2">شرح کالا</th>
+                        <th class="col-3">تعداد</th>
+                        <th class="col-4">قیمت واحد</th>
+                        <th class="col-5">جمع</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in items %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ item.description }}</td>
+                        <td>{{ item.quantity }}</td>
+                        <td>{{ item.price }}</td>
+                        <td>{{ item.total }}</td>
+                    </tr>
+                    {% endfor %}
+                    <tr class="total-row">
+                        <td colspan="4" style="text-align: center;">جمع کل</td>
+                        <td>{{ total_amount }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="notes">
+            <div>ملاحظات: {{ note|default:"-" }}</div>
+        </div>
+        <div class="footer">
+            <div class="signature-line">حسابداری</div>
+            <div class="signature-line">مدیر فروش</div>
+            <div class="signature-line">مدیریت کارخانه</div>
+            <div class="signature-line">تحویل گیرنده</div>
+        </div>
+    </div>
+    {% endfor %}
+</body>
+</html>

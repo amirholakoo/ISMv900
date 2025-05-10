@@ -83,7 +83,8 @@ urlpatterns = [
 
     path("invoice/", invoice_page),
     path("invoice/havaleh", havaleh),
-    path("invoice/SalesOrder/", SalesOrder),
+    path("api/sales-order-pdf/", sales_order, name='sales-order-pdf'),
+    path("invoice/sales-order", sales_order),
     path("invoice/Purchases/", Purchases),
 ]+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 

@@ -1,5 +1,8 @@
 {
   "devDependencies": {
     "html-loader": "^5.1.0"
+  },
+  "dependencies": {
+    "html2pdf.js": "^0.10.3"
   }
 }
