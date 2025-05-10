@@ -1,6 +1,6 @@
 <template>
   <div class="sales-order-container">
-    <!-- Form for user input -->
+    <!-- Form section (unchanged) -->
     <form @submit.prevent="submitForm">
       <div class="form-row">
         <label>شماره فاکتور:</label>
@@ -13,24 +13,24 @@
         <input v-model="form.buyer_name" required />
         <label>شماره اقتصادی خریدار:</label>
         <input v-model="form.buyer_economic_code" />
-      </div>
-      <div class="form-row">
         <label>شماره ثبت خریدار:</label>
         <input v-model="form.buyer_reg" />
-        <label>شماره پستی خریدار:</label>
+        <label>کد پستی خریدار:</label>
         <input v-model="form.buyer_postcode" />
+        <label>تلفن خریدار:</label>
+        <input v-model="form.buyer_phone" />
       </div>
       <div class="form-row">
-        <label>مشخصات فروشنده:</label>
+        <label>نام فروشنده:</label>
         <input v-model="form.seller_name" />
         <label>شماره اقتصادی فروشنده:</label>
         <input v-model="form.seller_economic_code" />
-      </div>
-      <div class="form-row">
         <label>شماره ثبت فروشنده:</label>
         <input v-model="form.seller_reg" />
-        <label>شماره پستی فروشنده:</label>
+        <label>کد پستی فروشنده:</label>
         <input v-model="form.seller_postcode" />
+        <label>تلفن فروشنده:</label>
+        <input v-model="form.seller_phone" />
       </div>
       <table class="input-table">
         <thead>
@@ -62,52 +62,61 @@
       <button type="submit" class="preview-btn">پیش نمایش</button>
     </form>
 
-    <!-- Preview area for PDF/export -->
+    <!-- Invoice Preview for PDF -->
     <div ref="pdfPreview" v-if="showData" class="pdf-preview">
       <div class="invoice-main">
+        <div class="invoice-title">صورت حساب فروش کالا</div>
+        <table class="invoice-details-table">
+          <tr>
+            <td class="detail-title">مشخصات فروشنده</td>
+            <td>نام فروشنده: {{ form.seller_name }}</td>
+            <td>شماره اقتصادی: {{ form.seller_economic_code }}</td>
+            <td>شماره ثبت: {{ form.seller_reg }}</td>
+            <td>کد پستی: {{ form.seller_postcode }}</td>
+            <td>تلفن: {{ form.seller_phone }}</td>
+          </tr>
+          <tr>
+            <td class="detail-title">مشخصات خریدار</td>
+            <td>نام خریدار: {{ form.buyer_name }}</td>
+            <td>شماره اقتصادی: {{ form.buyer_economic_code }}</td>
+            <td>شماره ثبت: {{ form.buyer_reg }}</td>
+            <td>کد پستی: {{ form.buyer_postcode }}</td>
+            <td>تلفن: {{ form.buyer_phone }}</td>
+          </tr>
+          <tr>
+            <td class="detail-title">شماره فاکتور</td>
+            <td colspan="2">{{ form.serial }}</td>
+            <td class="detail-title">تاریخ</td>
+            <td colspan="2">{{ form.date }}</td>
+          </tr>
+        </table>
         <table class="invoice-table">
-          <tr>
-            <td class="cell-title" colspan="8">صورت حساب فروش کالا</td>
-          </tr>
-          <tr>
-            <td colspan="2">شماره: {{ form.serial }}</td>
-            <td colspan="2">تاریخ: {{ form.date }}</td>
-            <td colspan="2">شماره ثبت فروشنده: {{ form.seller_reg }}</td>
-            <td colspan="2">شماره اقتصادی فروشنده: {{ form.seller_economic_code }}</td>
-          </tr>
-          <tr>
-            <td colspan="2">نام خریدار: {{ form.buyer_name }}</td>
-            <td colspan="2">شماره اقتصادی خریدار: {{ form.buyer_economic_code }}</td>
-            <td colspan="2">شماره ثبت خریدار: {{ form.buyer_reg }}</td>
-            <td colspan="2">کد پستی خریدار: {{ form.buyer_postcode }}</td>
-          </tr>
-          <tr>
-            <td colspan="2">نام فروشنده: {{ form.seller_name }}</td>
-            <td colspan="2">کد پستی فروشنده: {{ form.seller_postcode }}</td>
-            <td colspan="4">تلفن: 026-44388386</td>
-          </tr>
-          <tr class="header-row">
-            <th>شرح کالا</th>
-            <th>کد کالا</th>
-            <th>تعداد</th>
-            <th>واحد</th>
-            <th>مبلغ واحد</th>
-            <th>مبلغ کل</th>
-            <th>ملاحظات</th>
-          </tr>
-          <tr v-for="item in form.items" :key="item.code + item.description">
-            <td>{{ item.description }}</td>
-            <td>{{ item.code }}</td>
-            <td>{{ item.quantity }}</td>
-            <td>{{ item.unit }}</td>
-            <td>{{ formatNumber(item.price) }}</td>
-            <td>{{ formatNumber(item.total) }}</td>
-            <td>{{ item.comment }}</td>
-          </tr>
-          <tr>
-            <td colspan="5" class="total-label">جمع کل</td>
-            <td colspan="2" class="total-value">{{ formatNumber(totalAmount) }}</td>
-          </tr>
+          <thead>
+            <tr>
+              <th>شرح کالا</th>
+              <th>کد کالا</th>
+              <th>تعداد</th>
+              <th>واحد</th>
+              <th>مبلغ واحد</th>
+              <th>مبلغ کل</th>
+              <th>ملاحظات</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="item in form.items" :key="item.code + item.description">
+              <td>{{ item.description }}</td>
+              <td>{{ item.code }}</td>
+              <td>{{ item.quantity }}</td>
+              <td>{{ item.unit }}</td>
+              <td>{{ formatNumber(item.price) }}</td>
+              <td>{{ formatNumber(item.total) }}</td>
+              <td>{{ item.comment }}</td>
+            </tr>
+            <tr>
+              <td colspan="5" class="total-label">جمع کل</td>
+              <td colspan="2" class="total-value">{{ formatNumber(totalAmount) }}</td>
+            </tr>
+          </tbody>
         </table>
         <div class="footer-row">
           <div>مبلغ قابل پرداخت به حروف و عدد: ..........................................</div>
@@ -123,11 +132,7 @@
 </template>
 
 <script>
-
 import html2pdf from "html2pdf.js";
-
-
-
 export default {
   name: 'SalesOrder',
   data() {
@@ -139,10 +144,12 @@ export default {
         buyer_economic_code: '',
         buyer_reg: '',
         buyer_postcode: '',
+        buyer_phone: '',
         seller_name: '',
         seller_economic_code: '',
         seller_reg: '',
         seller_postcode: '',
+        seller_phone: '',
         items: [
           { description: '', code: '', quantity: 1, unit: '', price: 0, total: 0, comment: '' }
         ]
@@ -166,24 +173,21 @@ export default {
       this.form.items.splice(idx, 1);
     },
     submitForm() {
-    this.showData = true;
-    // Don't generate the PDF here!
-  },
-  async downloadPDF() {
-    // Wait for DOM update to finish before generating PDF
-    await this.$nextTick();
-    // Now generate the PDF
-    html2pdf(this.$refs.pdfPreview, {
-      margin: 0.2,
-      filename: `sales_order_${this.form.serial}.pdf`,
-      html2canvas: { scale: 2 },
-      jsPDF: { orientation: "landscape", unit: "mm", format: "a4" }
-    });
-  },
+      this.showData = true;
+    },
     formatNumber(val) {
       if (val == null || val === '') return '';
       return Number(val).toLocaleString('en-US', { minimumFractionDigits: 0 });
     },
+    async downloadPDF() {
+      await this.$nextTick();
+      html2pdf(this.$refs.pdfPreview, {
+        margin: 0.2,
+        filename: `sales_order_${this.form.serial}.pdf`,
+        html2canvas: { scale: 2 },
+        jsPDF: { orientation: "landscape", unit: "mm", format: "a4" }
+      });
+    }
   }
 }
 </script>
@@ -200,6 +204,7 @@ export default {
   display: flex;
   gap: 1em;
   margin-bottom: 8px;
+  flex-wrap: wrap;
 }
 .input-table {
   width: 100%;
@@ -228,6 +233,30 @@ export default {
   background: white;
   padding: 0;
 }
+.invoice-title {
+  text-align: center;
+  font-size: 1.6em;
+  font-weight: bold;
+  margin: 30px 0 18px 0;
+  letter-spacing: 1px;
+}
+.invoice-details-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 16px;
+  font-size: 1em;
+}
+.invoice-details-table td {
+  border: 1px solid #888;
+  padding: 6px 10px;
+  text-align: right;
+  background: #f6f6f6;
+}
+.invoice-details-table .detail-title {
+  background: #e7e7e7;
+  font-weight: bold;
+  text-align: center;
+}
 .invoice-table {
   width: 100%;
   border-collapse: collapse;
@@ -242,15 +271,6 @@ export default {
 .invoice-table th {
   background: #ececec;
   font-weight: bold;
-}
-.cell-title {
-  background: #e7e7e7;
-  font-size: 1.3em;
-  font-weight: bold;
-  text-align: center;
-}
-.header-row th {
-  background: #dedede;
 }
 .total-label {
   background: #e7e7e7;
