@@ -166,20 +166,24 @@ export default {
       this.form.items.splice(idx, 1);
     },
     submitForm() {
-      this.showData = true;
-    },
+    this.showData = true;
+    // Don't generate the PDF here!
+  },
+  async downloadPDF() {
+    // Wait for DOM update to finish before generating PDF
+    await this.$nextTick();
+    // Now generate the PDF
+    html2pdf(this.$refs.pdfPreview, {
+      margin: 0.2,
+      filename: `sales_order_${this.form.serial}.pdf`,
+      html2canvas: { scale: 2 },
+      jsPDF: { orientation: "landscape", unit: "mm", format: "a4" }
+    });
+  },
     formatNumber(val) {
       if (val == null || val === '') return '';
       return Number(val).toLocaleString('en-US', { minimumFractionDigits: 0 });
     },
-    downloadPDF() {
-  window.html2pdf(this.$refs.pdfPreview, {
-    margin: 0.2,
-    filename: `sales_order_${this.form.serial}.pdf`,
-    html2canvas: { scale: 2 },
-    jsPDF: { orientation: "landscape", unit: "mm", format: "a4" }
-  });
-}
   }
 }
 </script>
