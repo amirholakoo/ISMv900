@@ -1,0 +1,7 @@
+Django
+pandas
+openpyxl
+jdatetime
+qrcode
+psycopg2-binary
+daphne
